@@ -1,0 +1,12 @@
+{
+  "name": "weraser-prototype",
+  "version": "1.0.0",
+  "description": "Weraser AI Knowledge Platform Prototype",
+  "scripts": {
+    "dev": "npx http-server . -p 3000 -o",
+    "build": "echo 'Static site - no build needed'"
+  },
+  "keywords": ["weraser", "ai", "knowledge-management", "rag"],
+  "author": "Weraser Team",
+  "license": "MIT"
+}
