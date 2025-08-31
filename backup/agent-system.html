@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weraser Agent System - Phase 2</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Phase 2 에이전트 시스템 스타일 */
+        .agent-system-container {
+            display: flex;
+            height: calc(100vh - 80px);
+        }
+        
+        /* 에이전트 선택 패널 */
+        .agent-panel {
+            width: 100px;
+            background: linear-gradient(180deg, #0A0E27 0%, #1a1f3a 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 0;
+        }
+        
+        .agent-selector-vertical {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .agent-btn {
+            width: 70px;
+            height: 70px;
+            border-radius: 12px;
+            border: 2px solid transparent;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .agent-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+        
+        .agent-btn--active {
+            background: linear-gradient(135deg, #0066FF, #00D4AA);
+            border-color: #00D4AA;
+            box-shadow: 0 4px 12px rgba(0, 212, 170, 0.4);
+        }
+        
+        .agent-btn__icon {
+            font-size: 1.5rem;
+            margin-bottom: 4px;
+        }
+        
+        .agent-btn__name {
+            font-size: 0.65rem;
+            font-weight: 600;
+        }
+        
+        .agent-btn__badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #10B981;
+            color: white;
+            font-size: 0.5rem;
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
+        
+        /* 작업 영역 */
+        .work-area {
+            flex: 1;
+            display: flex;
+        }
+        
+        .work-sidebar {
+            width: 300px;
+            background: #f9fafb;
+            border-right: 1px solid #e5e7eb;
+            padding: 20px;
+        }
+        
+        .work-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* 에이전트 정보 카드 */
+        .agent-info-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .agent-info-card__title {
+            font-size: 1.125rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #0A0E27;
+        }
+        
+        .agent-info-card__desc {
+            font-size: 0.875rem;
+            color: #6B7280;
+            margin-bottom: 16px;
+        }
+        
+        .agent-capabilities {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .capability-tag {
+            padding: 4px 8px;
+            background: #E0F2FE;
+            color: #0066FF;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        /* 작업 템플릿 */
+        .work-templates {
+            margin-top: 20px;
+        }
+        
+        .template-item {
+            background: white;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .template-item:hover {
+            background: #f0f9ff;
+            border-color: #0066FF;
+        }
+        
+        .template-item__title {
+            font-weight: 600;
+            font-size: 0.875rem;
+            margin-bottom: 4px;
+        }
+        
+        .template-item__desc {
+            font-size: 0.75rem;
+            color: #6B7280;
+        }
+        
+        /* 실시간 처리 상태 */
+        .processing-status {
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px;
+        }
+        
+        .processing-steps {
+            margin-top: 16px;
+        }
+        
+        .step-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .step-indicator {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            margin-right: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .step-indicator--complete {
+            background: #10B981;
+            color: white;
+        }
+        
+        .step-indicator--active {
+            background: #0066FF;
+            color: white;
+            animation: pulse 1.5s infinite;
+        }
+        
+        .step-indicator--pending {
+            background: #e5e7eb;
+            color: #6B7280;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(0, 102, 255, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(0, 102, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 102, 255, 0); }
+        }
+        
+        /* 아웃풋 결과 */
+        .output-container {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        
+        .output-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+        
+        .output-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .accuracy-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 12px;
+            background: linear-gradient(135deg, #10B981, #059669);
+            color: white;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+        
+        .hs-code-result {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-top: 20px;
+        }
+        
+        .hs-code-item {
+            padding: 16px;
+            background: #f9fafb;
+            border-radius: 8px;
+            border-left: 4px solid #0066FF;
+        }
+        
+        .hs-code-item__product {
+            font-size: 0.875rem;
+            color: #6B7280;
+            margin-bottom: 4px;
+        }
+        
+        .hs-code-item__code {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: #0A0E27;
+            margin-bottom: 8px;
+        }
+        
+        .hs-code-item__saving {
+            font-size: 0.875rem;
+            color: #10B981;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header__logo">
+                <h1>Weraser Agents</h1>
+                <span class="header__tagline">Phase 2: 실제 업무 처리</span>
+            </div>
+            <nav class="header__nav">
+                <ul class="nav__list">
+                    <li class="nav__item">
+                        <span class="accuracy-badge">✓ 99.4% 정확도</span>
+                    </li>
+                    <li class="nav__item">
+                        <span>처리 시간: 24시간 → 1분</span>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Agent System Container -->
+    <div class="agent-system-container">
+        <!-- 에이전트 선택 패널 -->
+        <div class="agent-panel">
+            <div class="agent-selector-vertical">
+                <div class="agent-btn" data-agent="general">
+                    <span class="agent-btn__icon">🤖</span>
+                    <span class="agent-btn__name">일반</span>
+                </div>
+                <div class="agent-btn agent-btn--active" data-agent="customs">
+                    <span class="agent-btn__icon">🛃</span>
+                    <span class="agent-btn__name">관세</span>
+                    <span class="agent-btn__badge">활성</span>
+                </div>
+                <div class="agent-btn" data-agent="logistics">
+                    <span class="agent-btn__icon">📦</span>
+                    <span class="agent-btn__name">물류</span>
+                </div>
+                <div class="agent-btn" data-agent="legal" style="opacity: 0.5;">
+                    <span class="agent-btn__icon">⚖️</span>
+                    <span class="agent-btn__name">법무</span>
+                </div>
+                <div class="agent-btn" data-agent="accounting" style="opacity: 0.5;">
+                    <span class="agent-btn__icon">💰</span>
+                    <span class="agent-btn__name">회계</span>
+                </div>
+                <div class="agent-btn" data-agent="patent" style="opacity: 0.5;">
+                    <span class="agent-btn__icon">💡</span>
+                    <span class="agent-btn__name">특허</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 작업 영역 -->
+        <div class="work-area">
+            <!-- 사이드바 -->
+            <aside class="work-sidebar">
+                <!-- 에이전트 정보 -->
+                <div class="agent-info-card">
+                    <h3 class="agent-info-card__title">🛃 AI 관세 전문가</h3>
+                    <p class="agent-info-card__desc">
+                        램리서치에서 검증된 99.4% 정확도로 HS Code 분류와 관세 최적화를 수행합니다
+                    </p>
+                    <div class="agent-capabilities">
+                        <span class="capability-tag">HS Code 분류</span>
+                        <span class="capability-tag">FTA 활용</span>
+                        <span class="capability-tag">관세 최적화</span>
+                        <span class="capability-tag">실시간 연동</span>
+                    </div>
+                </div>
+
+                <!-- 작업 템플릿 -->
+                <div class="work-templates">
+                    <h4 style="font-size: 0.875rem; color: #6B7280; margin-bottom: 12px;">빠른 작업</h4>
+                    
+                    <div class="template-item" onclick="startHSClassification()">
+                        <div class="template-item__title">HS Code 일괄 분류</div>
+                        <div class="template-item__desc">Excel 파일의 제품 목록 자동 분류</div>
+                    </div>
+                    
+                    <div class="template-item">
+                        <div class="template-item__title">FTA 적용 분석</div>
+                        <div class="template-item__desc">최적 FTA 경로 자동 탐색</div>
+                    </div>
+                    
+                    <div class="template-item">
+                        <div class="template-item__title">관세 절감 시뮬레이션</div>
+                        <div class="template-item__desc">대체 공급처 및 경로 분석</div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- 메인 작업 영역 -->
+            <main class="work-main">
+                <!-- 처리 상태 -->
+                <div class="processing-status" id="processingStatus" style="display: none;">
+                    <h3 style="font-size: 1.125rem; font-weight: 700; margin-bottom: 4px;">
+                        HS Code 분류 작업 진행 중
+                    </h3>
+                    <p style="font-size: 0.875rem; color: #6B7280;">
+                        8,471개 제품 분석 중...
+                    </p>
+                    
+                    <div class="processing-steps">
+                        <div class="step-item">
+                            <span class="step-indicator step-indicator--complete">✓</span>
+                            <span>Excel 파일 파싱 완료 (8,471개 제품)</span>
+                        </div>
+                        <div class="step-item">
+                            <span class="step-indicator step-indicator--complete">✓</span>
+                            <span>제품 설명 자연어 분석</span>
+                        </div>
+                        <div class="step-item">
+                            <span class="step-indicator step-indicator--active">...</span>
+                            <span>관세청 DB 실시간 매칭 (진행률: 67%)</span>
+                        </div>
+                        <div class="step-item">
+                            <span class="step-indicator step-indicator--pending">4</span>
+                            <span>FTA 적용 가능성 검토</span>
+                        </div>
+                        <div class="step-item">
+                            <span class="step-indicator step-indicator--pending">5</span>
+                            <span>최적화 전략 수립</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 초기 화면 -->
+                <div class="chat-messages" id="initialScreen" style="padding: 40px; text-align: center;">
+                    <div style="font-size: 3rem; margin-bottom: 20px;">🛃</div>
+                    <h2 style="font-size: 1.5rem; margin-bottom: 12px;">AI 관세 전문가가 대기 중입니다</h2>
+                    <p style="color: #6B7280; margin-bottom: 24px;">
+                        좌측 템플릿을 선택하거나 파일을 업로드하여 시작하세요
+                    </p>
+                    
+                    <div style="display: inline-block; padding: 20px; background: #f0f9ff; border-radius: 12px;">
+                        <h3 style="font-size: 1.125rem; margin-bottom: 12px;">실제 성과</h3>
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; text-align: left;">
+                            <div>
+                                <div style="font-size: 1.5rem; font-weight: 700; color: #0066FF;">99.4%</div>
+                                <div style="font-size: 0.875rem; color: #6B7280;">정확도</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 1.5rem; font-weight: 700; color: #10B981;">1분</div>
+                                <div style="font-size: 0.875rem; color: #6B7280;">처리 시간</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 1.5rem; font-weight: 700; color: #F59E0B;">15%</div>
+                                <div style="font-size: 0.875rem; color: #6B7280;">관세 절감</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 결과 출력 -->
+                <div class="output-container" id="outputResult" style="display: none;">
+                    <div class="output-header">
+                        <div>
+                            <h3 style="font-size: 1.25rem; font-weight: 700;">HS Code 분류 완료</h3>
+                            <p style="font-size: 0.875rem; color: #6B7280; margin-top: 4px;">
+                                처리 시간: 58초 | 정확도: 99.4%
+                            </p>
+                        </div>
+                        <div class="output-actions">
+                            <button class="btn btn--secondary">📊 상세 보고서</button>
+                            <button class="btn btn--primary">📥 Excel 다운로드</button>
+                        </div>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px;">
+                        <div style="background: #f0fdf4; padding: 16px; border-radius: 8px;">
+                            <div style="font-size: 0.875rem; color: #6B7280;">총 제품 수</div>
+                            <div style="font-size: 1.5rem; font-weight: 700; color: #059669;">8,471개</div>
+                        </div>
+                        <div style="background: #fef3c7; padding: 16px; border-radius: 8px;">
+                            <div style="font-size: 0.875rem; color: #6B7280;">FTA 적용 가능</div>
+                            <div style="font-size: 1.5rem; font-weight: 700; color: #D97706;">7,234개</div>
+                        </div>
+                        <div style="background: #dbeafe; padding: 16px; border-radius: 8px;">
+                            <div style="font-size: 0.875rem; color: #6B7280;">예상 절감액</div>
+                            <div style="font-size: 1.5rem; font-weight: 700; color: #1E40AF;">₩12.3억</div>
+                        </div>
+                    </div>
+                    
+                    <h4 style="font-size: 1rem; font-weight: 600; margin-bottom: 12px;">주요 분류 결과 (상위 10개)</h4>
+                    <div class="hs-code-result">
+                        <div class="hs-code-item">
+                            <div class="hs-code-item__product">실리콘 웨이퍼</div>
+                            <div class="hs-code-item__code">8541.10.1000</div>
+                            <div class="hs-code-item__saving">관세 0% (한-미 FTA)</div>
+                        </div>
+                        <div class="hs-code-item">
+                            <div class="hs-code-item__product">포토마스크</div>
+                            <div class="hs-code-item__code">9017.20.1000</div>
+                            <div class="hs-code-item__saving">관세 0% (한-EU FTA)</div>
+                        </div>
+                        <div class="hs-code-item">
+                            <div class="hs-code-item__product">CMP 패드</div>
+                            <div class="hs-code-item__code">6805.30.0000</div>
+                            <div class="hs-code-item__saving">대체 공급처 제안</div>
+                        </div>
+                        <div class="hs-code-item">
+                            <div class="hs-code-item__product">에칭 가스</div>
+                            <div class="hs-code-item__code">2811.21.0000</div>
+                            <div class="hs-code-item__saving">관세 5.5% → 2%</div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 24px; padding: 16px; background: #f0f9ff; border-radius: 8px;">
+                        <h4 style="font-size: 0.875rem; font-weight: 600; margin-bottom: 8px;">
+                            💡 AI 최적화 제안
+                        </h4>
+                        <ul style="font-size: 0.875rem; color: #6B7280; margin: 0; padding-left: 20px;">
+                            <li>CMP 패드를 중국 공급처로 변경 시 연간 ₩5.1억 추가 절감 가능</li>
+                            <li>234개 제품이 잘못된 HS Code로 신고되어 있었음 (즉시 수정 필요)</li>
+                            <li>한-싱가포르 FTA 활용 시 추가 856개 제품 관세 면제 가능</li>
+                        </ul>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // 에이전트 선택
+        document.querySelectorAll('.agent-btn:not([style*="opacity"])').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.agent-btn').forEach(b => {
+                    b.classList.remove('agent-btn--active');
+                });
+                this.classList.add('agent-btn--active');
+                
+                // 에이전트별 정보 업데이트
+                updateAgentInfo(this.dataset.agent);
+            });
+        });
+
+        // HS Code 분류 시작
+        function startHSClassification() {
+            // 초기 화면 숨기기
+            document.getElementById('initialScreen').style.display = 'none';
+            document.getElementById('outputResult').style.display = 'none';
+            
+            // 처리 상태 표시
+            document.getElementById('processingStatus').style.display = 'block';
+            
+            // 단계별 진행 시뮬레이션
+            let steps = document.querySelectorAll('.step-indicator');
+            let currentStep = 2; // 이미 2단계까지 완료
+            
+            const interval = setInterval(() => {
+                if (currentStep < steps.length) {
+                    // 현재 단계 완료
+                    steps[currentStep].classList.remove('step-indicator--active');
+                    steps[currentStep].classList.add('step-indicator--complete');
+                    steps[currentStep].innerHTML = '✓';
+                    
+                    // 다음 단계 활성화
+                    currentStep++;
+                    if (currentStep < steps.length) {
+                        steps[currentStep].classList.remove('step-indicator--pending');
+                        steps[currentStep].classList.add('step-indicator--active');
+                        steps[currentStep].innerHTML = '...';
+                    }
+                } else {
+                    clearInterval(interval);
+                    
+                    // 결과 표시
+                    setTimeout(() => {
+                        document.getElementById('processingStatus').style.display = 'none';
+                        document.getElementById('outputResult').style.display = 'block';
+                        
+                        // 완료 알림
+                        showNotification('HS Code 분류가 완료되었습니다. 예상 절감액: ₩12.3억', 'success');
+                    }, 1000);
+                }
+            }, 1500);
+        }
+
+        // 에이전트 정보 업데이트
+        function updateAgentInfo(agentType) {
+            const agentInfo = {
+                customs: {
+                    title: '🛃 AI 관세 전문가',
+                    desc: '램리서치에서 검증된 99.4% 정확도로 HS Code 분류와 관세 최적화를 수행합니다',
+                    capabilities: ['HS Code 분류', 'FTA 활용', '관세 최적화', '실시간 연동']
+                },
+                logistics: {
+                    title: '📦 AI 물류 전문가',
+                    desc: '글로벌 공급망 최적화와 실시간 화물 추적을 제공합니다',
+                    capabilities: ['운송 경로 최적화', '재고 관리', '리드타임 예측', '비용 분석']
+                },
+                general: {
+                    title: '🤖 일반 AI 비서',
+                    desc: '문서 검색과 일상 업무를 지원합니다',
+                    capabilities: ['문서 검색', '일정 관리', '이메일 작성', '보고서 요약']
+                }
+            };
+            
+            const info = agentInfo[agentType];
+            if (info) {
+                document.querySelector('.agent-info-card__title').textContent = info.title;
+                document.querySelector('.agent-info-card__desc').textContent = info.desc;
+                
+                // 기능 태그 업데이트
+                const capabilitiesDiv = document.querySelector('.agent-capabilities');
+                capabilitiesDiv.innerHTML = info.capabilities.map(cap => 
+                    `<span class="capability-tag">${cap}</span>`
+                ).join('');
+            }
+        }
+
+        // 알림 표시
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification notification--${type}`;
+            notification.textContent = message;
+            notification.style.position = 'fixed';
+            notification.style.top = '20px';
+            notification.style.right = '20px';
+            notification.style.padding = '16px 24px';
+            notification.style.borderRadius = '8px';
+            notification.style.zIndex = '1000';
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 10);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

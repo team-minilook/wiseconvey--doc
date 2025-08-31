@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weraser - 기업의 두뇌를 복제하여 미래의 일을 지웁니다</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans KR', sans-serif;
+            line-height: 1.8;
+            color: #37352f;
+            background: #ffffff;
+        }
+        
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+        
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 20px 0;
+            border-bottom: 1px solid #e9e9e7;
+        }
+        
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #0066FF, #00D4AA);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .cta-button {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #0066FF, #00D4AA);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: transform 0.2s;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-2px);
+        }
+        
+        /* Hero Section */
+        .hero {
+            padding: 160px 0 100px;
+            text-align: center;
+            background: linear-gradient(180deg, #f7f6f3 0%, #ffffff 100%);
+        }
+        
+        .hero h1 {
+            font-size: 56px;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 24px;
+            background: linear-gradient(135deg, #37352f 0%, #0066FF 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .hero .subtitle {
+            font-size: 22px;
+            color: #787774;
+            margin-bottom: 48px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .metrics {
+            display: flex;
+            justify-content: center;
+            gap: 60px;
+            margin: 60px 0;
+        }
+        
+        .metric {
+            text-align: center;
+        }
+        
+        .metric-value {
+            font-size: 48px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #0066FF, #00D4AA);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .metric-label {
+            font-size: 16px;
+            color: #787774;
+        }
+        
+        /* Content Sections */
+        section {
+            padding: 80px 0;
+        }
+        
+        section:nth-child(even) {
+            background: #fbfbfa;
+        }
+        
+        h2 {
+            font-size: 42px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+        
+        .section-subtitle {
+            font-size: 18px;
+            color: #787774;
+            text-align: center;
+            margin-bottom: 60px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        /* Problem Cards */
+        .problem-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 32px;
+            margin-top: 48px;
+        }
+        
+        .problem-card {
+            background: white;
+            padding: 32px;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        }
+        
+        .problem-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+        
+        .problem-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        
+        .problem-desc {
+            color: #787774;
+            line-height: 1.6;
+        }
+        
+        .problem-impact {
+            margin-top: 16px;
+            font-size: 28px;
+            font-weight: bold;
+            color: #ef4444;
+        }
+        
+        /* Architecture Section */
+        .architecture-steps {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 32px;
+            margin-top: 48px;
+        }
+        
+        .step-card {
+            text-align: center;
+            padding: 32px;
+            background: white;
+            border-radius: 12px;
+        }
+        
+        .step-number {
+            display: inline-block;
+            width: 48px;
+            height: 48px;
+            line-height: 48px;
+            background: linear-gradient(135deg, #0066FF, #00D4AA);
+            color: white;
+            border-radius: 50%;
+            font-weight: bold;
+            margin-bottom: 16px;
+        }
+        
+        .step-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        
+        .step-desc {
+            color: #787774;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        /* Features Table */
+        .features-table {
+            width: 100%;
+            margin-top: 48px;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        }
+        
+        .features-table thead {
+            background: linear-gradient(135deg, #0066FF, #00D4AA);
+            color: white;
+        }
+        
+        .features-table th {
+            padding: 20px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        .features-table td {
+            padding: 20px;
+            border-bottom: 1px solid #e9e9e7;
+        }
+        
+        .features-table tbody tr:hover {
+            background: #f7f6f3;
+        }
+        
+        .feature-name {
+            font-weight: 600;
+            color: #37352f;
+        }
+        
+        .feature-problem {
+            color: #ef4444;
+        }
+        
+        .feature-solution {
+            color: #22c55e;
+        }
+        
+        /* Agent Grid */
+        .agent-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+            margin-top: 48px;
+        }
+        
+        .agent-card {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            text-align: center;
+            transition: transform 0.2s;
+            border: 2px solid transparent;
+        }
+        
+        .agent-card:hover {
+            transform: translateY(-4px);
+            border-color: #0066FF;
+        }
+        
+        .agent-icon {
+            font-size: 36px;
+            margin-bottom: 12px;
+        }
+        
+        .agent-name {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .agent-desc {
+            font-size: 14px;
+            color: #787774;
+        }
+        
+        /* Business Model */
+        .model-comparison {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 32px;
+            margin-top: 48px;
+        }
+        
+        .model-card {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            position: relative;
+            border: 2px solid #e9e9e7;
+        }
+        
+        .model-card.featured {
+            border-color: #0066FF;
+            transform: scale(1.05);
+        }
+        
+        .model-label {
+            position: absolute;
+            top: -12px;
+            left: 32px;
+            background: white;
+            padding: 0 12px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #0066FF;
+        }
+        
+        .model-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+        
+        .model-price {
+            font-size: 36px;
+            font-weight: bold;
+            color: #0066FF;
+            margin-bottom: 24px;
+        }
+        
+        .model-features {
+            list-style: none;
+        }
+        
+        .model-features li {
+            padding: 8px 0;
+            color: #787774;
+        }
+        
+        .model-features li::before {
+            content: "✓";
+            color: #22c55e;
+            font-weight: bold;
+            margin-right: 12px;
+        }
+        
+        /* Case Studies */
+        .case-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 32px;
+            margin-top: 48px;
+        }
+        
+        .case-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        }
+        
+        .case-header {
+            background: linear-gradient(135deg, #0066FF, #00D4AA);
+            color: white;
+            padding: 24px;
+        }
+        
+        .case-company {
+            font-size: 24px;
+            font-weight: 700;
+        }
+        
+        .case-industry {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .case-content {
+            padding: 24px;
+        }
+        
+        .case-metric {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e9e9e7;
+        }
+        
+        .case-before {
+            text-align: center;
+        }
+        
+        .case-after {
+            text-align: center;
+        }
+        
+        .case-label {
+            font-size: 12px;
+            color: #787774;
+            margin-bottom: 4px;
+        }
+        
+        .case-value {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .case-before .case-value {
+            color: #ef4444;
+        }
+        
+        .case-after .case-value {
+            color: #22c55e;
+        }
+        
+        /* CTA Section */
+        .cta {
+            background: linear-gradient(135deg, #0066FF, #00D4AA);
+            color: white;
+            padding: 100px 0;
+            text-align: center;
+        }
+        
+        .cta h2 {
+            color: white;
+            margin-bottom: 24px;
+        }
+        
+        .cta .subtitle {
+            font-size: 20px;
+            margin-bottom: 48px;
+            opacity: 0.95;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+        }
+        
+        .btn-white {
+            background: white;
+            color: #0066FF;
+            padding: 16px 32px;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            transition: transform 0.2s;
+        }
+        
+        .btn-white:hover {
+            transform: translateY(-2px);
+        }
+        
+        /* Footer */
+        footer {
+            background: #37352f;
+            color: white;
+            padding: 60px 0;
+            text-align: center;
+        }
+        
+        .footer-content {
+            margin-bottom: 32px;
+        }
+        
+        .footer-logo {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 16px;
+        }
+        
+        .footer-desc {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 24px;
+        }
+        
+        .footer-links {
+            display: flex;
+            gap: 32px;
+            justify-content: center;
+            margin-bottom: 32px;
+        }
+        
+        .footer-link {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        
+        .footer-link:hover {
+            color: white;
+        }
+        
+        .footer-bottom {
+            padding-top: 32px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 14px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 36px;
+            }
+            
+            .metrics {
+                flex-direction: column;
+                gap: 32px;
+            }
+            
+            .problem-grid,
+            .architecture-steps,
+            .agent-grid,
+            .model-comparison,
+            .case-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .model-card.featured {
+                transform: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <div class="logo">Weraser</div>
+            <a href="index.html" class="cta-button">시작하기</a>
+        </div>
+    </nav>
+    
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1>기업의 두뇌를 복제하여<br>미래의 일을 지웁니다</h1>
+            <p class="subtitle">
+                "We erase work with AI"<br>
+                반복적인 지식 노동은 AI가 처리하고, 인간은 창의적 사고에만 집중합니다
+            </p>
+            
+            <div class="metrics">
+                <div class="metric">
+                    <div class="metric-value">99.4%</div>
+                    <div class="metric-label">정확도</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value">0%</div>
+                    <div class="metric-label">환각 현상</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value">30x</div>
+                    <div class="metric-label">생산성 향상</div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Problem Section -->
+    <section>
+        <div class="container">
+            <h2>기업 기억상실증 (Corporate Amnesia)</h2>
+            <p class="section-subtitle">
+                "가장 소중한 자산인 '사람의 지식'이 매일 저녁 퇴근과 함께 문밖으로 걸어 나갑니다"
+            </p>
+            
+            <div class="problem-grid">
+                <div class="problem-card">
+                    <div class="problem-icon">👤</div>
+                    <h3 class="problem-title">지식의 유실</h3>
+                    <p class="problem-desc">
+                        10년차 직원이 퇴사하면 그가 쌓아온 모든 노하우와 고객 관계, 
+                        프로젝트 히스토리가 한순간에 사라집니다.
+                    </p>
+                    <div class="problem-impact">연 1억원 손실</div>
+                </div>
+                
+                <div class="problem-card">
+                    <div class="problem-icon">📚</div>
+                    <h3 class="problem-title">정보 사일로</h3>
+                    <p class="problem-desc">
+                        문서는 폴더 깊숙이 묻혀있고, 이메일은 개인 계정에 갇혀있으며,
+                        회의록은 찾을 수 없는 어딘가에 있습니다.
+                    </p>
+                    <div class="problem-impact">주 10시간 낭비</div>
+                </div>
+                
+                <div class="problem-card">
+                    <div class="problem-icon">🔄</div>
+                    <h3 class="problem-title">반복되는 실수</h3>
+                    <p class="problem-desc">
+                        과거에 해결했던 문제를 신입사원이 다시 겪고,
+                        같은 실수를 반복하며 불필요한 비용이 발생합니다.
+                    </p>
+                    <div class="problem-impact">6개월 학습 기간</div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Solution Architecture -->
+    <section>
+        <div class="container">
+            <h2>3단계 핵심 기술 아키텍처</h2>
+            <p class="section-subtitle">
+                물류라는 가장 험난한 지형에서 단련된 99.4% 정확도의 기술
+            </p>
+            
+            <div class="architecture-steps">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <h3 class="step-title">완벽한 문서 이해</h3>
+                    <p class="step-desc">
+                        99.9% OCR 정확도를 넘어 문서의 구조와 맥락, 
+                        전문적 의미까지 완벽히 파악합니다.
+                        Excel 그리드부터 손글씨 메모까지 모든 형식을 처리합니다.
+                    </p>
+                </div>
+                
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <h3 class="step-title">지능적 지식 구조화</h3>
+                    <p class="step-desc">
+                        의미 벡터(Meaning Vector)와 지식 그래프(Knowledge Graph)로 재구성.
+                        진실 교차검증(Truth Reconciliation) 알고리즘으로 
+                        가장 신뢰도 높은 단일 정보 소스를 생성합니다.
+                    </p>
+                </div>
+                
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <h3 class="step-title">전문가 AI 에이전트 생성</h3>
+                    <p class="step-desc">
+                        150개 이상의 전문화된 에이전트가 
+                        멀티 에이전트 협업 시스템(Multi-Agent Collaboration Framework)으로
+                        복합적인 문제를 해결합니다.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Core Features -->
+    <section>
+        <div class="container">
+            <h2>핵심 기능</h2>
+            <p class="section-subtitle">
+                각 기능은 실제 기업 현장의 문제를 해결하기 위해 설계되었습니다
+            </p>
+            
+            <table class="features-table">
+                <thead>
+                    <tr>
+                        <th>기능</th>
+                        <th>해결하는 문제</th>
+                        <th>제공하는 가치</th>
+                        <th>기술적 차별점</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="feature-name">Daily Operations coreChat</td>
+                        <td class="feature-problem">"어디 있는지 모르는 문서 찾기"<br>주 10시간 낭비</td>
+                        <td class="feature-solution">자연어로 질문하면<br>즉시 정확한 답변과 출처 제공</td>
+                        <td>Closed Book 방식으로<br>환각 현상 0%</td>
+                    </tr>
+                    <tr>
+                        <td class="feature-name">프로젝트 기반 구조</td>
+                        <td class="feature-problem">"부서별로 흩어진 지식"<br>70% 업무가 프로젝트 단위</td>
+                        <td class="feature-solution">프로젝트-문서 1:1<br>프로젝트-채팅 1:N 관계</td>
+                        <td>컨텍스트 명확한 분리<br>체계적 지식 관리</td>
+                    </tr>
+                    <tr>
+                        <td class="feature-name">조직/개인 문서 분리</td>
+                        <td class="feature-problem">"보안과 공유의 딜레마"<br>접근 권한 복잡성</td>
+                        <td class="feature-solution">조직 문서: 영구 보존<br>개인 문서: 프라이버시 보호</td>
+                        <td>세밀한 권한 관리<br>데이터 거버넌스</td>
+                    </tr>
+                    <tr>
+                        <td class="feature-name">AI 사고 과정 투명성</td>
+                        <td class="feature-problem">"AI를 신뢰할 수 없다"<br>블랙박스 의사결정</td>
+                        <td class="feature-solution">검색→분석→검증 과정 공개<br>모든 출처 명시</td>
+                        <td>진실 교차검증 알고리즘<br>신뢰도 점수 표시</td>
+                    </tr>
+                    <tr>
+                        <td class="feature-name">Hyper-frequent 서비스</td>
+                        <td class="feature-problem">"가끔 쓰는 신기한 기술"<br>습관화 실패</td>
+                        <td class="feature-solution">매일 쓰는 업무 도구<br>평균 세션 10분 이상</td>
+                        <td>0.3초 응답 속도<br>실시간 처리</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+    
+    <!-- AI Agents -->
+    <section>
+        <div class="container">
+            <h2>전문 AI 에이전트</h2>
+            <p class="section-subtitle">
+                150개 이상의 전문 에이전트가 24시간 일관된 품질로 서비스합니다
+            </p>
+            
+            <div class="agent-grid">
+                <div class="agent-card">
+                    <div class="agent-icon">📦</div>
+                    <h3 class="agent-name">AI 통관사</h3>
+                    <p class="agent-desc">
+                        8만개 HS Code 분류<br>
+                        99.4% 정확도<br>
+                        관세 15% 절감
+                    </p>
+                </div>
+                
+                <div class="agent-card">
+                    <div class="agent-icon">🚚</div>
+                    <h3 class="agent-name">AI 물류 전문가</h3>
+                    <p class="agent-desc">
+                        실시간 공급망 최적화<br>
+                        문서 처리 80% 감소<br>
+                        처리 시간 60% 단축
+                    </p>
+                </div>
+                
+                <div class="agent-card">
+                    <div class="agent-icon">⚖️</div>
+                    <h3 class="agent-name">AI 변호사</h3>
+                    <p class="agent-desc">
+                        계약서 검토 자동화<br>
+                        리스크 평가<br>
+                        법률 자문
+                    </p>
+                </div>
+                
+                <div class="agent-card">
+                    <div class="agent-icon">💊</div>
+                    <h3 class="agent-name">AI 의사</h3>
+                    <p class="agent-desc">
+                        의료 기록 분석<br>
+                        진단 지원<br>
+                        약물 상호작용 검토
+                    </p>
+                </div>
+                
+                <div class="agent-card">
+                    <div class="agent-icon">💼</div>
+                    <h3 class="agent-name">AI 회계사</h3>
+                    <p class="agent-desc">
+                        자동 분개<br>
+                        세무 최적화<br>
+                        재무 분석
+                    </p>
+                </div>
+                
+                <div class="agent-card">
+                    <div class="agent-icon">🔬</div>
+                    <h3 class="agent-name">AI 변리사</h3>
+                    <p class="agent-desc">
+                        특허 검색<br>
+                        선행 기술 조사<br>
+                        출원 서류 작성
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Business Model -->
+    <section>
+        <div class="container">
+            <h2>Land & Expand 비즈니스 모델</h2>
+            <p class="section-subtitle">
+                일상적인 도구로 시작하여 핵심 운영체제(OS)로 진화합니다
+            </p>
+            
+            <div class="model-comparison">
+                <div class="model-card">
+                    <span class="model-label">STAGE 1</span>
+                    <h3 class="model-title">Land - 기본 플랫폼</h3>
+                    <div class="model-price">월 5만원</div>
+                    <p style="color: #787774; margin-bottom: 24px;">사용자당 / 연간 계약시 20% 할인</p>
+                    <ul class="model-features">
+                        <li>Daily Operations coreChat</li>
+                        <li>무제한 문서 업로드</li>
+                        <li>프로젝트 관리</li>
+                        <li>AI 질의응답</li>
+                        <li>팀 협업 기능</li>
+                    </ul>
+                </div>
+                
+                <div class="model-card featured">
+                    <span class="model-label">STAGE 2</span>
+                    <h3 class="model-title">Expand - 전문 에이전트</h3>
+                    <div class="model-price">월 20만원</div>
+                    <p style="color: #787774; margin-bottom: 24px;">에이전트당 추가 / 성과 기반 보상</p>
+                    <ul class="model-features">
+                        <li>AI 통관사 (관세 15% 절감)</li>
+                        <li>AI 변호사 (계약서 자동 검토)</li>
+                        <li>AI 회계사 (자동 분개)</li>
+                        <li>멀티 에이전트 협업</li>
+                        <li>커스텀 에이전트 개발</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Case Studies -->
+    <section>
+        <div class="container">
+            <h2>실제 도입 사례</h2>
+            <p class="section-subtitle">
+                글로벌 기업들이 검증한 압도적인 성과
+            </p>
+            
+            <div class="case-grid">
+                <div class="case-card">
+                    <div class="case-header">
+                        <div class="case-company">Lam Research</div>
+                        <div class="case-industry">반도체 장비</div>
+                    </div>
+                    <div class="case-content">
+                        <div class="case-metric">
+                            <div class="case-before">
+                                <div class="case-label">도입 전</div>
+                                <div class="case-value">24시간</div>
+                            </div>
+                            <div style="font-size: 24px;">→</div>
+                            <div class="case-after">
+                                <div class="case-label">도입 후</div>
+                                <div class="case-value">1분</div>
+                            </div>
+                        </div>
+                        <p style="color: #787774;">
+                            8만개 반도체 부품 HS Code 분류 작업을 99.4% 정확도로 수행.
+                            관세 15% 절감으로 연간 수십억원 비용 절감.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="case-card">
+                    <div class="case-header">
+                        <div class="case-company">한국타이어</div>
+                        <div class="case-industry">제조업</div>
+                    </div>
+                    <div class="case-content">
+                        <div class="case-metric">
+                            <div class="case-before">
+                                <div class="case-label">도입 전</div>
+                                <div class="case-value">수동 처리</div>
+                            </div>
+                            <div style="font-size: 24px;">→</div>
+                            <div class="case-after">
+                                <div class="case-label">도입 후</div>
+                                <div class="case-value">80% 자동화</div>
+                            </div>
+                        </div>
+                        <p style="color: #787774;">
+                            글로벌 공급망 실시간 최적화.
+                            문서 데이터 입력 80% 감소, 전체 처리 시간 60% 단축.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="case-card">
+                    <div class="case-header">
+                        <div class="case-company">H-Line</div>
+                        <div class="case-industry">물류/무역</div>
+                    </div>
+                    <div class="case-content">
+                        <div class="case-metric">
+                            <div class="case-before">
+                                <div class="case-label">도입 전</div>
+                                <div class="case-value">연 5억 손실</div>
+                            </div>
+                            <div style="font-size: 24px;">→</div>
+                            <div class="case-after">
+                                <div class="case-label">도입 후</div>
+                                <div class="case-value">0원</div>
+                            </div>
+                        </div>
+                        <p style="color: #787774;">
+                            관세 분류 오류 완전 제거.
+                            FTA 혜택 극대화로 추가 비용 절감.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="case-card">
+                    <div class="case-header">
+                        <div class="case-company">Global Enterprise</div>
+                        <div class="case-industry">컨설팅</div>
+                    </div>
+                    <div class="case-content">
+                        <div class="case-metric">
+                            <div class="case-before">
+                                <div class="case-label">도입 전</div>
+                                <div class="case-value">30% 지식 유실</div>
+                            </div>
+                            <div style="font-size: 24px;">→</div>
+                            <div class="case-after">
+                                <div class="case-label">도입 후</div>
+                                <div class="case-value">100% 보존</div>
+                            </div>
+                        </div>
+                        <p style="color: #787774;">
+                            프로젝트 종료 후 지식 유실 완전 차단.
+                            모든 인사이트와 방법론 영구 보존.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- CTA Section -->
+    <section class="cta">
+        <div class="container">
+            <h2>지금 시작하세요</h2>
+            <p class="subtitle">
+                30일 무료 체험으로 AI가 만드는 업무 혁신을 경험하세요
+            </p>
+            <div class="cta-buttons">
+                <a href="index.html" class="btn-white">무료 체험 시작</a>
+                <a href="#" class="btn-white" style="background: transparent; color: white; border: 2px solid white;">데모 요청</a>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">Weraser</div>
+                <p class="footer-desc">
+                    기업의 두뇌를 복제하여 미래의 일을 지웁니다<br>
+                    "We erase work with AI"
+                </p>
+            </div>
+            
+            <div class="footer-links">
+                <a href="#" class="footer-link">회사 소개</a>
+                <a href="#" class="footer-link">제품</a>
+                <a href="#" class="footer-link">가격</a>
+                <a href="#" class="footer-link">문의</a>
+            </div>
+            
+            <div class="footer-bottom">
+                © 2024 Weraser. All rights reserved.
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

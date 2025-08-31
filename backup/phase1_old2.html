@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weraser Phase 1 - AI Knowledge Platform</title>
+    <link rel="stylesheet" href="assets/shared.css">
+    <style>
+        /* Layout Structure - Same for Phase 1 & 4 */
+        .weraser-app {
+            height: 100vh;
+            display: grid;
+            grid-template-columns: 260px 1fr 320px;
+            background: #f8f9fa;
+        }
+        
+        /* Left Sidebar - Project & Documents */
+        .sidebar {
+            background: white;
+            border-right: 1px solid #e5e7eb;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .sidebar__header {
+            padding: var(--spacing-lg);
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .sidebar__logo {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--weraser-primary);
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .sidebar__phase {
+            font-size: 0.75rem;
+            color: var(--weraser-gray);
+        }
+        
+        /* Project Section */
+        .project-section {
+            padding: var(--spacing-lg);
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .project-selector {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--spacing-sm) var(--spacing-md);
+            background: #f8f9fa;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .project-selector:hover {
+            background: #f1f3f5;
+        }
+        
+        .project-name {
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+        
+        .project-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-sm);
+            font-size: 0.75rem;
+        }
+        
+        .stat-item {
+            padding: var(--spacing-sm);
+            background: #f8f9fa;
+            border-radius: 6px;
+        }
+        
+        .stat-label {
+            color: var(--weraser-gray);
+            margin-bottom: 2px;
+        }
+        
+        .stat-value {
+            font-weight: 600;
+            color: var(--weraser-dark);
+        }
+        
+        /* Document List */
+        .documents-section {
+            flex: 1;
+            overflow-y: auto;
+            padding: var(--spacing-lg);
+        }
+        
+        .documents-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .documents-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--weraser-gray);
+            font-weight: 600;
+        }
+        
+        .data-toggle {
+            display: flex;
+            background: #f1f3f5;
+            border-radius: 6px;
+            padding: 2px;
+        }
+        
+        .data-toggle__btn {
+            padding: 4px 8px;
+            border: none;
+            background: transparent;
+            font-size: 0.75rem;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+        
+        .data-toggle__btn.active {
+            background: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .document-item {
+            display: flex;
+            align-items: center;
+            padding: var(--spacing-sm);
+            margin-bottom: var(--spacing-xs);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .document-item:hover {
+            background: #f8f9fa;
+        }
+        
+        .document-icon {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f1f3f5;
+            border-radius: 6px;
+            margin-right: var(--spacing-sm);
+            font-size: 1rem;
+        }
+        
+        .document-info {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .document-name {
+            font-size: 0.875rem;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .document-meta {
+            font-size: 0.75rem;
+            color: var(--weraser-gray);
+        }
+        
+        .document-badge {
+            padding: 2px 6px;
+            background: var(--weraser-primary);
+            color: white;
+            border-radius: 4px;
+            font-size: 0.625rem;
+            font-weight: 600;
+        }
+        
+        .badge--org {
+            background: var(--weraser-secondary);
+        }
+        
+        /* Upload Button */
+        .upload-section {
+            padding: var(--spacing-lg);
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        /* Main Chat Area */
+        .main-area {
+            display: flex;
+            flex-direction: column;
+            background: white;
+        }
+        
+        .chat-header {
+            padding: var(--spacing-lg);
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .chat-title {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+        
+        .chat-actions {
+            display: flex;
+            gap: var(--spacing-sm);
+        }
+        
+        .icon-btn {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .icon-btn:hover {
+            background: #f8f9fa;
+            border-color: var(--weraser-primary);
+        }
+        
+        /* Chat Messages */
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: var(--spacing-xl);
+        }
+        
+        .message-group {
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        .message {
+            display: flex;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .message--user {
+            flex-direction: row-reverse;
+        }
+        
+        .message-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+            flex-shrink: 0;
+        }
+        
+        .message--ai .message-avatar {
+            background: var(--weraser-primary);
+            color: white;
+        }
+        
+        .message--user .message-avatar {
+            background: #f1f3f5;
+        }
+        
+        .message-content {
+            max-width: 70%;
+        }
+        
+        .message-bubble {
+            padding: var(--spacing-md);
+            border-radius: 12px;
+            line-height: 1.5;
+            position: relative;
+        }
+        
+        .message--ai .message-bubble {
+            background: #f8f9fa;
+            color: var(--weraser-dark);
+        }
+        
+        .message--user .message-bubble {
+            background: var(--weraser-primary);
+            color: white;
+        }
+        
+        /* Thinking Process */
+        .thinking-process {
+            margin-top: var(--spacing-sm);
+            padding: var(--spacing-sm);
+            background: rgba(0, 102, 255, 0.05);
+            border-left: 3px solid var(--weraser-primary);
+            border-radius: 4px;
+            font-size: 0.875rem;
+            color: var(--weraser-gray);
+            font-style: italic;
+        }
+        
+        /* Source Reference */
+        .message-source {
+            margin-top: var(--spacing-sm);
+            padding: var(--spacing-xs) var(--spacing-sm);
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            color: var(--weraser-gray);
+            display: inline-block;
+        }
+        
+        .message-source__icon {
+            margin-right: 4px;
+        }
+        
+        /* Message Actions */
+        .message-actions {
+            display: flex;
+            gap: var(--spacing-xs);
+            margin-top: var(--spacing-sm);
+        }
+        
+        .message-action {
+            padding: 4px 8px;
+            font-size: 0.75rem;
+            color: var(--weraser-gray);
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .message-action:hover {
+            background: #f8f9fa;
+            color: var(--weraser-primary);
+        }
+        
+        /* Visualization in Chat */
+        .chat-table {
+            margin-top: var(--spacing-md);
+            overflow-x: auto;
+        }
+        
+        .chat-chart {
+            margin-top: var(--spacing-md);
+            padding: var(--spacing-md);
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+        }
+        
+        /* Input Area */
+        .input-area {
+            padding: var(--spacing-lg);
+            border-top: 1px solid #e5e7eb;
+            background: #f8f9fa;
+        }
+        
+        .input-container {
+            display: flex;
+            gap: var(--spacing-md);
+            align-items: flex-end;
+        }
+        
+        .input-wrapper {
+            flex: 1;
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: var(--spacing-md);
+            transition: all 0.2s;
+        }
+        
+        .input-wrapper:focus-within {
+            border-color: var(--weraser-primary);
+        }
+        
+        .input-field {
+            width: 100%;
+            border: none;
+            resize: none;
+            font-family: var(--font-family);
+            font-size: 0.875rem;
+            line-height: 1.5;
+            max-height: 120px;
+        }
+        
+        .input-field:focus {
+            outline: none;
+        }
+        
+        .input-actions {
+            display: flex;
+            gap: var(--spacing-xs);
+            margin-top: var(--spacing-sm);
+        }
+        
+        .input-action {
+            padding: 4px 8px;
+            font-size: 0.75rem;
+            color: var(--weraser-gray);
+            background: #f8f9fa;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .input-action:hover {
+            background: #e5e7eb;
+        }
+        
+        /* Right Panel - Info & Features */
+        .right-panel {
+            background: white;
+            border-left: 1px solid #e5e7eb;
+            padding: var(--spacing-lg);
+            overflow-y: auto;
+        }
+        
+        .panel-section {
+            margin-bottom: var(--spacing-xxl);
+        }
+        
+        .panel-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--weraser-gray);
+            font-weight: 600;
+            margin-bottom: var(--spacing-md);
+        }
+        
+        /* Feature Grid */
+        .feature-grid {
+            display: grid;
+            gap: var(--spacing-sm);
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: center;
+            padding: var(--spacing-sm);
+            background: #f8f9fa;
+            border-radius: 6px;
+        }
+        
+        .feature-icon {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            border-radius: 6px;
+            margin-right: var(--spacing-sm);
+        }
+        
+        .feature-info {
+            flex: 1;
+        }
+        
+        .feature-name {
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+        
+        .feature-status {
+            font-size: 0.625rem;
+            color: var(--weraser-success);
+        }
+        
+        .feature-disabled {
+            opacity: 0.5;
+        }
+        
+        .feature-disabled .feature-status {
+            color: var(--weraser-gray);
+        }
+        
+        /* Metrics */
+        .metric-card {
+            padding: var(--spacing-md);
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--weraser-primary);
+        }
+        
+        .metric-label {
+            font-size: 0.75rem;
+            color: var(--weraser-gray);
+        }
+        
+        /* Modals */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .modal.show {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: var(--spacing-xl);
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8f9fa;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        
+        /* Project Create Form */
+        .form-group {
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: var(--spacing-sm) var(--spacing-md);
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 0.875rem;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--weraser-primary);
+        }
+        
+        .form-helper {
+            font-size: 0.75rem;
+            color: var(--weraser-gray);
+            margin-top: var(--spacing-xs);
+        }
+        
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .weraser-app {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar, .right-panel {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="weraser-app">
+        <!-- Left Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar__header">
+                <div class="sidebar__logo">
+                    <span>🧠</span>
+                    <span>Weraser</span>
+                </div>
+                <div class="sidebar__phase">Phase 1 - RAG System</div>
+            </div>
+            
+            <!-- Project Section -->
+            <div class="project-section">
+                <div class="project-selector" onclick="showProjectModal()">
+                    <div>
+                        <div class="project-name">Q3 매출 분석</div>
+                        <div style="font-size: 0.75rem; color: var(--weraser-gray);">프로젝트 변경</div>
+                    </div>
+                    <span>▼</span>
+                </div>
+                
+                <div class="project-stats">
+                    <div class="stat-item">
+                        <div class="stat-label">문서</div>
+                        <div class="stat-value">24</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">벡터</div>
+                        <div class="stat-value">12.4K</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">정확도</div>
+                        <div class="stat-value">99.4%</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">대화</div>
+                        <div class="stat-value">156</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Documents Section -->
+            <div class="documents-section">
+                <div class="documents-header">
+                    <div class="documents-title">프로젝트 문서</div>
+                    <div class="data-toggle">
+                        <button class="data-toggle__btn active" onclick="filterDocuments('all')">전체</button>
+                        <button class="data-toggle__btn" onclick="filterDocuments('org')">조직</button>
+                        <button class="data-toggle__btn" onclick="filterDocuments('personal')">개인</button>
+                    </div>
+                </div>
+                
+                <div id="documentList">
+                    <div class="document-item">
+                        <div class="document-icon">📊</div>
+                        <div class="document-info">
+                            <div class="document-name">Q3_매출보고서.xlsx</div>
+                            <div class="document-meta">2.3MB • 2시간 전</div>
+                        </div>
+                        <span class="document-badge badge--org">조직</span>
+                    </div>
+                    
+                    <div class="document-item">
+                        <div class="document-icon">📄</div>
+                        <div class="document-info">
+                            <div class="document-name">관세_분류표.pdf</div>
+                            <div class="document-meta">15.2MB • 어제</div>
+                        </div>
+                        <span class="document-badge badge--org">조직</span>
+                    </div>
+                    
+                    <div class="document-item">
+                        <div class="document-icon">📝</div>
+                        <div class="document-info">
+                            <div class="document-name">회의록_20241203.docx</div>
+                            <div class="document-meta">345KB • 방금 전</div>
+                        </div>
+                        <span class="document-badge">개인</span>
+                    </div>
+                    
+                    <div class="document-item">
+                        <div class="document-icon">📊</div>
+                        <div class="document-info">
+                            <div class="document-name">재고현황_2024.xlsx</div>
+                            <div class="document-meta">856KB • 3일 전</div>
+                        </div>
+                        <span class="document-badge badge--org">조직</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Upload Section -->
+            <div class="upload-section">
+                <button class="btn btn--primary btn--small" style="width: 100%;" onclick="showUploadModal()">
+                    + 문서 추가
+                </button>
+            </div>
+        </aside>
+        
+        <!-- Main Chat Area -->
+        <main class="main-area">
+            <div class="chat-header">
+                <div class="chat-title">AI 지식 어시스턴트</div>
+                <div class="chat-actions">
+                    <button class="icon-btn" title="새 대화">🔄</button>
+                    <button class="icon-btn" title="설정">⚙️</button>
+                </div>
+            </div>
+            
+            <div class="chat-messages" id="chatMessages">
+                <!-- Welcome Message -->
+                <div class="message-group">
+                    <div class="message message--ai">
+                        <div class="message-avatar">AI</div>
+                        <div class="message-content">
+                            <div class="message-bubble">
+                                안녕하세요! Q3 매출 분석 프로젝트의 문서를 모두 학습했습니다.
+                                무엇을 도와드릴까요?
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Example User Message -->
+                <div class="message-group">
+                    <div class="message message--user">
+                        <div class="message-avatar">나</div>
+                        <div class="message-content">
+                            <div class="message-bubble">
+                                현재 분기 매출 현황을 표로 정리해줘
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Example AI Response with Table -->
+                <div class="message-group">
+                    <div class="message message--ai">
+                        <div class="message-avatar">AI</div>
+                        <div class="message-content">
+                            <div class="message-bubble">
+                                Q3 매출 현황을 정리했습니다:
+                                
+                                <div class="thinking-process">
+                                    💭 Q3_매출보고서.xlsx 파일에서 데이터를 추출하고, 재고현황_2024.xlsx와 교차 검증하여 정확성을 확인했습니다...
+                                </div>
+                                
+                                <div class="chat-table">
+                                    <table class="data-table">
+                                        <thead>
+                                            <tr>
+                                                <th>구분</th>
+                                                <th>목표</th>
+                                                <th>실적</th>
+                                                <th>달성률</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>국내 매출</td>
+                                                <td>30억원</td>
+                                                <td>19.2억원</td>
+                                                <td>64%</td>
+                                            </tr>
+                                            <tr>
+                                                <td>해외 매출</td>
+                                                <td>20억원</td>
+                                                <td>12.8억원</td>
+                                                <td>64%</td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>총 매출</strong></td>
+                                                <td><strong>50억원</strong></td>
+                                                <td><strong>32억원</strong></td>
+                                                <td><strong>64%</strong></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                
+                                <div class="message-source">
+                                    <span class="message-source__icon">📎</span>
+                                    출처: Q3_매출보고서.xlsx (페이지 2, 행 15-24)
+                                </div>
+                            </div>
+                            
+                            <div class="message-actions">
+                                <button class="message-action" onclick="editMessage(this)">수정 요청</button>
+                                <button class="message-action" onclick="cancelMessage(this)">취소</button>
+                                <button class="message-action" onclick="copyMessage(this)">복사</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Input Area -->
+            <div class="input-area">
+                <div class="input-container">
+                    <div class="input-wrapper">
+                        <textarea class="input-field" id="chatInput" 
+                                  placeholder="질문을 입력하세요... (Shift+Enter로 줄바꿈)"
+                                  rows="1"></textarea>
+                        <div class="input-actions">
+                            <span class="input-action" onclick="attachFile()">📎 파일</span>
+                            <span class="input-action" onclick="toggleThinking()">💭 생각 과정</span>
+                        </div>
+                    </div>
+                    <button class="btn btn--primary" onclick="sendMessage()">전송</button>
+                </div>
+            </div>
+        </main>
+        
+        <!-- Right Panel -->
+        <aside class="right-panel">
+            <!-- Phase 1 Features -->
+            <div class="panel-section">
+                <h3 class="panel-title">Phase 1 기능</h3>
+                <div class="feature-grid">
+                    <div class="feature-item">
+                        <div class="feature-icon">📚</div>
+                        <div class="feature-info">
+                            <div class="feature-name">RAG System</div>
+                            <div class="feature-status">✓ 활성</div>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon">📊</div>
+                        <div class="feature-info">
+                            <div class="feature-name">Excel 파싱</div>
+                            <div class="feature-status">✓ 활성</div>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon">📈</div>
+                        <div class="feature-info">
+                            <div class="feature-name">차트 생성</div>
+                            <div class="feature-status">✓ 활성</div>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon">🔒</div>
+                        <div class="feature-info">
+                            <div class="feature-name">닫힌 책 모드</div>
+                            <div class="feature-status">✓ 활성</div>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-item feature-disabled">
+                        <div class="feature-icon">🤖</div>
+                        <div class="feature-info">
+                            <div class="feature-name">AI 에이전트</div>
+                            <div class="feature-status">Phase 2</div>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-item feature-disabled">
+                        <div class="feature-icon">📦</div>
+                        <div class="feature-info">
+                            <div class="feature-name">아티팩트</div>
+                            <div class="feature-status">Phase 3</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Metrics -->
+            <div class="panel-section">
+                <h3 class="panel-title">실시간 지표</h3>
+                <div class="metric-card">
+                    <div class="metric-value">1.2초</div>
+                    <div class="metric-label">평균 응답 시간</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">99.4%</div>
+                    <div class="metric-label">정확도</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">847</div>
+                    <div class="metric-label">처리된 쿼리</div>
+                </div>
+            </div>
+        </aside>
+    </div>
+    
+    <!-- Project Modal -->
+    <div class="modal" id="projectModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">프로젝트 관리</h2>
+                <div class="modal-close" onclick="closeModal('projectModal')">✕</div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">프로젝트 이름</label>
+                <input type="text" class="form-input" placeholder="예: Q4 사업 계획">
+                <div class="form-helper">프로젝트를 구분할 수 있는 이름을 입력하세요</div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">설명 (선택)</label>
+                <textarea class="form-input" rows="3" placeholder="프로젝트에 대한 간단한 설명"></textarea>
+            </div>
+            
+            <div style="display: flex; gap: var(--spacing-md); justify-content: flex-end;">
+                <button class="btn btn--secondary" onclick="closeModal('projectModal')">취소</button>
+                <button class="btn btn--primary">프로젝트 생성</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Upload Modal -->
+    <div class="modal" id="uploadModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">문서 추가</h2>
+                <div class="modal-close" onclick="closeModal('uploadModal')">✕</div>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-md); margin-bottom: var(--spacing-lg);">
+                <button class="btn btn--secondary" onclick="selectOrgFiles()">
+                    <div style="font-size: 1.5rem; margin-bottom: var(--spacing-sm);">🏢</div>
+                    <div>조직 문서 불러오기</div>
+                    <div style="font-size: 0.75rem; margin-top: var(--spacing-xs);">공유 저장소에서 선택</div>
+                </button>
+                
+                <button class="btn btn--secondary" onclick="uploadPersonalFiles()">
+                    <div style="font-size: 1.5rem; margin-bottom: var(--spacing-sm);">👤</div>
+                    <div>개인 문서 업로드</div>
+                    <div style="font-size: 0.75rem; margin-top: var(--spacing-xs);">내 컴퓨터에서 선택</div>
+                </button>
+            </div>
+            
+            <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+                <div class="upload-area__icon">📁</div>
+                <div class="upload-area__text">
+                    파일을 선택하거나 드래그하세요<br>
+                    <small>PDF, DOCX, XLSX, CSV, TXT, PPTX (최대 100MB)</small>
+                </div>
+            </div>
+            <input type="file" id="fileInput" style="display: none;" multiple>
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="assets/config.js"></script>
+    <script src="assets/shared.js"></script>
+    <script>
+        // Initialize
+        WeraserCore.init('phase1');
+        
+        let showThinkingProcess = true;
+        
+        // Project management
+        function showProjectModal() {
+            document.getElementById('projectModal').classList.add('show');
+        }
+        
+        // Upload management
+        function showUploadModal() {
+            document.getElementById('uploadModal').classList.add('show');
+        }
+        
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+        }
+        
+        function selectOrgFiles() {
+            // 조직 문서 선택 UI
+            WeraserCore.ui.showNotification('조직 문서 저장소 연결 중...', 'info');
+        }
+        
+        function uploadPersonalFiles() {
+            document.getElementById('fileInput').click();
+        }
+        
+        // Document filtering
+        function filterDocuments(type) {
+            const buttons = document.querySelectorAll('.data-toggle__btn');
+            buttons.forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.textContent === '전체' && type === 'all') btn.classList.add('active');
+                if (btn.textContent === '조직' && type === 'org') btn.classList.add('active');
+                if (btn.textContent === '개인' && type === 'personal') btn.classList.add('active');
+            });
+            
+            // Filter logic here
+            WeraserCore.ui.showNotification(`${type === 'all' ? '전체' : type === 'org' ? '조직' : '개인'} 문서 표시`, 'info');
+        }
+        
+        // Chat functions
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            if (!message) return;
+            
+            // Add user message
+            addUserMessage(message);
+            input.value = '';
+            
+            // Process with RAG
+            const response = await WeraserCore.ragEngine.searchQuery(message);
+            
+            // Add AI response
+            addAIMessage(response);
+        }
+        
+        function addUserMessage(text) {
+            const messagesDiv = document.getElementById('chatMessages');
+            const messageGroup = document.createElement('div');
+            messageGroup.className = 'message-group';
+            messageGroup.innerHTML = `
+                <div class="message message--user">
+                    <div class="message-avatar">나</div>
+                    <div class="message-content">
+                        <div class="message-bubble">${text}</div>
+                    </div>
+                </div>
+            `;
+            messagesDiv.appendChild(messageGroup);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+        
+        function addAIMessage(response) {
+            const messagesDiv = document.getElementById('chatMessages');
+            const messageGroup = document.createElement('div');
+            messageGroup.className = 'message-group';
+            
+            let thinkingHtml = '';
+            if (showThinkingProcess) {
+                thinkingHtml = `
+                    <div class="thinking-process">
+                        💭 문서를 검색하고 분석 중... 관련 청크 ${Math.floor(Math.random() * 10) + 5}개 발견
+                    </div>
+                `;
+            }
+            
+            messageGroup.innerHTML = `
+                <div class="message message--ai">
+                    <div class="message-avatar">AI</div>
+                    <div class="message-content">
+                        <div class="message-bubble">
+                            ${response.text}
+                            ${thinkingHtml}
+                            ${response.source ? `
+                                <div class="message-source">
+                                    <span class="message-source__icon">📎</span>
+                                    출처: ${response.source}
+                                </div>
+                            ` : ''}
+                        </div>
+                        <div class="message-actions">
+                            <button class="message-action" onclick="editMessage(this)">수정 요청</button>
+                            <button class="message-action" onclick="cancelMessage(this)">취소</button>
+                            <button class="message-action" onclick="copyMessage(this)">복사</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            messagesDiv.appendChild(messageGroup);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+        
+        // Message actions
+        function editMessage(btn) {
+            WeraserCore.ui.showNotification('메시지 수정 모드', 'info');
+        }
+        
+        function cancelMessage(btn) {
+            const messageGroup = btn.closest('.message-group');
+            messageGroup.style.opacity = '0.5';
+            WeraserCore.ui.showNotification('메시지 취소됨', 'info');
+        }
+        
+        function copyMessage(btn) {
+            const bubble = btn.closest('.message-content').querySelector('.message-bubble');
+            navigator.clipboard.writeText(bubble.textContent);
+            WeraserCore.ui.showNotification('클립보드에 복사됨', 'success');
+        }
+        
+        function attachFile() {
+            document.getElementById('fileInput').click();
+        }
+        
+        function toggleThinking() {
+            showThinkingProcess = !showThinkingProcess;
+            WeraserCore.ui.showNotification(
+                showThinkingProcess ? '생각 과정 표시 켜짐' : '생각 과정 표시 꺼짐',
+                'info'
+            );
+        }
+        
+        // Auto-resize textarea
+        const chatInput = document.getElementById('chatInput');
+        chatInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+        });
+        
+        // Keyboard shortcuts
+        chatInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+        
+        // File upload handling
+        document.getElementById('fileInput').addEventListener('change', async (e) => {
+            const files = e.target.files;
+            for (const file of files) {
+                await WeraserCore.ragEngine.processDocument(file);
+                
+                // Add to document list
+                const docList = document.getElementById('documentList');
+                const docItem = document.createElement('div');
+                docItem.className = 'document-item';
+                docItem.innerHTML = `
+                    <div class="document-icon">📄</div>
+                    <div class="document-info">
+                        <div class="document-name">${file.name}</div>
+                        <div class="document-meta">${WeraserCore.utils.formatFileSize(file.size)} • 방금 전</div>
+                    </div>
+                    <span class="document-badge">개인</span>
+                `;
+                docList.insertBefore(docItem, docList.firstChild);
+            }
+            
+            closeModal('uploadModal');
+        });
+    </script>
+</body>
+</html>

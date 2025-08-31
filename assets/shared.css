@@ -1,0 +1,385 @@
+/* ==============================================
+   Weraser Shared Styles
+   공통 스타일 - 모든 Phase에서 재사용
+   ============================================== */
+
+/* Reset & Base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    /* Weraser Brand Colors */
+    --weraser-primary: #0066FF;
+    --weraser-secondary: #00D4AA;
+    --weraser-dark: #0A0E27;
+    --weraser-gray: #6B7280;
+    --weraser-light: #F9FAFB;
+    --weraser-white: #FFFFFF;
+    --weraser-success: #10B981;
+    --weraser-warning: #F59E0B;
+    --weraser-danger: #EF4444;
+    
+    /* Typography */
+    --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans KR', Roboto, sans-serif;
+    --font-size-base: 16px;
+    --line-height-base: 1.6;
+    
+    /* Spacing System */
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    --spacing-xxl: 3rem;
+    --spacing-xxxl: 4rem;
+    
+    /* Breakpoints */
+    --breakpoint-sm: 576px;
+    --breakpoint-md: 768px;
+    --breakpoint-lg: 992px;
+    --breakpoint-xl: 1200px;
+    
+    /* Shadows */
+    --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+    --shadow-md: 0 4px 8px rgba(0,0,0,0.08);
+    --shadow-lg: 0 10px 24px rgba(0,0,0,0.12);
+    --shadow-xl: 0 20px 40px rgba(0,0,0,0.15);
+}
+
+body {
+    font-family: var(--font-family);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-base);
+    color: var(--weraser-dark);
+    background-color: var(--weraser-white);
+}
+
+/* Container */
+.container {
+    width: 100%;
+    max-width: var(--breakpoint-xl);
+    margin: 0 auto;
+    padding: 0 var(--spacing-md);
+}
+
+/* Header (공통) */
+.header {
+    background-color: var(--weraser-white);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    padding: var(--spacing-md) 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(10px);
+    background-color: rgba(255, 255, 255, 0.95);
+}
+
+.header__logo h1 {
+    color: var(--weraser-primary);
+    font-size: 1.75rem;
+    font-weight: 700;
+}
+
+.header__tagline {
+    color: var(--weraser-gray);
+    font-size: 0.875rem;
+    margin-left: var(--spacing-sm);
+}
+
+/* Navigation */
+.nav__list {
+    display: flex;
+    list-style: none;
+    gap: var(--spacing-xl);
+    align-items: center;
+}
+
+.nav__item a {
+    color: var(--weraser-dark);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+.nav__item a:hover {
+    color: var(--weraser-primary);
+}
+
+/* Buttons (공통) */
+.btn {
+    display: inline-block;
+    padding: var(--spacing-md) var(--spacing-xl);
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-decoration: none;
+    font-family: var(--font-family);
+}
+
+.btn--primary {
+    background-color: var(--weraser-primary);
+    color: var(--weraser-white);
+}
+
+.btn--primary:hover {
+    background-color: #0052CC;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(0,102,255,0.3);
+}
+
+.btn--secondary {
+    background-color: transparent;
+    color: var(--weraser-primary);
+    border: 2px solid var(--weraser-primary);
+}
+
+.btn--secondary:hover {
+    background-color: var(--weraser-primary);
+    color: var(--weraser-white);
+}
+
+.btn--success {
+    background-color: var(--weraser-success);
+    color: var(--weraser-white);
+}
+
+.btn--small {
+    padding: var(--spacing-sm) var(--spacing-lg);
+    font-size: 0.875rem;
+}
+
+.btn--large {
+    padding: var(--spacing-lg) var(--spacing-xxl);
+    font-size: 1.125rem;
+}
+
+/* Cards (공통) */
+.card {
+    background-color: var(--weraser-white);
+    border-radius: 12px;
+    padding: var(--spacing-xl);
+    box-shadow: var(--shadow-md);
+    transition: all 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Badges (공통) */
+.badge {
+    display: inline-block;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.badge--success {
+    background-color: var(--weraser-success);
+    color: var(--weraser-white);
+}
+
+.badge--primary {
+    background-color: var(--weraser-primary);
+    color: var(--weraser-white);
+}
+
+.badge--warning {
+    background-color: var(--weraser-warning);
+    color: var(--weraser-white);
+}
+
+/* Trust Indicators */
+.trust-indicator {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 12px;
+    background: var(--weraser-success);
+    color: white;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+/* Loading State */
+.loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid var(--weraser-light);
+    border-top-color: var(--weraser-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Notification */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: var(--spacing-md) var(--spacing-lg);
+    border-radius: 8px;
+    background-color: var(--weraser-dark);
+    color: var(--weraser-white);
+    transform: translateX(400px);
+    transition: transform 0.3s;
+    z-index: 1001;
+    box-shadow: var(--shadow-lg);
+}
+
+.notification.show {
+    transform: translateX(0);
+}
+
+.notification--success {
+    background-color: var(--weraser-success);
+}
+
+.notification--error {
+    background-color: var(--weraser-danger);
+}
+
+.notification--warning {
+    background-color: var(--weraser-warning);
+}
+
+/* Chat Interface (공통) */
+.chat-container {
+    display: flex;
+    height: calc(100vh - 80px);
+}
+
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--spacing-xl);
+    background-color: var(--weraser-white);
+}
+
+.message {
+    margin-bottom: var(--spacing-lg);
+}
+
+.message--user {
+    text-align: right;
+}
+
+.message__content {
+    display: inline-block;
+    max-width: 70%;
+    padding: var(--spacing-md);
+    border-radius: 12px;
+    line-height: 1.5;
+}
+
+.message--user .message__content {
+    background-color: var(--weraser-primary);
+    color: var(--weraser-white);
+}
+
+.message--ai .message__content {
+    background-color: var(--weraser-light);
+    color: var(--weraser-dark);
+}
+
+.message__reference {
+    margin-top: var(--spacing-sm);
+    padding: var(--spacing-sm);
+    background-color: rgba(0, 102, 255, 0.1);
+    border-radius: 4px;
+    font-size: 0.875rem;
+    color: var(--weraser-primary);
+}
+
+/* Tables (공통) */
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--weraser-white);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.data-table th {
+    background: var(--weraser-light);
+    padding: var(--spacing-md);
+    text-align: left;
+    font-weight: 600;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.data-table td {
+    padding: var(--spacing-md);
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.data-table tr:hover {
+    background-color: rgba(0, 102, 255, 0.02);
+}
+
+/* Upload Area (공통) */
+.upload-area {
+    padding: var(--spacing-xl);
+    border: 2px dashed rgba(0, 102, 255, 0.3);
+    border-radius: 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    background-color: rgba(0, 102, 255, 0.02);
+}
+
+.upload-area:hover {
+    border-color: var(--weraser-primary);
+    background-color: rgba(0, 102, 255, 0.05);
+}
+
+.upload-area__icon {
+    font-size: 2rem;
+    color: var(--weraser-primary);
+    margin-bottom: var(--spacing-sm);
+}
+
+.upload-area__text {
+    color: var(--weraser-gray);
+    font-size: 0.875rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .container {
+        padding: 0 var(--spacing-sm);
+    }
+    
+    .chat-container {
+        flex-direction: column;
+    }
+    
+    .message__content {
+        max-width: 90%;
+    }
+}
+
+/* Utilities */
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+.mt-1 { margin-top: var(--spacing-sm); }
+.mt-2 { margin-top: var(--spacing-md); }
+.mt-3 { margin-top: var(--spacing-lg); }
+.mt-4 { margin-top: var(--spacing-xl); }
+.mb-1 { margin-bottom: var(--spacing-sm); }
+.mb-2 { margin-bottom: var(--spacing-md); }
+.mb-3 { margin-bottom: var(--spacing-lg); }
+.mb-4 { margin-bottom: var(--spacing-xl); }

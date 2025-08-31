@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weraser RAG System - Phase 1</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Phase 1 특화 스타일 */
+        .rag-container {
+            display: flex;
+            height: calc(100vh - 80px);
+        }
+        
+        .rag-sidebar {
+            width: 320px;
+            background: linear-gradient(180deg, #f9fafb 0%, #ffffff 100%);
+            border-right: 1px solid rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .data-selector {
+            padding: 20px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        
+        .data-toggle {
+            display: flex;
+            background: #e5e7eb;
+            border-radius: 8px;
+            padding: 4px;
+            margin-bottom: 16px;
+        }
+        
+        .data-toggle__btn {
+            flex: 1;
+            padding: 8px;
+            border: none;
+            background: transparent;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .data-toggle__btn--active {
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .data-scope {
+            margin-top: 16px;
+        }
+        
+        .data-scope__item {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            margin-bottom: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .data-scope__item:hover {
+            background: rgba(0, 102, 255, 0.05);
+        }
+        
+        .data-scope__item--selected {
+            background: rgba(0, 102, 255, 0.1);
+            border: 1px solid var(--color-primary);
+        }
+        
+        .data-scope__icon {
+            margin-right: 8px;
+        }
+        
+        .data-scope__info {
+            flex: 1;
+        }
+        
+        .data-scope__name {
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        
+        .data-scope__count {
+            font-size: 0.75rem;
+            color: var(--color-gray);
+        }
+        
+        .chart-container {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .table-container {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 16px;
+            overflow-x: auto;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .data-table th {
+            background: #f3f4f6;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #e5e7eb;
+        }
+        
+        .data-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .trust-indicator {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 8px;
+            background: #10b981;
+            color: white;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            margin-left: 8px;
+        }
+        
+        .source-link {
+            color: var(--color-primary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            cursor: pointer;
+        }
+        
+        .source-link:hover {
+            text-decoration: underline;
+        }
+        
+        /* 플로팅 아티팩트 윈도우 (Phase 3 미리보기) */
+        .artifact-window {
+            position: fixed;
+            top: 50%;
+            right: 20px;
+            transform: translateY(-50%);
+            width: 400px;
+            max-height: 600px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            display: none;
+            z-index: 1000;
+        }
+        
+        .artifact-window--active {
+            display: block;
+        }
+        
+        .artifact-header {
+            padding: 16px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .artifact-content {
+            padding: 20px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        .artifact-actions {
+            padding: 16px;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            gap: 8px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header__logo">
+                <h1>Weraser RAG</h1>
+                <span class="header__tagline">Phase 1: 조직원 일상 업무 침투</span>
+            </div>
+            <nav class="header__nav">
+                <ul class="nav__list">
+                    <li class="nav__item">
+                        <span class="trust-indicator">✓ 닫힌 책 모드</span>
+                    </li>
+                    <li class="nav__item">
+                        <span>조직: 램리서치코리아</span>
+                    </li>
+                    <li class="nav__item">
+                        <span>김대리님</span>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- RAG Container -->
+    <div class="rag-container">
+        <!-- Enhanced Sidebar with 조직/개인 구분 -->
+        <aside class="rag-sidebar">
+            <!-- 데이터 소스 선택 -->
+            <div class="data-selector">
+                <h3 style="font-size: 0.875rem; color: #6b7280; margin-bottom: 12px;">데이터 소스</h3>
+                
+                <!-- 조직/개인 토글 -->
+                <div class="data-toggle">
+                    <button class="data-toggle__btn data-toggle__btn--active" data-scope="org">
+                        🏢 조직 데이터
+                    </button>
+                    <button class="data-toggle__btn" data-scope="personal">
+                        👤 개인 데이터
+                    </button>
+                </div>
+                
+                <!-- 조직 데이터 목록 -->
+                <div class="data-scope" id="orgData">
+                    <div class="data-scope__item data-scope__item--selected">
+                        <span class="data-scope__icon">📊</span>
+                        <div class="data-scope__info">
+                            <div class="data-scope__name">전사 공통</div>
+                            <div class="data-scope__count">문서 1,234개</div>
+                        </div>
+                    </div>
+                    <div class="data-scope__item">
+                        <span class="data-scope__icon">📦</span>
+                        <div class="data-scope__info">
+                            <div class="data-scope__name">물류팀</div>
+                            <div class="data-scope__count">문서 456개</div>
+                        </div>
+                    </div>
+                    <div class="data-scope__item">
+                        <span class="data-scope__icon">💰</span>
+                        <div class="data-scope__info">
+                            <div class="data-scope__name">재무팀</div>
+                            <div class="data-scope__count">문서 789개</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 개인 데이터 목록 (숨김) -->
+                <div class="data-scope" id="personalData" style="display: none;">
+                    <div class="data-scope__item">
+                        <span class="data-scope__icon">📝</span>
+                        <div class="data-scope__info">
+                            <div class="data-scope__name">내 업무 문서</div>
+                            <div class="data-scope__count">문서 45개</div>
+                        </div>
+                    </div>
+                    <div class="data-scope__item">
+                        <span class="data-scope__icon">📧</span>
+                        <div class="data-scope__info">
+                            <div class="data-scope__name">이메일 아카이브</div>
+                            <div class="data-scope__count">문서 123개</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 문서 업로드 영역 -->
+            <div style="padding: 20px; flex: 1;">
+                <h3 style="font-size: 0.875rem; color: #6b7280; margin-bottom: 12px;">문서 처리 현황</h3>
+                <div style="background: #f3f4f6; padding: 12px; border-radius: 8px; margin-bottom: 12px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <span style="font-size: 0.875rem;">Excel 파일 분석</span>
+                        <span style="font-size: 0.875rem; color: #10b981;">✓ 완료</span>
+                    </div>
+                    <div style="font-size: 0.75rem; color: #6b7280;">
+                        • 시트 5개 감지<br>
+                        • 비정형 그리드 자동 파싱<br>
+                        • 피벗 테이블 구조 분석
+                    </div>
+                </div>
+                
+                <div class="upload-area" style="margin-top: 16px;">
+                    <div class="upload-area__icon">📤</div>
+                    <div class="upload-area__text">
+                        Excel, PDF, DOCX 등<br>모든 형식 지원
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Chat Area with Enhanced Output -->
+        <main class="chat-main">
+            <div class="chat-messages" id="chatMessages" style="padding: 24px;">
+                <!-- 시스템 메시지 -->
+                <div class="message message--ai">
+                    <div class="message__content">
+                        🚀 <strong>Weraser RAG System Phase 1</strong><br><br>
+                        조직의 모든 문서를 완벽하게 이해하고 있습니다.<br>
+                        자연어로 질문하시면 차트, 표, 텍스트 등 최적의 형태로 답변드립니다.<br><br>
+                        <span style="color: #10b981;">✓ 환각 현상 0% (닫힌 책 모드)</span><br>
+                        <span style="color: #10b981;">✓ 모든 답변에 출처 명시</span>
+                    </div>
+                </div>
+
+                <!-- 예시: Excel 데이터 질의 -->
+                <div class="message message--user">
+                    <div class="message__content">
+                        지난 분기 반도체 부품별 관세 현황을 표로 정리해줘
+                    </div>
+                </div>
+
+                <div class="message message--ai">
+                    <div class="message__content">
+                        Q3 2024 반도체 부품 관세 현황을 분석했습니다:
+                        
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>부품 카테고리</th>
+                                        <th>HS Code</th>
+                                        <th>기본 관세율</th>
+                                        <th>FTA 적용</th>
+                                        <th>실제 납부액</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>웨이퍼</td>
+                                        <td>8541.10.1000</td>
+                                        <td>8%</td>
+                                        <td>한-미 FTA 0%</td>
+                                        <td>₩0</td>
+                                    </tr>
+                                    <tr>
+                                        <td>포토마스크</td>
+                                        <td>9017.20.1000</td>
+                                        <td>8%</td>
+                                        <td>한-EU FTA 0%</td>
+                                        <td>₩0</td>
+                                    </tr>
+                                    <tr>
+                                        <td>CMP 패드</td>
+                                        <td>6805.30.0000</td>
+                                        <td>8%</td>
+                                        <td>미적용</td>
+                                        <td>₩4,250,000</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div style="margin-top: 12px; padding: 12px; background: #f0fdf4; border-radius: 6px;">
+                            💡 <strong>최적화 제안</strong>: CMP 패드를 한-중 FTA 적용 가능한 대체 공급처로 변경 시 연간 ₩5,100만원 절감 가능
+                        </div>
+                        
+                        <div class="message__reference">
+                            📎 출처: <span class="source-link">2024_Q3_관세납부현황.xlsx</span> (Sheet: 부품별상세, A2:F156)
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 예시: 차트 생성 -->
+                <div class="message message--user">
+                    <div class="message__content">
+                        월별 관세 절감 추이를 차트로 보여줘
+                    </div>
+                </div>
+
+                <div class="message message--ai">
+                    <div class="message__content">
+                        2024년 월별 관세 절감 현황을 시각화했습니다:
+                        
+                        <div class="chart-container">
+                            <canvas id="taxChart" width="400" height="200"></canvas>
+                        </div>
+                        
+                        <div style="margin-top: 12px;">
+                            <strong>주요 지표</strong><br>
+                            • 총 절감액: ₩8.5억원 (전년 대비 +23%)<br>
+                            • 평균 절감율: 15.2%<br>
+                            • 최고 절감 월: 9월 (₩1.8억원)
+                        </div>
+                        
+                        <button class="btn btn--secondary" style="margin-top: 12px;" onclick="showArtifact()">
+                            📊 상세 보고서 보기 (아티팩트)
+                        </button>
+                        
+                        <div class="message__reference">
+                            📎 출처: <span class="source-link">관세최적화_월별실적.xlsx</span> (Sheet: Dashboard, 진실 교차검증 완료)
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat Input -->
+            <div class="chat-input">
+                <form class="chat-input__form">
+                    <input 
+                        type="text" 
+                        class="chat-input__field" 
+                        placeholder="Excel 데이터도 완벽 분석합니다. 예: '재고 회전율 차트로 보여줘'"
+                        autocomplete="off"
+                    >
+                    <button type="submit" class="chat-input__submit">전송</button>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <!-- 플로팅 아티팩트 윈도우 (Phase 3 미리보기) -->
+    <div class="artifact-window" id="artifactWindow">
+        <div class="artifact-header">
+            <h3>📊 관세 절감 상세 보고서</h3>
+            <button onclick="closeArtifact()" style="border: none; background: none; cursor: pointer;">✕</button>
+        </div>
+        <div class="artifact-content">
+            <h4>2024 Q3 관세 최적화 성과</h4>
+            <p>램리서치코리아 물류팀</p>
+            
+            <div style="margin-top: 20px;">
+                <canvas id="artifactChart" width="350" height="200"></canvas>
+            </div>
+            
+            <div style="margin-top: 20px;">
+                <h5>핵심 성과</h5>
+                <ul style="list-style: none; padding: 0;">
+                    <li>✓ HS Code 재분류: 234건</li>
+                    <li>✓ FTA 활용률: 89% → 96%</li>
+                    <li>✓ 평균 처리 시간: 24시간 → 1분</li>
+                </ul>
+            </div>
+        </div>
+        <div class="artifact-actions">
+            <button class="btn btn--secondary">📤 팀 공유</button>
+            <button class="btn btn--primary">📥 다운로드</button>
+        </div>
+    </div>
+
+    <script>
+        // 조직/개인 데이터 토글
+        document.querySelectorAll('.data-toggle__btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.data-toggle__btn').forEach(b => {
+                    b.classList.remove('data-toggle__btn--active');
+                });
+                this.classList.add('data-toggle__btn--active');
+                
+                const scope = this.dataset.scope;
+                if (scope === 'org') {
+                    document.getElementById('orgData').style.display = 'block';
+                    document.getElementById('personalData').style.display = 'none';
+                } else {
+                    document.getElementById('orgData').style.display = 'none';
+                    document.getElementById('personalData').style.display = 'block';
+                }
+            });
+        });
+
+        // 간단한 차트 그리기 (실제로는 Chart.js 등 사용)
+        function drawChart(canvasId) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
+            
+            const ctx = canvas.getContext('2d');
+            const data = [50, 70, 85, 120, 150, 140, 160, 155, 180];
+            const max = Math.max(...data);
+            const barWidth = 35;
+            const gap = 10;
+            
+            ctx.fillStyle = '#0066FF';
+            data.forEach((value, index) => {
+                const height = (value / max) * 150;
+                const x = index * (barWidth + gap) + 20;
+                const y = 180 - height;
+                
+                ctx.fillRect(x, y, barWidth, height);
+                
+                // 레이블
+                ctx.fillStyle = '#6B7280';
+                ctx.font = '10px sans-serif';
+                ctx.fillText(`${index + 1}월`, x + 5, 195);
+                ctx.fillStyle = '#0066FF';
+            });
+        }
+
+        // 차트 초기화
+        setTimeout(() => {
+            drawChart('taxChart');
+            drawChart('artifactChart');
+        }, 100);
+
+        // 아티팩트 윈도우 표시/숨기기
+        function showArtifact() {
+            document.getElementById('artifactWindow').classList.add('artifact-window--active');
+        }
+
+        function closeArtifact() {
+            document.getElementById('artifactWindow').classList.remove('artifact-window--active');
+        }
+    </script>
+</body>
+</html>

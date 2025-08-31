@@ -1,0 +1,1720 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weraser - AI Knowledge Platform</title>
+    <link rel="stylesheet" href="assets/shared.css">
+    <style>
+        /* Notion-inspired Clean Design */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans KR', sans-serif;
+            background: #ffffff;
+            color: #37352f;
+            line-height: 1.5;
+        }
+        
+        /* Layout Structure */
+        .weraser-app {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        /* Navigation Header */
+        .app-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 45px;
+            background: #ffffff;
+            border-bottom: 1px solid #e9e9e7;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            z-index: 100;
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .nav-icon {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 18px;
+        }
+        
+        .nav-icon:hover {
+            background: #f1f1ef;
+        }
+        
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 14px;
+            color: #37352f;
+            margin-left: 12px;
+        }
+        
+        .breadcrumb-separator {
+            color: #a4a4a2;
+            margin: 0 4px;
+        }
+        
+        .breadcrumb-item {
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        
+        .breadcrumb-item:hover {
+            background: #f1f1ef;
+        }
+        
+        .breadcrumb-current {
+            font-weight: 500;
+        }
+        
+        .header-right {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .header-action {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .header-action:hover {
+            background: #f1f1ef;
+        }
+        
+        /* Main Content Area */
+        .app-body {
+            display: flex;
+            width: 100%;
+            margin-top: 45px;
+            height: calc(100vh - 45px);
+        }
+        
+        /* Sidebar - 2 Level Navigation */
+        .sidebar {
+            width: 260px;
+            background: #fbfbfa;
+            border-right: 1px solid #e9e9e7;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        
+        .sidebar-header {
+            padding: 12px 16px;
+            border-bottom: 1px solid #e9e9e7;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .back-button {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .back-button:hover {
+            background: #e9e9e7;
+        }
+        
+        .sidebar-section {
+            padding: 16px;
+        }
+        
+        .sidebar-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #a4a4a2;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .icon-button {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            background: transparent;
+            color: #a4a4a2;
+        }
+        
+        .icon-button:hover {
+            background: #e9e9e7;
+            color: #37352f;
+        }
+        
+        /* Project List */
+        .project-list {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .project-item {
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .project-item:hover {
+            background: #f1f1ef;
+        }
+        
+        .project-item-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+        
+        .project-icon {
+            font-size: 16px;
+        }
+        
+        .project-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #37352f;
+        }
+        
+        .project-meta {
+            display: flex;
+            gap: 12px;
+            margin-left: 24px;
+            font-size: 12px;
+            color: #a4a4a2;
+        }
+        
+        .doc-count, .chat-count {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        /* Chat List */
+        .chat-list {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        
+        .chat-item {
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+        
+        .chat-item:hover {
+            background: #f1f1ef;
+        }
+        
+        .chat-item.active {
+            background: #e9e9e7;
+        }
+        
+        .chat-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #37352f;
+            margin-bottom: 2px;
+        }
+        
+        .chat-preview {
+            font-size: 12px;
+            color: #a4a4a2;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .chat-time {
+            position: absolute;
+            top: 8px;
+            right: 12px;
+            font-size: 11px;
+            color: #a4a4a2;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 24px;
+            color: #a4a4a2;
+        }
+        
+        .text-button {
+            width: 100%;
+            padding: 8px 12px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 14px;
+            color: #37352f;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+        
+        .text-button:hover {
+            background: #f1f1ef;
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #ffffff;
+        }
+        
+        .chat-header {
+            padding: 12px 20px;
+            border-bottom: 1px solid #e9e9e7;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .chat-header-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .chat-header-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #37352f;
+        }
+        
+        .chat-header-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .action-button {
+            padding: 6px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+            border: none;
+            background: transparent;
+            color: #787774;
+        }
+        
+        .action-button:hover {
+            background: #f1f1ef;
+            color: #37352f;
+        }
+        
+        .action-button.active {
+            background: #e9e9e7;
+            color: #37352f;
+        }
+        
+        /* Chat Messages */
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        
+        .message {
+            margin-bottom: 24px;
+        }
+        
+        .message-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .message-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            background: #f1f1ef;
+        }
+        
+        .message-avatar--ai {
+            background: linear-gradient(135deg, #0066FF, #00D4AA);
+            color: white;
+        }
+        
+        .message-sender {
+            font-size: 14px;
+            font-weight: 500;
+            color: #37352f;
+        }
+        
+        .message-time {
+            font-size: 12px;
+            color: #a4a4a2;
+        }
+        
+        .message-content {
+            margin-left: 36px;
+        }
+        
+        .message-edit-wrapper {
+            position: relative;
+        }
+        
+        .message-text {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #37352f;
+            padding: 8px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+        
+        .message-text[contenteditable="true"] {
+            background: #f7f6f3;
+            outline: 2px solid #0066FF;
+            outline-offset: 2px;
+        }
+        
+        .edit-button {
+            position: absolute;
+            right: -30px;
+            top: 8px;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            cursor: pointer;
+            opacity: 0;
+            transition: all 0.2s;
+            background: #ffffff;
+            border: 1px solid #e9e9e7;
+        }
+        
+        .message:hover .edit-button {
+            opacity: 1;
+        }
+        
+        .thinking-process {
+            margin-top: 8px;
+            padding: 8px;
+            background: #f7f6f3;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #787774;
+        }
+        
+        .thinking-header {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .thinking-content {
+            margin-top: 8px;
+            padding-left: 16px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 12px;
+        }
+        
+        .reference-card {
+            display: inline-block;
+            margin-top: 8px;
+            padding: 8px 12px;
+            background: #f7f6f3;
+            border-radius: 6px;
+            font-size: 12px;
+            color: #0066FF;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .reference-card:hover {
+            background: #e9e9e7;
+        }
+        
+        /* Chat Input */
+        .chat-input-wrapper {
+            padding: 16px;
+            border-top: 1px solid #e9e9e7;
+        }
+        
+        .chat-input-container {
+            display: flex;
+            gap: 8px;
+            align-items: flex-end;
+        }
+        
+        .chat-input-field {
+            flex: 1;
+            min-height: 40px;
+            max-height: 120px;
+            padding: 10px 12px;
+            border: 1px solid #e9e9e7;
+            border-radius: 8px;
+            font-size: 14px;
+            resize: none;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        
+        .chat-input-field:focus {
+            border-color: #0066FF;
+        }
+        
+        .send-button {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: #0066FF;
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        
+        .send-button:hover {
+            background: #0052CC;
+        }
+        
+        .send-button:disabled {
+            background: #e9e9e7;
+            cursor: not-allowed;
+        }
+        
+        /* Modals */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.show {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #37352f;
+        }
+        
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .modal-close:hover {
+            background: #f1f1ef;
+        }
+        
+        /* File Tree for Documents */
+        .file-tree {
+            padding: 12px;
+            background: #f7f6f3;
+            border-radius: 8px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .tree-item {
+            padding: 4px 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        
+        .tree-item:hover {
+            background: #e9e9e7;
+        }
+        
+        .tree-folder {
+            font-weight: 500;
+        }
+        
+        .tree-file {
+            margin-left: 20px;
+            color: #787774;
+        }
+        
+        /* Document Tree in Sidebar */
+        .document-tree {
+            margin-top: 8px;
+            font-size: 13px;
+        }
+        
+        .doc-category {
+            margin-bottom: 8px;
+        }
+        
+        .doc-category-header {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+            user-select: none;
+        }
+        
+        .doc-category-header:hover {
+            background: #e9e9e7;
+        }
+        
+        .doc-category-icon {
+            font-size: 12px;
+            transition: transform 0.2s;
+        }
+        
+        .doc-category.expanded .doc-category-icon {
+            transform: rotate(90deg);
+        }
+        
+        .doc-category-label {
+            flex: 1;
+            font-weight: 500;
+            color: #37352f;
+        }
+        
+        .doc-category-count {
+            font-size: 11px;
+            color: #a4a4a2;
+            background: #f1f1ef;
+            padding: 2px 6px;
+            border-radius: 10px;
+        }
+        
+        .doc-category-type {
+            font-size: 10px;
+            color: #787774;
+            margin-left: 4px;
+        }
+        
+        .doc-items {
+            display: none;
+            margin-left: 12px;
+            margin-top: 4px;
+        }
+        
+        .doc-category.expanded .doc-items {
+            display: block;
+        }
+        
+        .doc-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+            color: #787774;
+        }
+        
+        .doc-item:hover {
+            background: #e9e9e7;
+            color: #37352f;
+        }
+        
+        .doc-item-icon {
+            font-size: 12px;
+        }
+        
+        .doc-item-name {
+            flex: 1;
+            font-size: 12px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .doc-folder {
+            margin-bottom: 4px;
+        }
+        
+        .doc-folder-header {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .doc-folder-header:hover {
+            background: #e9e9e7;
+        }
+        
+        .doc-folder-files {
+            display: none;
+            margin-left: 16px;
+        }
+        
+        .doc-folder.expanded .doc-folder-files {
+            display: block;
+        }
+        
+        /* Welcome Screen */
+        .welcome-screen {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #a4a4a2;
+        }
+        
+        .welcome-content {
+            text-align: center;
+        }
+        
+        .welcome-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+        
+        .welcome-title {
+            color: #37352f;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+<div class="weraser-app">
+    <!-- Header -->
+    <header class="app-header">
+        <div class="header-left">
+            <div class="nav-icon" onclick="toggleSidebar()" title="사이드바 토글">
+                <span>☰</span>
+            </div>
+            <div class="breadcrumb" id="breadcrumb">
+                <span class="breadcrumb-current">프로젝트</span>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="header-action" onclick="goToAdmin()">
+                관리자
+            </div>
+            <div class="header-action" onclick="showProfile()">
+                내 프로필
+            </div>
+        </div>
+    </header>
+    
+    <!-- Main Body -->
+    <div class="app-body">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <!-- Dynamic content loaded here -->
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="main-content" id="mainContent">
+            <!-- Dynamic content loaded here -->
+        </main>
+    </div>
+</div>
+
+<!-- Removed document modal as documents are now in LNB -->
+
+<script src="assets/shared.js"></script>
+<script>
+    // State management
+    let currentView = 'projects'; // 'projects' or 'chats'
+    let currentProject = null;
+    let currentChat = null;
+    let showThinkingProcess = true;
+    
+    // Mock data for projects and chats
+    let projects = [
+        {
+            id: 'proj1',
+            name: 'H-Line 수출 프로젝트',
+            documentCount: 24,
+            chats: [
+                { id: 'chat1', title: 'HS 코드 분류 검토', lastMessage: '올해 관세율은...', time: '방금 전' },
+                { id: 'chat2', title: '운송 경로 최적화', lastMessage: '부산항 경유시...', time: '2시간 전' }
+            ],
+            documents: {
+                organization: [
+                    { type: 'folder', name: '계약서', files: ['2024_H-Line_계약서.pdf', '부속합의서.docx'] },
+                    { type: 'folder', name: '관세자료', files: ['HS_코드_분류표.xlsx', '관세율표.pdf'] },
+                    { type: 'folder', name: '법무자료', files: ['수출입법령.pdf', 'FTA_가이드.pdf'] }
+                ],
+                personal: [
+                    { type: 'file', name: '프로젝트_요약.pptx' },
+                    { type: 'file', name: '미팅_노트.docx' },
+                    { type: 'folder', name: '개인메모', files: ['검토사항.txt', '체크리스트.xlsx'] }
+                ]
+            }
+        },
+        {
+            id: 'proj2',
+            name: '2024 연간 계획',
+            documentCount: 15,
+            chats: [
+                { id: 'chat3', title: 'Q1 목표 설정', lastMessage: '1분기 매출 목표는...', time: '어제' }
+            ],
+            documents: {
+                organization: [
+                    { type: 'folder', name: '회사정책', files: ['인사규정.pdf', '복무규정.pdf'] },
+                    { type: 'file', name: '2024_사업계획서.pdf' }
+                ],
+                personal: [
+                    { type: 'folder', name: '분기별 계획', files: ['Q1_계획.docx', 'Q2_계획.docx'] },
+                    { type: 'file', name: '연간_목표.xlsx' }
+                ]
+            }
+        },
+        {
+            id: 'proj3',
+            name: '신규 고객사 대응',
+            documentCount: 8,
+            chats: [],
+            documents: {
+                organization: [
+                    { type: 'file', name: '회사소개서.pdf' },
+                    { type: 'file', name: '포트폴리오.pdf' }
+                ],
+                personal: [
+                    { type: 'file', name: '제안서_초안.pptx' },
+                    { type: 'file', name: '견적서.xlsx' }
+                ]
+            }
+        }
+    ];
+    
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+        WeraserCore.init('phase1');
+        renderSidebar();
+        showWelcomeScreen();
+    });
+    
+    // Render document tree
+    function renderDocumentTree(documents) {
+        if (!documents) return '<div class="empty-state" style="padding: 12px; font-size: 12px;">문서가 없습니다</div>';
+        
+        const orgCount = countDocuments(documents.organization);
+        const personalCount = countDocuments(documents.personal);
+        
+        return `
+            <div class="doc-category expanded" id="orgDocs">
+                <div class="doc-category-header" onclick="toggleDocCategory('orgDocs')">
+                    <span class="doc-category-icon">▼</span>
+                    <span class="doc-category-label">🏢 조직 문서</span>
+                    <span class="doc-category-count">${orgCount}</span>
+                </div>
+                <div class="doc-items">
+                    ${renderDocumentItems(documents.organization)}
+                </div>
+            </div>
+            <div class="doc-category" id="personalDocs">
+                <div class="doc-category-header" onclick="toggleDocCategory('personalDocs')">
+                    <span class="doc-category-icon">▶</span>
+                    <span class="doc-category-label">👤 개인 문서</span>
+                    <span class="doc-category-count">${personalCount}</span>
+                </div>
+                <div class="doc-items">
+                    ${renderDocumentItems(documents.personal)}
+                </div>
+            </div>
+        `;
+    }
+    
+    // Render document items
+    function renderDocumentItems(items) {
+        if (!items || items.length === 0) return '<div style="padding: 4px 8px; color: #a4a4a2; font-size: 11px;">비어 있음</div>';
+        
+        return items.map(item => {
+            if (item.type === 'folder') {
+                return `
+                    <div class="doc-folder" id="folder-${item.name}">
+                        <div class="doc-folder-header" onclick="toggleDocFolder('folder-${item.name}')">
+                            <span class="doc-category-icon">▶</span>
+                            <span>📁</span>
+                            <span class="doc-item-name">${item.name}</span>
+                        </div>
+                        <div class="doc-folder-files">
+                            ${item.files.map(file => `
+                                <div class="doc-item" onclick="showDocument('${file}')">
+                                    <span class="doc-item-icon">${getFileIcon(file)}</span>
+                                    <span class="doc-item-name">${file}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            } else {
+                return `
+                    <div class="doc-item" onclick="showDocument('${item.name}')">
+                        <span class="doc-item-icon">${getFileIcon(item.name)}</span>
+                        <span class="doc-item-name">${item.name}</span>
+                    </div>
+                `;
+            }
+        }).join('');
+    }
+    
+    // Count documents
+    function countDocuments(items) {
+        if (!items) return 0;
+        let count = 0;
+        items.forEach(item => {
+            if (item.type === 'folder') {
+                count += item.files.length;
+            } else {
+                count += 1;
+            }
+        });
+        return count;
+    }
+    
+    // Get file icon based on extension
+    function getFileIcon(filename) {
+        const ext = filename.split('.').pop().toLowerCase();
+        const icons = {
+            'pdf': '📕',
+            'docx': '📄',
+            'doc': '📄',
+            'xlsx': '📊',
+            'xls': '📊',
+            'pptx': '📊',
+            'ppt': '📊',
+            'txt': '📝',
+            'csv': '📊'
+        };
+        return icons[ext] || '📄';
+    }
+    
+    // Toggle document category
+    function toggleDocCategory(categoryId) {
+        const category = document.getElementById(categoryId);
+        category.classList.toggle('expanded');
+    }
+    
+    // Toggle document folder
+    function toggleDocFolder(folderId) {
+        const folder = document.getElementById(folderId);
+        folder.classList.toggle('expanded');
+        const icon = folder.querySelector('.doc-category-icon');
+        icon.textContent = folder.classList.contains('expanded') ? '▼' : '▶';
+    }
+    
+    // Render sidebar based on current view
+    function renderSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        
+        if (currentView === 'projects') {
+            // Show project list
+            sidebar.innerHTML = `
+                <div class="sidebar-section">
+                    <div class="sidebar-title">
+                        <span>프로젝트</span>
+                        <button class="icon-button" onclick="createNewProject()" title="새 프로젝트">+</button>
+                    </div>
+                    <div class="project-list" id="projectList">
+                        ${projects.map(project => `
+                            <div class="project-item" onclick="selectProject('${project.id}')">
+                                <div class="project-item-header">
+                                    <span class="project-icon">📁</span>
+                                    <span class="project-name">${project.name}</span>
+                                </div>
+                                <div class="project-meta">
+                                    <span class="doc-count">📄 ${project.documentCount}개</span>
+                                    <span class="chat-count">💬 ${project.chats.length}개</span>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        } else if (currentView === 'chats' && currentProject) {
+            // Show chat list for selected project
+            const project = projects.find(p => p.id === currentProject);
+            sidebar.innerHTML = `
+                <div class="sidebar-header">
+                    <div class="back-button" onclick="backToProjects()" title="프로젝트 목록으로">
+                        <span>←</span>
+                    </div>
+                    <div style="flex: 1;">
+                        <div style="font-size: 14px; font-weight: 600;">${project.name}</div>
+                        <div style="font-size: 12px; color: #a4a4a2;">📄 ${project.documentCount}개 문서</div>
+                    </div>
+                </div>
+                <div class="sidebar-section">
+                    <div class="sidebar-title">
+                        <span>채팅 세션</span>
+                        <button class="icon-button" onclick="createNewChat('${project.id}')" title="새 채팅">+</button>
+                    </div>
+                    <div class="chat-list" id="chatList">
+                        ${project.chats.length > 0 ? project.chats.map(chat => `
+                            <div class="chat-item ${currentChat === chat.id ? 'active' : ''}" onclick="selectChat('${project.id}', '${chat.id}')">
+                                <div class="chat-title">${chat.title}</div>
+                                <div class="chat-preview">${chat.lastMessage}</div>
+                                <div class="chat-time">${chat.time}</div>
+                            </div>
+                        `).join('') : `
+                            <div class="empty-state">
+                                <div style="font-size: 32px; margin-bottom: 8px;">💬</div>
+                                <div style="font-size: 14px;">채팅이 없습니다</div>
+                                <button class="btn btn--primary btn--small" style="margin-top: 12px;" onclick="createNewChat('${project.id}')">첫 채팅 시작</button>
+                            </div>
+                        `}
+                    </div>
+                </div>
+                <div class="sidebar-section" style="border-top: 1px solid #e9e9e7;">
+                    <div class="sidebar-title">
+                        <span>문서 관리</span>
+                        <div style="display: flex; gap: 4px;">
+                            <button class="icon-button" onclick="uploadDocument()" title="개인 문서 업로드">📤</button>
+                            <button class="icon-button" onclick="importFromOrg()" title="조직 문서 임포트">📥</button>
+                        </div>
+                    </div>
+                    <div class="document-tree" id="sidebarDocumentTree">
+                        ${renderDocumentTree(project.documents)}
+                    </div>
+                </div>
+            `;
+        }
+    }
+    
+    // Navigate to project's chat list
+    function selectProject(projectId) {
+        currentProject = projectId;
+        currentView = 'chats';
+        renderSidebar();
+        updateBreadcrumb();
+        
+        // Show project welcome or last chat
+        const project = projects.find(p => p.id === projectId);
+        if (project.chats.length > 0) {
+            selectChat(projectId, project.chats[0].id);
+        } else {
+            showProjectWelcome(projectId);
+        }
+    }
+    
+    // Back to project list
+    function backToProjects() {
+        currentView = 'projects';
+        currentProject = null;
+        currentChat = null;
+        renderSidebar();
+        updateBreadcrumb();
+        showWelcomeScreen();
+    }
+    
+    // Update breadcrumb based on current view
+    function updateBreadcrumb() {
+        const breadcrumb = document.getElementById('breadcrumb');
+        
+        if (currentView === 'projects') {
+            breadcrumb.innerHTML = '<span class="breadcrumb-current">프로젝트</span>';
+        } else if (currentView === 'chats' && currentProject) {
+            const project = projects.find(p => p.id === currentProject);
+            const chat = currentChat ? project.chats.find(c => c.id === currentChat) : null;
+            
+            breadcrumb.innerHTML = `
+                <span class="breadcrumb-item" onclick="backToProjects()">프로젝트</span>
+                <span class="breadcrumb-separator">/</span>
+                <span class="breadcrumb-item" onclick="selectProject('${project.id}')">${project.name}</span>
+                ${chat ? `
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">${chat.title}</span>
+                ` : ''}
+            `;
+        }
+    }
+    
+    // Select a chat
+    function selectChat(projectId, chatId) {
+        currentChat = chatId;
+        
+        // Update active state in sidebar
+        document.querySelectorAll('.chat-item').forEach(item => {
+            item.classList.remove('active');
+        });
+        const chatElement = event.currentTarget;
+        if (chatElement && chatElement.classList) {
+            chatElement.classList.add('active');
+        }
+        
+        updateBreadcrumb();
+        loadChatMessages(chatId);
+    }
+    
+    // Show welcome screen
+    function showWelcomeScreen() {
+        const mainContent = document.getElementById('mainContent');
+        mainContent.innerHTML = `
+            <div class="welcome-screen">
+                <div class="welcome-content">
+                    <div class="welcome-icon">🤖</div>
+                    <h2 class="welcome-title">Weraser에 오신 것을 환영합니다</h2>
+                    <p>프로젝트를 선택하여 시작하세요</p>
+                </div>
+            </div>
+        `;
+    }
+    
+    // Show project welcome
+    function showProjectWelcome(projectId) {
+        const project = projects.find(p => p.id === projectId);
+        const mainContent = document.getElementById('mainContent');
+        mainContent.innerHTML = `
+            <div class="welcome-screen">
+                <div class="welcome-content">
+                    <div class="welcome-icon">📁</div>
+                    <h2 class="welcome-title">${project.name}</h2>
+                    <p style="margin-bottom: 16px;">문서 ${project.documentCount}개 준비됨</p>
+                    <button class="btn btn--primary" onclick="createNewChat('${projectId}')">채팅 시작하기</button>
+                </div>
+            </div>
+        `;
+    }
+    
+    // Load chat messages
+    function loadChatMessages(chatId) {
+        const project = projects.find(p => p.id === currentProject);
+        const chat = project.chats.find(c => c.id === chatId);
+        
+        const mainContent = document.getElementById('mainContent');
+        mainContent.innerHTML = `
+            <div class="chat-header">
+                <div class="chat-header-info">
+                    <div class="chat-header-title">${chat.title}</div>
+                </div>
+                <div class="chat-header-actions">
+                    <button class="action-button" onclick="renameChat()">이름 변경</button>
+                    <button class="action-button" onclick="deleteChat()">삭제</button>
+                    <button class="action-button ${showThinkingProcess ? 'active' : ''}" onclick="toggleThinkingMode()">
+                        사고 과정
+                    </button>
+                </div>
+            </div>
+            <div class="chat-messages" id="chatMessages">
+                <!-- Messages will be loaded here -->
+            </div>
+            <div class="chat-input-wrapper">
+                <div class="chat-input-container">
+                    <textarea 
+                        class="chat-input-field" 
+                        id="chatInput" 
+                        placeholder="메시지를 입력하세요..."
+                        onkeydown="handleInputKeydown(event)"
+                        oninput="adjustInputHeight(this)"
+                    ></textarea>
+                    <button class="send-button" id="sendButton" onclick="sendMessage()">
+                        ➤
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        // Load sample messages
+        addSampleMessages();
+    }
+    
+    // Add sample messages
+    function addSampleMessages() {
+        const messagesDiv = document.getElementById('chatMessages');
+        
+        // Sample 1: User asks for discount rate
+        const userMessage1 = createMessage('user', '작년 H-Line 프로젝트의 최종 할인율과 근거 자료를 찾아줘');
+        messagesDiv.appendChild(userMessage1);
+        
+        // Sample 1: AI response with references
+        const aiMessage1 = createMessage('ai', 
+            `작년 H-Line 프로젝트의 최종 할인율은 **15%**였습니다.
+            
+            근거 자료:
+            1. 2023년 4분기 계약서 (p.12): "최종 합의 할인율 15% 적용"
+            2. 가격 협상 회의록 (2023.10.15): "경쟁사 대비 우위 확보를 위한 전략적 할인"
+            3. CFO 승인 문서: "15% 할인 승인, 단 최소 물량 보장 조건"`,
+            true,
+            ['2023_Q4_계약서.pdf', '가격협상_회의록.docx', 'CFO_승인문서.pdf']
+        );
+        messagesDiv.appendChild(aiMessage1);
+        
+        // Sample 2: User asks for comparison
+        const userMessage2 = createMessage('user', '최근 3년간 주요 품목의 관세율 변화를 표로 정리해줘');
+        messagesDiv.appendChild(userMessage2);
+        
+        // Sample 2: AI response with table
+        const aiMessage2 = createMessage('ai', 
+            `최근 3년간 주요 품목의 관세율 변화를 정리했습니다:
+
+<table style="width: 100%; border-collapse: collapse; margin: 12px 0;">
+<thead>
+<tr style="background: #f7f6f3;">
+<th style="border: 1px solid #e9e9e7; padding: 8px; text-align: left;">품목명</th>
+<th style="border: 1px solid #e9e9e7; padding: 8px; text-align: center;">HS 코드</th>
+<th style="border: 1px solid #e9e9e7; padding: 8px; text-align: center;">2022년</th>
+<th style="border: 1px solid #e9e9e7; padding: 8px; text-align: center;">2023년</th>
+<th style="border: 1px solid #e9e9e7; padding: 8px; text-align: center;">2024년</th>
+<th style="border: 1px solid #e9e9e7; padding: 8px; text-align: center;">변화율</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="border: 1px solid #e9e9e7; padding: 8px;">전자부품</td>
+<td style="border: 1px solid #e9e9e7; padding: 8px; text-align: center;">8542.31</td>
+<td style="border: 1px solid #e9e9e7; padding: 8px; text-align: center;">8%</td>
+<td style="border: 1px solid #e9e9e7; padding: 8px; text-align: center;">6%</td>
+<td style="border: 1px solid #e9e9e7; padding: 8px; text-align: center;">4%</td>
+<td style="border: 1px solid #e9e9e7; padding: 8px; text-align: center; color: #22c55e;">↓ 50%</td>
+</tr>
+<tr style="background: #fbfbfa;">
+<td style="border: 1px solid #e9e9e7; padding: 8px;">기계부품</td>
+<td style="border: 1px solid #e9e9e7; padding: 8px; text-align: center;">8481.10</td>
+<td style="border: 1px solid #e9e9e7; padding: 8px; text-align: center;">5%</td>
+<td style="border: 1px solid #e9e9e7; padding: 8px; text-align: center;">5%</td>
+<td style="border: 1px solid #e9e9e7; padding: 8px; text-align: center;">3%</td>
+<td style="border: 1px solid #e9e9e7; padding: 8px; text-align: center; color: #22c55e;">↓ 40%</td>
+</tr>
+<tr>
+<td style="border: 1px solid #e9e9e7; padding: 8px;">화학제품</td>
+<td style="border: 1px solid #e9e9e7; padding: 8px; text-align: center;">3901.10</td>
+<td style="border: 1px solid #e9e9e7; padding: 8px; text-align: center;">6.5%</td>
+<td style="border: 1px solid #e9e9e7; padding: 8px; text-align: center;">6.5%</td>
+<td style="border: 1px solid #e9e9e7; padding: 8px; text-align: center;">6.5%</td>
+<td style="border: 1px solid #e9e9e7; padding: 8px; text-align: center; color: #a4a4a2;">→ 0%</td>
+</tr>
+</tbody>
+</table>
+
+**주요 변화 사항:**
+- FTA 체결로 인한 단계적 관세 인하 진행 중
+- 전자부품과 기계부품의 관세율이 크게 감소
+- 화학제품은 변동 없이 유지`,
+            true,
+            ['관세율표_2022.xlsx', '관세율표_2023.xlsx', '관세율표_2024.xlsx', 'FTA_영향분석.pdf']
+        );
+        messagesDiv.appendChild(aiMessage2);
+        
+        // Sample 3: User asks for trend analysis
+        const userMessage3 = createMessage('user', '올해 상반기 수출 실적을 그래프로 보여주고 분석해줘');
+        messagesDiv.appendChild(userMessage3);
+        
+        // Sample 3: AI response with chart
+        const aiMessage3 = createMessage('ai', 
+            `2024년 상반기 수출 실적을 분석했습니다:
+
+<div style="background: #f7f6f3; padding: 16px; border-radius: 8px; margin: 12px 0;">
+<canvas id="exportChart" style="max-width: 100%; height: 300px;"></canvas>
+</div>
+
+**📊 상반기 수출 실적 분석**
+
+**월별 실적 (단위: 백만 달러)**
+- 1월: $45.2M (전년 동기 대비 +12%)
+- 2월: $42.8M (전년 동기 대비 +8%)
+- 3월: $48.6M (전년 동기 대비 +15%)
+- 4월: $51.3M (전년 동기 대비 +18%)
+- 5월: $49.7M (전년 동기 대비 +14%)
+- 6월: $53.9M (전년 동기 대비 +22%)
+
+**핵심 인사이트:**
+1. **성장 추세**: 상반기 전체 +14.8% 성장
+2. **최고 실적**: 6월 $53.9M으로 역대 최고 기록
+3. **주요 요인**: 
+   - 신규 시장 진출 (동남아 3개국)
+   - 기존 고객사 주문량 증가
+   - 환율 효과 (+3% 기여)
+
+<div style="background: #e3f2fd; padding: 12px; border-left: 4px solid #0066FF; margin: 12px 0;">
+💡 **권장 사항**: 하반기에도 성장세 유지를 위해 재고 확보 및 물류 라인 점검 필요
+</div>`,
+            true,
+            ['수출실적_2024_상반기.xlsx', '시장분석_보고서.pdf', '환율동향_분석.pdf']
+        );
+        messagesDiv.appendChild(aiMessage3);
+        
+        // Initialize chart after message is added
+        setTimeout(() => {
+            const canvas = document.getElementById('exportChart');
+            if (canvas && canvas.getContext) {
+                drawExportChart(canvas);
+            }
+        }, 100);
+    }
+    
+    // Draw export chart
+    function drawExportChart(canvas) {
+        const ctx = canvas.getContext('2d');
+        const width = canvas.width = canvas.offsetWidth;
+        const height = canvas.height = 300;
+        
+        // Sample data
+        const data = [45.2, 42.8, 48.6, 51.3, 49.7, 53.9];
+        const labels = ['1월', '2월', '3월', '4월', '5월', '6월'];
+        const maxValue = 60;
+        
+        // Clear canvas
+        ctx.clearRect(0, 0, width, height);
+        
+        // Draw axes
+        ctx.strokeStyle = '#e9e9e7';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(40, 20);
+        ctx.lineTo(40, height - 40);
+        ctx.lineTo(width - 20, height - 40);
+        ctx.stroke();
+        
+        // Draw bars
+        const barWidth = (width - 80) / data.length * 0.6;
+        const barSpacing = (width - 80) / data.length;
+        
+        data.forEach((value, index) => {
+            const barHeight = (value / maxValue) * (height - 80);
+            const x = 40 + index * barSpacing + barSpacing * 0.2;
+            const y = height - 40 - barHeight;
+            
+            // Bar gradient
+            const gradient = ctx.createLinearGradient(0, y, 0, height - 40);
+            gradient.addColorStop(0, '#0066FF');
+            gradient.addColorStop(1, '#00D4AA');
+            
+            ctx.fillStyle = gradient;
+            ctx.fillRect(x, y, barWidth, barHeight);
+            
+            // Value label
+            ctx.fillStyle = '#37352f';
+            ctx.font = '12px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(`$${value}M`, x + barWidth / 2, y - 5);
+            
+            // Month label
+            ctx.fillText(labels[index], x + barWidth / 2, height - 25);
+        });
+        
+        // Y-axis labels
+        ctx.fillStyle = '#787774';
+        ctx.font = '11px sans-serif';
+        ctx.textAlign = 'right';
+        for (let i = 0; i <= 5; i++) {
+            const value = (maxValue / 5) * i;
+            const y = height - 40 - (i * (height - 80) / 5);
+            ctx.fillText(`$${value}M`, 35, y + 4);
+        }
+        
+        // Title
+        ctx.fillStyle = '#37352f';
+        ctx.font = 'bold 14px sans-serif';
+        ctx.textAlign = 'left';
+        ctx.fillText('2024년 상반기 월별 수출 실적', 50, 15);
+    }
+    
+    // Create message element
+    function createMessage(type, text, hasThinking = false, references = []) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message message--${type}`;
+        
+        const now = new Date();
+        const time = now.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
+        
+        if (type === 'user') {
+            messageDiv.innerHTML = `
+                <div class="message-header">
+                    <div class="message-avatar">나</div>
+                    <div class="message-sender">사용자</div>
+                    <div class="message-time">${time}</div>
+                </div>
+                <div class="message-content">
+                    <div class="message-edit-wrapper">
+                        <div class="message-text" contenteditable="false">${text}</div>
+                        <button class="edit-button" onclick="editMessage(this)">✏️</button>
+                    </div>
+                </div>
+            `;
+        } else {
+            messageDiv.innerHTML = `
+                <div class="message-header">
+                    <div class="message-avatar message-avatar--ai">AI</div>
+                    <div class="message-sender">Weraser AI</div>
+                    <div class="message-time">${time}</div>
+                </div>
+                <div class="message-content">
+                    <div class="message-text">${text}</div>
+                    ${hasThinking && showThinkingProcess ? `
+                        <div class="thinking-process">
+                            <div class="thinking-header" onclick="toggleThinking(this)">
+                                <span>▶</span>
+                                <span>사고 과정</span>
+                            </div>
+                            <div class="thinking-content" style="display: none;">
+                                1. 질문 분석: "H-Line 프로젝트" + "할인율" 키워드 추출<br>
+                                2. 문서 검색: 2023년 계약서, 회의록 검색<br>
+                                3. 정보 추출: 할인율 15% 확인<br>
+                                4. 교차 검증: CFO 승인 문서에서 재확인<br>
+                                5. 답변 생성: 정확한 수치와 출처 명시
+                            </div>
+                        </div>
+                    ` : ''}
+                    ${references.length > 0 ? references.map(ref => `
+                        <span class="reference-card" onclick="showDocument('${ref}')">
+                            📄 ${ref}
+                        </span>
+                    `).join('') : ''}
+                </div>
+            `;
+        }
+        
+        return messageDiv;
+    }
+    
+    
+    // Toggle sidebar
+    function toggleSidebar() {
+        document.getElementById('sidebar').classList.toggle('collapsed');
+    }
+    
+    // Create new project
+    function createNewProject() {
+        const name = prompt('프로젝트 이름을 입력하세요:');
+        if (name) {
+            const newProject = {
+                id: `proj${projects.length + 1}`,
+                name: name,
+                documentCount: 0,
+                chats: [],
+                documents: []
+            };
+            projects.push(newProject);
+            renderSidebar();
+            WeraserCore.ui.showNotification(`프로젝트 '${name}' 생성됨`, 'success');
+        }
+    }
+    
+    // Create new chat
+    function createNewChat(projectId) {
+        const chatName = prompt('채팅 이름을 입력하세요:', '새 채팅');
+        if (chatName) {
+            const project = projects.find(p => p.id === projectId);
+            const newChat = {
+                id: `chat${Date.now()}`,
+                title: chatName,
+                lastMessage: '',
+                time: '방금 전'
+            };
+            project.chats.push(newChat);
+            
+            // Update view
+            currentChat = newChat.id;
+            renderSidebar();
+            loadChatMessages(newChat.id);
+            WeraserCore.ui.showNotification(`채팅 '${chatName}' 생성됨`, 'success');
+        }
+    }
+    
+    // Message editing
+    function editMessage(button) {
+        const wrapper = button.closest('.message-edit-wrapper');
+        const messageText = wrapper.querySelector('.message-text');
+        
+        if (messageText.contentEditable === 'false') {
+            // Start editing
+            messageText.contentEditable = 'true';
+            messageText.focus();
+            button.textContent = '✓';
+            
+            // Fade subsequent AI messages
+            let nextMessage = wrapper.closest('.message').nextElementSibling;
+            while (nextMessage) {
+                if (nextMessage.classList.contains('message--ai')) {
+                    nextMessage.style.opacity = '0.3';
+                }
+                nextMessage = nextMessage.nextElementSibling;
+            }
+        } else {
+            // Finish editing and regenerate
+            messageText.contentEditable = 'false';
+            button.textContent = '✏️';
+            
+            // Remove faded messages and regenerate AI response
+            let nextMessage = wrapper.closest('.message').nextElementSibling;
+            while (nextMessage && nextMessage.classList.contains('message--ai')) {
+                const temp = nextMessage.nextElementSibling;
+                nextMessage.remove();
+                nextMessage = temp;
+            }
+            
+            // Generate new AI response
+            generateAIResponse(messageText.textContent);
+        }
+    }
+    
+    // Generate AI response
+    async function generateAIResponse(message) {
+        const messagesDiv = document.getElementById('chatMessages');
+        
+        // Show typing indicator
+        WeraserCore.ui.showNotification('AI가 답변을 생성중...', 'info');
+        
+        // Simulate AI response
+        setTimeout(() => {
+            const aiMessage = createMessage('ai', 
+                `"${message}"에 대한 답변입니다.
+                
+                관련 문서를 검색하여 정확한 정보를 제공해드리겠습니다.`,
+                true,
+                []
+            );
+            messagesDiv.appendChild(aiMessage);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }, 1000);
+    }
+    
+    // Toggle thinking process
+    function toggleThinking(element) {
+        const content = element.nextElementSibling;
+        const toggle = element.querySelector('span:first-child');
+        
+        if (content.style.display === 'none' || !content.style.display) {
+            content.style.display = 'block';
+            toggle.textContent = '▼';
+        } else {
+            content.style.display = 'none';
+            toggle.textContent = '▶';
+        }
+    }
+    
+    // Toggle thinking mode
+    function toggleThinkingMode() {
+        showThinkingProcess = !showThinkingProcess;
+        const button = event.currentTarget;
+        button.classList.toggle('active');
+        WeraserCore.ui.showNotification(
+            showThinkingProcess ? '사고 과정 표시 켜짐' : '사고 과정 표시 꺼짐',
+            'info'
+        );
+    }
+    
+    // Send message
+    async function sendMessage() {
+        const input = document.getElementById('chatInput');
+        const message = input.value.trim();
+        if (!message) return;
+        
+        // Add user message
+        const messagesDiv = document.getElementById('chatMessages');
+        const userMessage = createMessage('user', message);
+        messagesDiv.appendChild(userMessage);
+        
+        // Clear input
+        input.value = '';
+        input.style.height = 'auto';
+        
+        // Disable send button
+        document.getElementById('sendButton').disabled = true;
+        
+        // Generate AI response
+        await generateAIResponse(message);
+        
+        // Enable send button
+        document.getElementById('sendButton').disabled = false;
+        
+        // Scroll to bottom
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+    
+    // Handle input keydown
+    function handleInputKeydown(event) {
+        if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault();
+            sendMessage();
+        }
+    }
+    
+    // Adjust input height
+    function adjustInputHeight(textarea) {
+        textarea.style.height = 'auto';
+        textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
+    }
+    
+    // Upload document
+    function uploadDocument() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.multiple = true;
+        input.accept = '.pdf,.docx,.xlsx,.csv,.txt,.pptx';
+        input.onchange = async (e) => {
+            const files = e.target.files;
+            WeraserCore.ui.showNotification(`${files.length}개 문서 업로드 중...`, 'info');
+            
+            // Add to current project's documents
+            const project = projects.find(p => p.id === currentProject);
+            for (const file of files) {
+                project.documents.push({ type: 'file', name: file.name });
+                project.documentCount++;
+            }
+            
+            renderSidebar();
+            setTimeout(() => {
+                WeraserCore.ui.showNotification(`${files.length}개 문서 업로드 완료`, 'success');
+            }, 1000);
+        };
+        input.click();
+    }
+    
+    // Import from organization
+    function importFromOrg() {
+        WeraserCore.ui.showNotification('조직 공유 저장소에서 문서 선택 화면 표시', 'info');
+        // TODO: Show organization document picker
+    }
+    
+    // Show document
+    function showDocument(filename) {
+        WeraserCore.ui.showNotification(`문서 '${filename}' 열기`, 'info');
+        // TODO: Open document viewer
+    }
+    
+    // Close modal
+    function closeModal(modalId) {
+        document.getElementById(modalId).classList.remove('show');
+    }
+    
+    // Rename chat
+    function renameChat() {
+        const project = projects.find(p => p.id === currentProject);
+        const chat = project.chats.find(c => c.id === currentChat);
+        const newName = prompt('새 채팅 이름:', chat.title);
+        if (newName && newName !== chat.title) {
+            chat.title = newName;
+            renderSidebar();
+            updateBreadcrumb();
+            WeraserCore.ui.showNotification('채팅 이름 변경됨', 'success');
+        }
+    }
+    
+    // Delete chat
+    function deleteChat() {
+        if (confirm('이 채팅을 삭제하시겠습니까?')) {
+            const project = projects.find(p => p.id === currentProject);
+            const chatIndex = project.chats.findIndex(c => c.id === currentChat);
+            project.chats.splice(chatIndex, 1);
+            
+            // Show welcome or first chat
+            if (project.chats.length > 0) {
+                selectChat(currentProject, project.chats[0].id);
+            } else {
+                currentChat = null;
+                showProjectWelcome(currentProject);
+            }
+            
+            renderSidebar();
+            WeraserCore.ui.showNotification('채팅 삭제됨', 'success');
+        }
+    }
+    
+    // Go to admin
+    function goToAdmin() {
+        window.location.href = 'admin.html';
+    }
+    
+    // Show profile
+    function showProfile() {
+        WeraserCore.ui.showNotification('프로필 화면 표시', 'info');
+    }
+</script>
+</body>
+</html>

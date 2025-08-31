@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Operations coreChat - Weraser</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header__logo">
+                <h1>Weraser coreChat</h1>
+                <span class="header__tagline">99.4% 정확도의 AI 업무 비서</span>
+            </div>
+            <nav class="header__nav">
+                <ul class="nav__list">
+                    <li class="nav__item"><a href="index.html">홈</a></li>
+                    <li class="nav__item"><span>김대리님</span></li>
+                    <li class="nav__item"><button class="btn btn--primary-small">문서 업로드</button></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Chat Container -->
+    <div class="chat-container">
+        <!-- Sidebar -->
+        <aside class="chat-sidebar">
+            <!-- Agent Selector -->
+            <div class="agent-selector">
+                <h3 class="agent-selector__title">AI 에이전트 선택</h3>
+                <div class="agent-option agent-option--active" data-agent="general">
+                    <span class="agent-option__icon">🤖</span>
+                    <span>일반 비서</span>
+                </div>
+                <div class="agent-option" data-agent="logistics">
+                    <span class="agent-option__icon">📦</span>
+                    <span>물류 전문가</span>
+                </div>
+                <div class="agent-option" data-agent="customs">
+                    <span class="agent-option__icon">🛃</span>
+                    <span>관세 전문가</span>
+                </div>
+                <div class="agent-option" data-agent="legal" style="opacity: 0.5;">
+                    <span class="agent-option__icon">⚖️</span>
+                    <span>법무 전문가 (준비중)</span>
+                </div>
+            </div>
+
+            <!-- Document List -->
+            <div class="document-list">
+                <h3 class="document-list__title">업로드된 문서</h3>
+                <div class="document-item">📄 2024_사업계획서.pdf</div>
+                <div class="document-item">📊 Q3_매출보고서.xlsx</div>
+                <div class="document-item">📝 H-Line_계약서.docx</div>
+                <div class="document-item">📋 제품_HS코드_목록.csv</div>
+            </div>
+
+            <!-- Upload Area -->
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-area__icon">📤</div>
+                <div class="upload-area__text">
+                    문서를 드래그하거나<br>클릭하여 업로드
+                </div>
+                <input type="file" id="fileInput" multiple accept=".pdf,.docx,.xlsx,.csv,.txt" style="display: none;">
+            </div>
+        </aside>
+
+        <!-- Main Chat Area -->
+        <main class="chat-main">
+            <!-- Chat Header -->
+            <div class="chat-header">
+                <h2>Daily Operations coreChat</h2>
+                <p>업로드된 문서를 기반으로 즉시 정확한 답변을 제공합니다</p>
+            </div>
+
+            <!-- Chat Messages -->
+            <div class="chat-messages" id="chatMessages">
+                <!-- Welcome Message -->
+                <div class="message message--ai">
+                    <div class="message__content">
+                        안녕하세요! Weraser AI 비서입니다. 🤖<br><br>
+                        업로드하신 문서를 기반으로 질문에 답변해드립니다.<br>
+                        예시 질문:<br>
+                        • "지난 분기 매출 현황 요약해줘"<br>
+                        • "H-Line 계약의 최종 할인율은?"<br>
+                        • "이 제품의 HS 코드 찾아줘"<br><br>
+                        무엇을 도와드릴까요?
+                    </div>
+                </div>
+
+                <!-- Example Conversation -->
+                <div class="message message--user">
+                    <div class="message__content">
+                        작년 H-Line 계약의 최종 할인율과 근거 자료 찾아줘
+                    </div>
+                </div>
+
+                <div class="message message--ai">
+                    <div class="message__content">
+                        H-Line 계약서를 분석한 결과입니다:<br><br>
+                        <strong>최종 할인율: 15%</strong><br><br>
+                        적용 조건:<br>
+                        • 연간 구매량 10,000개 이상<br>
+                        • 3년 장기 계약<br>
+                        • 조기 결제 (30일 이내)<br><br>
+                        할인 구성:<br>
+                        - 물량 할인: 8%<br>
+                        - 장기계약 할인: 5%<br>
+                        - 조기결제 할인: 2%
+                        <div class="message__reference">
+                            📎 출처: H-Line_계약서.docx (p.12-13, 제7조 가격 및 할인 조건)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="message message--user">
+                    <div class="message__content">
+                        이번 분기 매출 목표 달성을 위해 뭘 해야 하지?
+                    </div>
+                </div>
+
+                <div class="message message--ai">
+                    <div class="message__content">
+                        Q3 매출 보고서를 분석한 결과, 목표 달성을 위한 액션 플랜입니다:<br><br>
+                        <strong>현재 상황</strong><br>
+                        • 목표: 50억원<br>
+                        • 현재 실적: 32억원 (64% 달성)<br>
+                        • 남은 기간: 45일<br><br>
+                        <strong>필요 조치</strong><br>
+                        1. <strong>대기 중인 견적 마감</strong> (예상 8억원)<br>
+                           - 램리서치: 5억원 (승인 대기)<br>
+                           - 한국타이어: 3억원 (최종 협상 중)<br><br>
+                        2. <strong>신규 리드 집중 공략</strong> (예상 7억원)<br>
+                           - 반도체 3사 RFP 참여<br>
+                           - 자동차 부품사 POC 제안<br><br>
+                        3. <strong>기존 고객 업셀링</strong> (예상 3억원)<br>
+                           - H-Line 추가 모듈 제안<br>
+                           - 연간 계약 전환 프로모션
+                        <div class="message__reference">
+                            📎 출처: Q3_매출보고서.xlsx (Sheet: 파이프라인, 행 23-45)
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat Input -->
+            <div class="chat-input">
+                <form class="chat-input__form" id="chatForm">
+                    <input 
+                        type="text" 
+                        class="chat-input__field" 
+                        id="chatInput"
+                        placeholder="질문을 입력하세요... (예: 지난주 회의록 찾아줘)"
+                        autocomplete="off"
+                    >
+                    <button type="submit" class="chat-input__submit">전송</button>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
