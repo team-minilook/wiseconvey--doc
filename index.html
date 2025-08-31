@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Weraser - AI Knowledge Platform</title>
     <link rel="stylesheet" href="assets/shared.css">
+    <link rel="stylesheet" href="gemini-api.css">
+    <!-- Gemini API Integration -->
+    <script src="gemini-api.js"></script>
     <style>
         /* Notion-inspired Clean Design */
         * {
@@ -1547,21 +1550,68 @@
     async function generateAIResponse(message) {
         const messagesDiv = document.getElementById('chatMessages');
         
+        // Initialize Gemini if not already done
+        if (!window.geminiChat) {
+            // API key should be set via the modal or localStorage
+            const apiKey = localStorage.getItem('gemini_api_key');
+            if (!apiKey) {
+                WeraserCore.ui.showNotification('API 키를 먼저 설정해주세요', 'warning');
+                initializeGeminiChat(); // Show API key modal
+                return;
+            }
+            window.geminiChat = new GeminiChat(apiKey);
+        }
+        
         // Show typing indicator
         WeraserCore.ui.showNotification('AI가 답변을 생성중...', 'info');
         
-        // Simulate AI response
-        setTimeout(() => {
-            const aiMessage = createMessage('ai', 
-                `"${message}"에 대한 답변입니다.
+        // Get current project documents
+        const project = projects.find(p => p.id === currentProject);
+        const documents = project ? project.documents.map(doc => ({
+            name: doc.name,
+            type: doc.type || 'file',
+            content: doc.content || '' // In real implementation, would load actual content
+        })) : [];
+        
+        try {
+            // Send message to Gemini
+            const result = await window.geminiChat.sendMessage(message, documents);
+            
+            if (result.success) {
+                // Create AI message with actual Gemini response
+                const aiMessage = createMessage('ai', 
+                    result.response,
+                    true,
+                    result.sources.map(s => s.name)
+                );
+                messagesDiv.appendChild(aiMessage);
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            } else {
+                // Handle error
+                WeraserCore.ui.showNotification('오류: ' + result.error, 'error');
                 
-                관련 문서를 검색하여 정확한 정보를 제공해드리겠습니다.`,
-                true,
+                // Fallback message
+                const aiMessage = createMessage('ai', 
+                    `죄송합니다. 응답 생성 중 오류가 발생했습니다. 다시 시도해주세요.`,
+                    false,
+                    []
+                );
+                messagesDiv.appendChild(aiMessage);
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            }
+        } catch (error) {
+            console.error('Gemini API Error:', error);
+            WeraserCore.ui.showNotification('API 연결 오류', 'error');
+            
+            // Fallback message
+            const aiMessage = createMessage('ai', 
+                `네트워크 오류가 발생했습니다. 인터넷 연결을 확인해주세요.`,
+                false,
                 []
             );
             messagesDiv.appendChild(aiMessage);
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
-        }, 1000);
+        }
     }
     
     // Toggle thinking process
