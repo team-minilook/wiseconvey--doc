@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Gemini API 직접 테스트</title>
+</head>
+<body>
+    <h1>Gemini API 테스트 (새 키)</h1>
+    <button onclick="testAPI()">API 테스트</button>
+    <pre id="result"></pre>
+
+    <script>
+        async function testAPI() {
+            const apiKey = 'AIzaSyCI1spB1J-3E5lkwmEUzG8v5C37duj0HVg';
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`;
+            
+            document.getElementById('result').textContent = '테스트 중...';
+            
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [{
+                                text: "Say hello in Korean"
+                            }]
+                        }]
+                    })
+                });
+                
+                const data = await response.json();
+                document.getElementById('result').textContent = JSON.stringify(data, null, 2);
+                
+                if (!response.ok) {
+                    console.error('API Error:', data);
+                }
+            } catch (error) {
+                document.getElementById('result').textContent = `Error: ${error.message}`;
+                console.error('Fetch error:', error);
+            }
+        }
+        
+        // 자동 실행
+        window.onload = testAPI;
+    </script>
+</body>
+</html>

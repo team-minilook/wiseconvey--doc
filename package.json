@@ -4,7 +4,14 @@
   "description": "Weraser AI Knowledge Platform Prototype",
   "scripts": {
     "dev": "npx http-server . -p 3000 -o",
+    "proxy": "node api-proxy.js",
+    "test-api": "open http://localhost:8080/test-api.html",
     "build": "echo 'Static site - no build needed'"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "axios": "^1.6.0"
   },
   "keywords": ["weraser", "ai", "knowledge-management", "rag"],
   "author": "Weraser Team",

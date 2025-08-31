@@ -3,7 +3,7 @@ class GeminiChat {
     constructor(apiKey) {
         this.apiKey = apiKey;
         this.baseURL = 'https://generativelanguage.googleapis.com/v1beta';
-        this.model = 'gemini-pro';
+        this.model = 'gemini-1.5-flash';  // Updated to working model
         this.chatHistory = [];
     }
 
@@ -138,7 +138,7 @@ class GeminiChat {
         return sources;
     }
 
-    // 스트리밍 응답 (Gemini Pro Vision 필요)
+    // 스트리밍 응답
     async *streamMessage(message, documents = []) {
         try {
             let fullMessage = message;
@@ -213,63 +213,49 @@ class GeminiChat {
 
 // UI 통합 헬퍼 함수
 function initializeGeminiChat() {
-    // API 키 입력 모달 표시
-    const apiKeyModal = document.createElement('div');
-    apiKeyModal.className = 'gemini-api-modal';
-    apiKeyModal.innerHTML = `
-        <div class="modal-backdrop"></div>
-        <div class="modal-content">
-            <h2>Gemini API 설정</h2>
-            <p>Gemini API 키를 입력하세요. <a href="https://makersuite.google.com/app/apikey" target="_blank">키 받기 →</a></p>
-            <input type="password" id="geminiApiKey" placeholder="AIzaSy..." />
-            <div class="modal-buttons">
-                <button onclick="saveGeminiApiKey()">저장</button>
-                <button onclick="skipGeminiSetup()">나중에</button>
-            </div>
-            <p class="modal-note">⚠️ API 키는 브라우저 로컬 저장소에만 저장되며 서버로 전송되지 않습니다.</p>
-        </div>
-    `;
+    // Get API key from secure config or localStorage
+    let apiKey = localStorage.getItem('gemini_api_key');
     
-    // 기존 API 키 확인
-    const savedApiKey = localStorage.getItem('gemini_api_key');
-    if (savedApiKey) {
-        window.geminiChat = new GeminiChat(savedApiKey);
-        console.log('Gemini API initialized with saved key');
-    } else {
-        document.body.appendChild(apiKeyModal);
+    // If no saved key, use the secure config
+    if (!apiKey && window.GEMINI_API_CONFIG) {
+        apiKey = window.GEMINI_API_CONFIG.getKey();
     }
-}
-
-// API 키 저장
-function saveGeminiApiKey() {
-    const apiKeyInput = document.getElementById('geminiApiKey');
-    const apiKey = apiKeyInput.value.trim();
     
     if (!apiKey) {
-        alert('API 키를 입력하세요.');
+        console.error('No API key available');
+        showNotification('API 키를 찾을 수 없습니다', 'error');
         return;
     }
     
-    // API 키 유효성 검사
+    // Gemini 초기화
     window.geminiChat = new GeminiChat(apiKey);
-    window.geminiChat.validateApiKey().then(isValid => {
-        if (isValid) {
-            localStorage.setItem('gemini_api_key', apiKey);
-            document.querySelector('.gemini-api-modal').remove();
-            showNotification('Gemini API 연결 성공!', 'success');
-            
-            // 채팅 인터페이스 활성화
-            enableGeminiChat();
-        } else {
-            alert('유효하지 않은 API 키입니다. 다시 확인해주세요.');
-        }
-    });
+    console.log('Gemini API initialized successfully');
+    
+    // API 상태 표시 (함수가 있는 경우에만)
+    if (typeof showApiStatus === 'function') {
+        showApiStatus(true);
+    }
+    
+    // 채팅 기능 즉시 활성화
+    enableGeminiChat();
 }
 
-// API 설정 건너뛰기
-function skipGeminiSetup() {
-    document.querySelector('.gemini-api-modal').remove();
-    showNotification('API 키 없이는 AI 기능을 사용할 수 없습니다.', 'warning');
+// API 상태 표시 함수
+function showApiStatus(connected) {
+    // Create status indicator if it doesn't exist
+    if (!document.querySelector('.api-status')) {
+        const statusDiv = document.createElement('div');
+        statusDiv.className = `api-status ${connected ? 'connected' : 'disconnected'}`;
+        statusDiv.innerHTML = `
+            <span class="api-status-dot"></span>
+            <span>Gemini API ${connected ? '연결됨' : '연결 안됨'}</span>
+        `;
+        document.body.appendChild(statusDiv);
+    } else {
+        const status = document.querySelector('.api-status');
+        status.className = `api-status ${connected ? 'connected' : 'disconnected'}`;
+        status.querySelector('span:last-child').textContent = `Gemini API ${connected ? '연결됨' : '연결 안됨'}`;
+    }
 }
 
 // 채팅 기능 활성화

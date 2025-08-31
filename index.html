@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="assets/shared.css">
     <link rel="stylesheet" href="gemini-api.css">
     <!-- Gemini API Integration -->
+    <script src="config-secure.js"></script>
     <script src="gemini-api.js"></script>
     <style>
         /* Notion-inspired Clean Design */
@@ -1552,14 +1553,8 @@
         
         // Initialize Gemini if not already done
         if (!window.geminiChat) {
-            // API key should be set via the modal or localStorage
-            const apiKey = localStorage.getItem('gemini_api_key');
-            if (!apiKey) {
-                WeraserCore.ui.showNotification('API 키를 먼저 설정해주세요', 'warning');
-                initializeGeminiChat(); // Show API key modal
-                return;
-            }
-            window.geminiChat = new GeminiChat(apiKey);
+            // Initialize with default or saved key
+            initializeGeminiChat();
         }
         
         // Show typing indicator

@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemini API 테스트</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+        }
+        button {
+            padding: 10px 20px;
+            background: #0066FF;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0052cc;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 6px;
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+        .success {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        .error {
+            background: #ffebee;
+            color: #c62828;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Gemini API 키 테스트</h1>
+    
+    <div class="test-section">
+        <h2>1. API 키 입력</h2>
+        <input type="text" id="apiKey" placeholder="AIzaSy..." value="AIzaSyBOoxrunnLgHYTnytY281yJFAikSEQV-J0">
+        <button onclick="testBasicConnection()">기본 연결 테스트</button>
+        <button onclick="testModelsList()">사용 가능한 모델 확인</button>
+        <button onclick="testGenerateContent()">콘텐츠 생성 테스트</button>
+        <div id="result1" class="result" style="display:none;"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>2. 상세 진단</h2>
+        <button onclick="runFullDiagnostics()">전체 진단 실행</button>
+        <div id="result2" class="result" style="display:none;"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>3. 대체 방법</h2>
+        <button onclick="testWithFetch()">Fetch API 직접 테스트</button>
+        <button onclick="testWithXHR()">XMLHttpRequest 테스트</button>
+        <div id="result3" class="result" style="display:none;"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://generativelanguage.googleapis.com/v1beta';
+        
+        function getApiKey() {
+            return document.getElementById('apiKey').value.trim();
+        }
+        
+        function showResult(elementId, message, isSuccess) {
+            const resultDiv = document.getElementById(elementId);
+            resultDiv.style.display = 'block';
+            resultDiv.className = `result ${isSuccess ? 'success' : 'error'}`;
+            resultDiv.textContent = message;
+        }
+        
+        async function testBasicConnection() {
+            const apiKey = getApiKey();
+            showResult('result1', '연결 테스트 중...', true);
+            
+            try {
+                const response = await fetch(`${API_BASE}/models?key=${apiKey}`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showResult('result1', 
+                        `✅ 연결 성공!\n\n사용 가능한 모델 수: ${data.models ? data.models.length : 0}\n\n` +
+                        JSON.stringify(data, null, 2), 
+                        true
+                    );
+                } else {
+                    showResult('result1', 
+                        `❌ 연결 실패\n\n상태 코드: ${response.status}\n에러: ${JSON.stringify(data, null, 2)}`, 
+                        false
+                    );
+                }
+            } catch (error) {
+                showResult('result1', `❌ 네트워크 에러\n\n${error.message}`, false);
+            }
+        }
+        
+        async function testModelsList() {
+            const apiKey = getApiKey();
+            showResult('result1', '모델 목록 조회 중...', true);
+            
+            try {
+                const response = await fetch(`${API_BASE}/models?key=${apiKey}`);
+                const data = await response.json();
+                
+                if (response.ok && data.models) {
+                    const modelList = data.models.map(m => `- ${m.name}: ${m.displayName}`).join('\n');
+                    showResult('result1', 
+                        `✅ 사용 가능한 모델:\n\n${modelList}`, 
+                        true
+                    );
+                } else {
+                    showResult('result1', 
+                        `❌ 모델 조회 실패\n\n${JSON.stringify(data, null, 2)}`, 
+                        false
+                    );
+                }
+            } catch (error) {
+                showResult('result1', `❌ 에러: ${error.message}`, false);
+            }
+        }
+        
+        async function testGenerateContent() {
+            const apiKey = getApiKey();
+            showResult('result1', '콘텐츠 생성 테스트 중...', true);
+            
+            try {
+                const response = await fetch(`${API_BASE}/models/gemini-pro:generateContent?key=${apiKey}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [{
+                                text: "Hello, please respond with 'Hi' if you can hear me."
+                            }]
+                        }]
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No response';
+                    showResult('result1', 
+                        `✅ 생성 성공!\n\nGemini 응답: ${responseText}\n\n전체 응답:\n${JSON.stringify(data, null, 2)}`, 
+                        true
+                    );
+                } else {
+                    showResult('result1', 
+                        `❌ 생성 실패\n\n상태 코드: ${response.status}\n에러: ${JSON.stringify(data, null, 2)}`, 
+                        false
+                    );
+                }
+            } catch (error) {
+                showResult('result1', `❌ 에러: ${error.message}`, false);
+            }
+        }
+        
+        async function runFullDiagnostics() {
+            const apiKey = getApiKey();
+            let report = '🔍 전체 진단 시작...\n\n';
+            
+            // 1. API 키 형식 확인
+            report += '1. API 키 형식 확인\n';
+            if (apiKey.startsWith('AIzaSy')) {
+                report += '   ✅ 올바른 형식\n';
+            } else {
+                report += '   ❌ 잘못된 형식 (AIzaSy로 시작해야 함)\n';
+            }
+            report += `   길이: ${apiKey.length}자\n\n`;
+            
+            // 2. 네트워크 연결 확인
+            report += '2. 네트워크 연결 확인\n';
+            try {
+                const pingResponse = await fetch('https://www.google.com/favicon.ico');
+                report += '   ✅ 인터넷 연결 정상\n\n';
+            } catch {
+                report += '   ❌ 인터넷 연결 문제\n\n';
+            }
+            
+            // 3. API 엔드포인트 접근성
+            report += '3. Gemini API 엔드포인트 테스트\n';
+            const endpoints = [
+                '/models',
+                '/models/gemini-pro',
+                '/models/gemini-pro:generateContent'
+            ];
+            
+            for (const endpoint of endpoints) {
+                try {
+                    const url = `${API_BASE}${endpoint}?key=${apiKey}`;
+                    const response = await fetch(url, {
+                        method: endpoint.includes('generate') ? 'POST' : 'GET',
+                        headers: {'Content-Type': 'application/json'},
+                        body: endpoint.includes('generate') ? JSON.stringify({
+                            contents: [{parts: [{text: "test"}]}]
+                        }) : undefined
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (response.ok) {
+                        report += `   ✅ ${endpoint}: 성공\n`;
+                    } else {
+                        report += `   ❌ ${endpoint}: ${response.status} - ${data.error?.message || 'Unknown error'}\n`;
+                    }
+                } catch (error) {
+                    report += `   ❌ ${endpoint}: ${error.message}\n`;
+                }
+            }
+            
+            // 4. CORS 확인
+            report += '\n4. CORS 정책 확인\n';
+            report += '   ℹ️ 브라우저에서 직접 호출 시 CORS 문제 발생 가능\n';
+            report += '   💡 해결방법: 서버 프록시 사용 또는 로컬 개발 서버\n';
+            
+            showResult('result2', report, report.includes('✅ /models/gemini-pro:generateContent'));
+        }
+        
+        async function testWithFetch() {
+            const apiKey = getApiKey();
+            showResult('result3', 'Fetch API로 테스트 중...', true);
+            
+            const testCode = `
+// 직접 Fetch 테스트
+fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+        contents: [{
+            parts: [{
+                text: "Say hello"
+            }]
+        }]
+    })
+})
+.then(response => response.json())
+.then(data => console.log(data))
+.catch(error => console.error(error));
+            `;
+            
+            try {
+                eval(testCode);
+                showResult('result3', `테스트 코드 실행됨. 콘솔을 확인하세요.\n\n${testCode}`, true);
+            } catch (error) {
+                showResult('result3', `에러: ${error.message}`, false);
+            }
+        }
+        
+        function testWithXHR() {
+            const apiKey = getApiKey();
+            showResult('result3', 'XMLHttpRequest로 테스트 중...', true);
+            
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', `${API_BASE}/models/gemini-pro:generateContent?key=${apiKey}`);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    showResult('result3', 
+                        `✅ XHR 성공!\n\n${xhr.responseText}`, 
+                        true
+                    );
+                } else {
+                    showResult('result3', 
+                        `❌ XHR 실패\n\n상태: ${xhr.status}\n응답: ${xhr.responseText}`, 
+                        false
+                    );
+                }
+            };
+            
+            xhr.onerror = function() {
+                showResult('result3', `❌ XHR 네트워크 에러`, false);
+            };
+            
+            xhr.send(JSON.stringify({
+                contents: [{
+                    parts: [{
+                        text: "Hello"
+                    }]
+                }]
+            }));
+        }
+        
+        // 페이지 로드 시 자동 진단
+        window.onload = function() {
+            console.log('Gemini API 테스트 페이지 로드됨');
+            console.log('API 키를 입력하고 테스트 버튼을 클릭하세요.');
+        };
+    </script>
+</body>
+</html>
