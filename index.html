@@ -10,6 +10,11 @@
     <script src="config-secure.js"></script>
     <script src="gemini-api.js"></script>
     <style>
+        /* Hide Gemini API Modal - No modal needed */
+        .gemini-api-modal {
+            display: none !important;
+        }
+        
         /* Notion-inspired Clean Design */
         * {
             margin: 0;
@@ -890,6 +895,12 @@
         WeraserCore.init('phase1');
         renderSidebar();
         showWelcomeScreen();
+        
+        // Initialize Gemini without modal
+        window.NO_API_MODAL = true;
+        if (typeof initializeGeminiChat === 'function') {
+            initializeGeminiChat();
+        }
     });
     
     // Render document tree

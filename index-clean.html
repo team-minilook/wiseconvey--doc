@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weraser - AI Knowledge Platform (Clean)</title>
+    <link rel="stylesheet" href="assets/shared.css">
+    <link rel="stylesheet" href="gemini-api.css">
+    <!-- Gemini API Integration - No Modal Version -->
+    <script src="config-secure.js"></script>
+    <script>
+        // Override to prevent any modal creation
+        window.NO_MODAL = true;
+    </script>
+    <script src="gemini-api.js"></script>
+    <style>
+        /* Hide any modal that might appear */
+        .gemini-api-modal {
+            display: none !important;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        
+        .chat-area {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            height: 400px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            background: #fafafa;
+        }
+        
+        .input-area {
+            display: flex;
+            gap: 10px;
+        }
+        
+        input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+        
+        button {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #0066FF, #00D4AA);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+        }
+        
+        button:hover {
+            opacity: 0.9;
+        }
+        
+        .message {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 6px;
+        }
+        
+        .user-message {
+            background: #0066FF;
+            color: white;
+            text-align: right;
+        }
+        
+        .ai-message {
+            background: #f0f0f0;
+            color: #333;
+        }
+        
+        .status {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🤖 Weraser AI Chat - Clean Version (No Modal)</h1>
+        
+        <div class="status" id="status">Gemini API 초기화 중...</div>
+        
+        <div class="chat-area" id="chatArea">
+            <div class="message ai-message">
+                안녕하세요! Weraser AI입니다. 무엇을 도와드릴까요?
+            </div>
+        </div>
+        
+        <div class="input-area">
+            <input type="text" id="messageInput" placeholder="메시지를 입력하세요..." onkeypress="if(event.key==='Enter') sendMessage()">
+            <button onclick="sendMessage()">전송</button>
+        </div>
+    </div>
+
+    <script>
+        // Wait for Gemini to initialize
+        setTimeout(() => {
+            if (window.geminiChat) {
+                document.getElementById('status').textContent = '✅ Gemini API 연결됨';
+                document.getElementById('status').style.color = '#28a745';
+            } else {
+                document.getElementById('status').textContent = '❌ API 초기화 실패';
+                document.getElementById('status').style.color = '#dc3545';
+            }
+        }, 1000);
+        
+        async function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            // Add user message
+            const chatArea = document.getElementById('chatArea');
+            const userMsg = document.createElement('div');
+            userMsg.className = 'message user-message';
+            userMsg.textContent = message;
+            chatArea.appendChild(userMsg);
+            
+            input.value = '';
+            
+            // Check if Gemini is initialized
+            if (!window.geminiChat) {
+                const errorMsg = document.createElement('div');
+                errorMsg.className = 'message ai-message';
+                errorMsg.textContent = 'API가 초기화되지 않았습니다. 잠시 후 다시 시도해주세요.';
+                chatArea.appendChild(errorMsg);
+                return;
+            }
+            
+            // Send to Gemini
+            document.getElementById('status').textContent = '응답 생성 중...';
+            
+            try {
+                const result = await window.geminiChat.sendMessage(message, []);
+                
+                const aiMsg = document.createElement('div');
+                aiMsg.className = 'message ai-message';
+                aiMsg.textContent = result.success ? result.response : `오류: ${result.error}`;
+                chatArea.appendChild(aiMsg);
+                
+                document.getElementById('status').textContent = '✅ Gemini API 연결됨';
+            } catch (error) {
+                const errorMsg = document.createElement('div');
+                errorMsg.className = 'message ai-message';
+                errorMsg.textContent = `오류: ${error.message}`;
+                chatArea.appendChild(errorMsg);
+                
+                document.getElementById('status').textContent = '❌ 오류 발생';
+            }
+            
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+    </script>
+</body>
+</html>

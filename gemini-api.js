@@ -368,9 +368,14 @@ function showNotification(message, type = 'info') {
     setTimeout(() => notification.remove(), 3000);
 }
 
-// 페이지 로드 시 초기화
+// 페이지 로드 시 초기화 - 모달 없이 자동 초기화
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initializeGeminiChat);
+    document.addEventListener('DOMContentLoaded', () => {
+        // 모달 생성 방지
+        window.NO_API_MODAL = true;
+        initializeGeminiChat();
+    });
 } else {
+    window.NO_API_MODAL = true;
     initializeGeminiChat();
 }
