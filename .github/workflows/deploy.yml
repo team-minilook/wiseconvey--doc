@@ -1,0 +1,40 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [ prototype ]
+  pull_request:
+    branches: [ prototype ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      if: github.ref == 'refs/heads/prototype'
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./Prototype
+        publish_branch: gh-pages
+        force_orphan: true
+        exclude_assets: |
+          .github
+          .git
+          README.md
+          PLAN.md
+          PRD.md
+          기능요구사항.md
+          CORS-SOLUTION.md
+          Research
+        commit_message: |
+          Deploy from prototype: ${{ github.sha }}
+          
+          Auto-deployed from prototype branch
+          🤖 Generated with GitHub Actions
