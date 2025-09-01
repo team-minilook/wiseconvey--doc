@@ -123,25 +123,19 @@ Weraser는 기업의 지식 유실(Corporate Amnesia) 문제를 근본적으로 
 
 ## 5. Technical Requirements Summary
 
-### Core Architecture
-**참조**: [기능요구사항.md](./기능요구사항.md)의 기술적 상세 명세서
+### Technical Summary
+**상세 기술 스펙 및 아키텍처**: [개발가이드.md](./개발가이드.md) 참조
 
-- **프론트엔드**: HTML5/CSS3/JavaScript (Vanilla) → React 마이그레이션 고려
-- **백엔드**: Node.js + Express, Python FastAPI
-- **데이터베이스**: PostgreSQL (메타데이터), Pinecone (벡터), Redis (캐싱)
-- **AI 모델**: Gemini API (현재), Claude/GPT-4 (대안)
+**핵심 성능 요구사항**:
+- 응답 시간 3초 이내
+- 동시 사용자 100명 이상 지원  
+- RAG 정확도 90% 이상 (최종 99.4% 목표)
+- 시스템 가용성 99.9%
 
-### Key Technical Constraints
-- **CORS 제한**: 서버 프록시 구축 필수 (Vercel/Netlify Functions)
-- **문서 처리**: 99.9% OCR 정확도 요구
-- **실시간 처리**: 3초 이내 응답 시간
-- **확장성**: 동시 사용자 100명 이상 지원
-
-### Security Requirements
-- End-to-end 암호화
-- 역할 기반 접근 제어 (RBAC)
-- 사내 문서 기반 '닫힌 책' RAG
-- 감사 로그 시스템
+**보안 요구사항**:
+- 사내 문서 기반 '닫힌 책' RAG (환각 현상 원천 차단)
+- End-to-end 암호화 및 RBAC
+- 모든 응답에 출처 명시 (100% 투명성)
 
 ## 6. User Experience Requirements
 
@@ -203,32 +197,19 @@ Weraser는 기업의 지식 유실(Corporate Amnesia) 문제를 근본적으로 
 
 ## 9. Implementation Roadmap
 
+**상세 개발 일정 및 기술 명세**: [개발가이드.md](./개발가이드.md) 참조
+
 ### Phase 1: MVP (3개월)
-**목표**: 조직원 일상 업무 침투
-- 기본 RAG 시스템 구축
-- 프로젝트 기반 문서 관리
-- AI 채팅 인터페이스
-- 소스 한도 관리
+**목표**: 조직원 일상 업무 침투  
+**핵심 성공지표**: NPS 70+, 10개 파일럿 고객
 
 ### Phase 2: AI Agent (3개월)  
 **목표**: 실제 업무 처리
-- 전문 AI 에이전트 구현
-- 멀티 에이전트 협업
-- 워크플로우 자동화
-- 분석 대시보드
+**핵심 성공지표**: 100개 유료 고객, 월간 질의 10만건
 
 ### Phase 3: Enterprise (6개월)
-**목표**: 조직 차원 업무 연결  
-- 아티팩트 시스템
-- 전사 공유 기능
-- 보안 강화
-- 시스템 통합
-
-### Phase 4: Autonomous OS (6개월+)
-**목표**: 자율 운영 기업 OS
-- 완전 자동화 시스템
-- 지식 순환 체계
-- 디지털 의존성 구축
+**목표**: 조직 차원 업무 연결
+**핵심 성공지표**: 1,000개 기업 고객, ARPU $5,000/월
 
 ## 10. Stakeholder Alignment
 
