@@ -2,9 +2,7 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [ prototype ]
-  pull_request:
-    branches: [ prototype ]
+    branches: [ dev ]
 
 jobs:
   deploy:
@@ -18,23 +16,10 @@ jobs:
     
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
-      if: github.ref == 'refs/heads/prototype'
+      if: github.ref == 'refs/heads/dev'
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: ./Prototype
         publish_branch: gh-pages
         force_orphan: true
-        exclude_assets: |
-          .github
-          .git
-          README.md
-          PLAN.md
-          PRD.md
-          기능요구사항.md
-          CORS-SOLUTION.md
-          Research
-        commit_message: |
-          Deploy from prototype: ${{ github.sha }}
-          
-          Auto-deployed from prototype branch
-          🤖 Generated with GitHub Actions
+        commit_message: Deploy from dev branch ${{ github.sha }}
