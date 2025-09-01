@@ -47,6 +47,7 @@ class GeminiChat {
 
     // 메시지 전송
     async sendMessage(message, documents = []) {
+        console.log('Sending message to Gemini:', message);
         try {
             // 문서 컨텍스트 추가
             let fullMessage = message;
@@ -56,7 +57,10 @@ class GeminiChat {
             }
 
             // Gemini API 요청
-            const response = await fetch(`${this.baseURL}/models/${this.model}:generateContent?key=${this.apiKey}`, {
+            const url = `${this.baseURL}/models/${this.model}:generateContent?key=${this.apiKey}`;
+            console.log('API URL:', url.replace(this.apiKey, '***'));
+            
+            const response = await fetch(url, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -91,10 +95,12 @@ class GeminiChat {
             }
 
             const data = await response.json();
+            console.log('Gemini response:', data);
             
             // 응답 파싱
             if (data.candidates && data.candidates[0]) {
                 const responseText = data.candidates[0].content.parts[0].text;
+                console.log('Extracted text:', responseText);
                 
                 // 채팅 히스토리 저장
                 this.chatHistory.push({

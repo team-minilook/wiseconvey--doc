@@ -382,6 +382,61 @@
             margin-bottom: 24px;
         }
         
+        /* Loading Spinner */
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            margin: 8px 0;
+            background: #f7f6f3;
+            border-radius: 8px;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+        }
+        
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: #787774;
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out;
+        }
+        
+        .typing-dot:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+        
+        .typing-dot:nth-child(2) {
+            animation-delay: -0.16s;
+        }
+        
+        @keyframes bounce {
+            0%, 80%, 100% {
+                transform: scale(0.8);
+                opacity: 0.5;
+            }
+            40% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
         .message-header {
             display: flex;
             align-items: center;
@@ -1566,10 +1621,23 @@
         if (!window.geminiChat) {
             // Initialize with default or saved key
             initializeGeminiChat();
+            // Wait a bit for initialization
+            await new Promise(resolve => setTimeout(resolve, 500));
         }
         
-        // Show typing indicator
-        WeraserCore.ui.showNotification('AI가 답변을 생성중...', 'info');
+        // Show typing indicator with animation
+        const typingIndicator = document.createElement('div');
+        typingIndicator.className = 'typing-indicator';
+        typingIndicator.innerHTML = `
+            <div class="typing-dots">
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+            </div>
+            <span style="color: #787774;">Weraser AI가 답변을 생성하고 있습니다...</span>
+        `;
+        messagesDiv.appendChild(typingIndicator);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
         
         // Get current project documents
         const project = projects.find(p => p.id === currentProject);
@@ -1580,25 +1648,34 @@
         })) : [];
         
         try {
+            // Ensure Gemini is initialized
+            if (!window.geminiChat) {
+                throw new Error('Gemini API가 초기화되지 않았습니다');
+            }
+            
             // Send message to Gemini
             const result = await window.geminiChat.sendMessage(message, documents);
             
-            if (result.success) {
+            // Remove typing indicator
+            typingIndicator.remove();
+            
+            if (result && result.success) {
                 // Create AI message with actual Gemini response
                 const aiMessage = createMessage('ai', 
                     result.response,
                     true,
-                    result.sources.map(s => s.name)
+                    result.sources ? result.sources.map(s => s.name) : []
                 );
                 messagesDiv.appendChild(aiMessage);
                 messagesDiv.scrollTop = messagesDiv.scrollHeight;
             } else {
                 // Handle error
-                WeraserCore.ui.showNotification('오류: ' + result.error, 'error');
+                const errorMessage = result?.error || '알 수 없는 오류';
+                console.error('Gemini Error:', errorMessage);
                 
-                // Fallback message
+                // Error message
                 const aiMessage = createMessage('ai', 
-                    `죄송합니다. 응답 생성 중 오류가 발생했습니다. 다시 시도해주세요.`,
+                    `죄송합니다. 오류가 발생했습니다: ${errorMessage}\n\n다시 시도해주세요.`,
                     false,
                     []
                 );
@@ -1607,11 +1684,15 @@
             }
         } catch (error) {
             console.error('Gemini API Error:', error);
-            WeraserCore.ui.showNotification('API 연결 오류', 'error');
             
-            // Fallback message
+            // Remove typing indicator
+            if (typingIndicator && typingIndicator.parentNode) {
+                typingIndicator.remove();
+            }
+            
+            // Error message
             const aiMessage = createMessage('ai', 
-                `네트워크 오류가 발생했습니다. 인터넷 연결을 확인해주세요.`,
+                `오류가 발생했습니다: ${error.message}\n\nAPI 연결을 확인해주세요.`,
                 false,
                 []
             );
