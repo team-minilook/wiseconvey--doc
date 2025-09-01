@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Gemini Model Speed Test</title>
+    <style>
+        body {
+            font-family: -apple-system, sans-serif;
+            max-width: 1000px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        h1 { color: #333; }
+        .test-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .model-test {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            background: #f9f9f9;
+        }
+        .model-name {
+            font-weight: bold;
+            color: #0066FF;
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            background: #0066FF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0052cc; }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+            min-height: 50px;
+        }
+        .time {
+            color: #22c55e;
+            font-weight: bold;
+        }
+        .error { color: #ef4444; }
+        .comparison {
+            margin-top: 20px;
+            padding: 20px;
+            background: #e6f7ff;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🚀 Gemini 모델 속도 테스트</h1>
+    
+    <button onclick="testAllModels()">모든 모델 테스트</button>
+    <button onclick="clearResults()">결과 초기화</button>
+    
+    <div class="test-container">
+        <div class="model-test">
+            <div class="model-name">gemini-1.5-flash-8b-latest (최신 초경량)</div>
+            <button onclick="testModel('gemini-1.5-flash-8b-latest', 'result1')">테스트</button>
+            <div id="result1" class="result">대기 중...</div>
+        </div>
+        
+        <div class="model-test">
+            <div class="model-name">gemini-1.5-flash (표준)</div>
+            <button onclick="testModel('gemini-1.5-flash', 'result2')">테스트</button>
+            <div id="result2" class="result">대기 중...</div>
+        </div>
+        
+        <div class="model-test">
+            <div class="model-name">gemini-1.5-flash-latest (최신)</div>
+            <button onclick="testModel('gemini-1.5-flash-latest', 'result3')">테스트</button>
+            <div id="result3" class="result">대기 중...</div>
+        </div>
+        
+        <div class="model-test">
+            <div class="model-name">gemini-1.5-pro (고성능)</div>
+            <button onclick="testModel('gemini-1.5-pro', 'result4')">테스트</button>
+            <div id="result4" class="result">대기 중...</div>
+        </div>
+    </div>
+    
+    <div class="comparison" id="comparison">
+        <h3>📊 속도 비교 결과</h3>
+        <div id="comparisonResults">테스트를 실행하면 여기에 결과가 표시됩니다.</div>
+    </div>
+
+    <script>
+        const API_KEY = 'AIzaSyCI1spB1J-3E5lkwmEUzG8v5C37duj0HVg';
+        const API_BASE = 'https://generativelanguage.googleapis.com/v1beta';
+        const TEST_PROMPT = '안녕하세요. 간단히 자기소개 해주세요.';
+        
+        const results = {};
+        
+        async function testModel(model, resultId) {
+            const resultDiv = document.getElementById(resultId);
+            resultDiv.innerHTML = '테스트 중...';
+            
+            const startTime = performance.now();
+            
+            try {
+                const response = await fetch(`${API_BASE}/models/${model}:generateContent?key=${API_KEY}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [{
+                                text: TEST_PROMPT
+                            }]
+                        }],
+                        generationConfig: {
+                            temperature: 0.3,
+                            maxOutputTokens: 256,
+                        }
+                    })
+                });
+                
+                const data = await response.json();
+                const endTime = performance.now();
+                const responseTime = ((endTime - startTime) / 1000).toFixed(2);
+                
+                if (response.ok && data.candidates) {
+                    const text = data.candidates[0].content.parts[0].text;
+                    resultDiv.innerHTML = `
+                        <div class="time">⏱️ ${responseTime}초</div>
+                        <div style="margin-top: 10px; font-size: 12px; color: #666;">
+                            ${text.substring(0, 100)}...
+                        </div>
+                    `;
+                    
+                    results[model] = parseFloat(responseTime);
+                    updateComparison();
+                } else {
+                    resultDiv.innerHTML = `<div class="error">❌ 오류: ${data.error?.message}</div>`;
+                }
+            } catch (error) {
+                const endTime = performance.now();
+                const responseTime = ((endTime - startTime) / 1000).toFixed(2);
+                resultDiv.innerHTML = `<div class="error">❌ ${error.message} (${responseTime}초)</div>`;
+            }
+        }
+        
+        async function testAllModels() {
+            const models = [
+                'gemini-1.5-flash-8b-latest',
+                'gemini-1.5-flash',
+                'gemini-1.5-flash-latest',
+                'gemini-1.5-pro'
+            ];
+            
+            for (let i = 0; i < models.length; i++) {
+                await testModel(models[i], `result${i + 1}`);
+                await new Promise(resolve => setTimeout(resolve, 500)); // Delay between tests
+            }
+        }
+        
+        function updateComparison() {
+            if (Object.keys(results).length === 0) return;
+            
+            const sorted = Object.entries(results).sort((a, b) => a[1] - b[1]);
+            let html = '<table style="width: 100%; border-collapse: collapse;">';
+            html += '<tr><th style="text-align: left; padding: 8px; border-bottom: 2px solid #ddd;">순위</th>';
+            html += '<th style="text-align: left; padding: 8px; border-bottom: 2px solid #ddd;">모델</th>';
+            html += '<th style="text-align: left; padding: 8px; border-bottom: 2px solid #ddd;">응답 시간</th>';
+            html += '<th style="text-align: left; padding: 8px; border-bottom: 2px solid #ddd;">상대 속도</th></tr>';
+            
+            const fastest = sorted[0][1];
+            
+            sorted.forEach((item, index) => {
+                const [model, time] = item;
+                const relative = ((time / fastest) * 100).toFixed(0);
+                const emoji = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '🏅';
+                
+                html += `<tr>`;
+                html += `<td style="padding: 8px; border-bottom: 1px solid #eee;">${emoji} ${index + 1}위</td>`;
+                html += `<td style="padding: 8px; border-bottom: 1px solid #eee;">${model}</td>`;
+                html += `<td style="padding: 8px; border-bottom: 1px solid #eee;">${time}초</td>`;
+                html += `<td style="padding: 8px; border-bottom: 1px solid #eee;">${relative}%</td>`;
+                html += `</tr>`;
+            });
+            
+            html += '</table>';
+            
+            document.getElementById('comparisonResults').innerHTML = html;
+        }
+        
+        function clearResults() {
+            document.querySelectorAll('.result').forEach(div => {
+                div.innerHTML = '대기 중...';
+            });
+            results = {};
+            document.getElementById('comparisonResults').innerHTML = '테스트를 실행하면 여기에 결과가 표시됩니다.';
+        }
+    </script>
+</body>
+</html>

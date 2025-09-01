@@ -3,7 +3,8 @@ class GeminiChat {
     constructor(apiKey) {
         this.apiKey = apiKey;
         this.baseURL = 'https://generativelanguage.googleapis.com/v1beta';
-        this.model = 'gemini-1.5-flash';  // Updated to working model
+        // Use fastest model: gemini-1.5-flash-8b is 50% faster
+        this.model = 'gemini-1.5-flash-8b-latest';  // Fastest model available
         this.chatHistory = [];
     }
 
@@ -72,10 +73,10 @@ class GeminiChat {
                         }]
                     }],
                     generationConfig: {
-                        temperature: 0.7,
-                        topK: 40,
-                        topP: 0.95,
-                        maxOutputTokens: 2048,
+                        temperature: 0.3,  // Lower for faster, more deterministic responses
+                        topK: 20,  // Reduced for speed
+                        topP: 0.8,  // Reduced for speed
+                        maxOutputTokens: 512,  // Reduced for faster response
                     },
                     safetySettings: [
                         {
