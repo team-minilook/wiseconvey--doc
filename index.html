@@ -6,6 +6,9 @@
     <title>Weraser - AI Knowledge Platform</title>
     <link rel="stylesheet" href="assets/shared.css">
     <link rel="stylesheet" href="gemini-api.css">
+    <!-- Core Systems -->
+    <script src="vector-engine.js"></script>
+    
     <!-- Gemini API Integration -->
     <script src="config-secure.js"></script>
     <script src="gemini-direct.js"></script>
@@ -924,7 +927,7 @@
         .modal-container {
             background: white;
             border-radius: 8px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            box-shadow: none !important;
             max-width: 90vw;
             max-height: 90vh;
             display: flex;
@@ -970,6 +973,373 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+        }
+
+        /* Quota Navigation Styles */
+        .modal-header-content {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .quota-navigation {
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: #787774;
+        }
+
+        .quota-bar-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .quota-bar {
+            width: 100px;
+            height: 4px;
+            background: #e9e9e7;
+            border-radius: 2px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quota-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #22c55e 0%, #eab308 70%, #ef4444 90%);
+            transition: width 0.3s ease;
+            border-radius: 2px;
+        }
+
+        .quota-text {
+            font-size: 11px;
+            color: #787774;
+            white-space: nowrap;
+        }
+
+        .quota-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: #787774;
+        }
+
+        .quota-label {
+            font-weight: 500;
+        }
+
+        /* Upload Tips Styles */
+        .upload-tips {
+            background: #f8f8f7;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 20px;
+        }
+
+        .tip-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+            font-size: 12px;
+            color: #787774;
+        }
+
+        .tip-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .tip-icon {
+            font-size: 14px;
+        }
+
+        /* Directory Selection Styles */
+        .directory-options {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .directory-list .directory-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            border: 1px solid #e9e9e7;
+            border-radius: 6px;
+            margin-bottom: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .directory-list .directory-item:hover {
+            background: #f8f8f7;
+            border-color: #d3d3d1;
+        }
+
+        .directory-list .directory-item input[type="radio"] {
+            margin-right: 8px;
+        }
+
+        .directory-list .directory-item label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .dir-count {
+            color: #787774;
+            font-size: 11px;
+            margin-left: auto;
+        }
+
+        .new-directory-section {
+            border-top: 1px solid #e9e9e7;
+            padding-top: 16px;
+        }
+
+        .new-directory-input {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        /* File Upload Section Styles */
+        .file-upload-section {
+            margin-top: 20px;
+        }
+
+        .selected-files {
+            margin-top: 16px;
+            padding: 12px;
+            background: #f8f8f7;
+            border-radius: 6px;
+        }
+
+        .file-list {
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 6px 8px;
+            background: white;
+            border-radius: 4px;
+            margin-bottom: 4px;
+            font-size: 12px;
+        }
+
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .file-size {
+            color: #787774;
+        }
+
+        /* Selection Info Styles */
+        .selection-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-size: 12px;
+            color: #787774;
+        }
+
+        .quota-status {
+            font-weight: 500;
+        }
+
+        .quota-status.warning {
+            color: #eab308;
+        }
+
+        .quota-status.error {
+            color: #ef4444;
+        }
+
+        .quota-status.success {
+            color: #22c55e;
+        }
+
+        /* Organization Document Browser Specific Styles */
+        .org-browser-container {
+            max-height: 500px;
+            overflow-y: auto;
+            border: 1px solid #e9e9e7;
+            border-radius: 6px;
+            background: #fafafa;
+        }
+
+        /* Fix for browser tips styling */
+        .browser-tips {
+            background: #f8f8f7 !important;
+            padding: 12px !important;
+            margin-bottom: 16px !important;
+            border-radius: 6px !important;
+            font-size: 12px !important;
+            color: #787774 !important;
+        }
+
+        /* Ensure modal content doesn't overflow */
+        .modal-content {
+            overflow-y: auto;
+            max-height: calc(90vh - 140px);
+        }
+
+        /* Fix directory selector styling */
+        .directory-selector h4, .directory-selector h5 {
+            margin: 0 0 8px 0;
+            font-size: 14px;
+            font-weight: 600;
+            color: #37352f;
+        }
+
+        /* Drag and drop enhancement */
+        .file-upload-area:hover {
+            border-color: #3b82f6;
+            background: #f8faff;
+        }
+
+        .file-upload-area.dragover {
+            border-color: #3b82f6 !important;
+            background: #eff6ff !important;
+            border-style: solid !important;
+        }
+
+        /* Modal z-index fix */
+        .modal-overlay {
+            z-index: 10000 !important;
+        }
+
+        /* Button style improvements */
+        .btn-primary {
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+        }
+
+        .org-folder {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            cursor: pointer;
+            border-bottom: 1px solid #f1f1f1;
+            background: white;
+            margin-bottom: 1px;
+        }
+
+        .org-folder:hover {
+            background: #f8f8f7;
+        }
+
+        .org-folder-content {
+            background: #f9f9f9;
+            border-left: 3px solid #e9e9e7;
+            margin-left: 16px;
+        }
+
+        .org-file {
+            display: flex;
+            align-items: center;
+            padding: 6px 12px;
+            margin: 1px 0;
+            background: white;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+
+        .org-file:hover {
+            background: #f0f0f0;
+        }
+
+        .org-file input[type="checkbox"] {
+            margin-right: 8px;
+            transform: scale(1.1);
+        }
+
+        .org-file .file-icon {
+            margin-right: 8px;
+            font-size: 16px;
+        }
+
+        .org-file .file-name {
+            flex: 1;
+            font-size: 13px;
+            font-weight: 500;
+            color: #37352f;
+        }
+
+        .org-file .file-meta {
+            font-size: 11px;
+            color: #787774;
+            margin-left: 8px;
+        }
+
+        .folder-icon {
+            margin-right: 8px;
+            font-size: 16px;
+        }
+
+        .folder-name {
+            flex: 1;
+            font-size: 14px;
+            font-weight: 600;
+            color: #37352f;
+        }
+
+        .folder-count {
+            font-size: 11px;
+            color: #787774;
+            margin-left: 8px;
+        }
+
+        /* Selection Info Enhancement */
+        .selection-summary {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .quota-warnings {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .quota-warning {
+            font-size: 12px;
+            color: #ef4444;
+            font-weight: 500;
+        }
+
+        .quota-help {
+            font-size: 11px;
+            color: #787774;
+        }
+
+        /* Import Button Enhancement */
+        #importBtn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        #importBtn:not(:disabled):hover {
+            background: #2563eb;
+            transform: translateY(-1px);
         }
         
         .modal-buttons {
@@ -1418,6 +1788,58 @@
     let currentChat = null;
     let showThinkingProcess = true;
     
+    // User roles and permissions
+    const userRoles = {
+        ADMIN: 'admin',
+        MANAGER: 'manager',
+        USER: 'user'
+    };
+    
+    // Current user (mock - in production, this would come from authentication)
+    let currentUser = {
+        id: 'user-001',
+        name: '김대리',
+        email: 'kim@company.com',
+        role: userRoles.ADMIN  // Change to test different roles
+    };
+    
+    // Organization directory structure
+    let organizationDirectories = [
+        {
+            id: 'org-dir-001',
+            name: '계약서',
+            path: '/조직문서/계약서',
+            type: 'organization',
+            permissions: ['admin', 'manager'],
+            createdBy: 'admin',
+            createdAt: '2024-01-15',
+            fileCount: 3,
+            children: []
+        },
+        {
+            id: 'org-dir-002',
+            name: '관세자료',
+            path: '/조직문서/관세자료',
+            type: 'organization',
+            permissions: ['admin', 'manager'],
+            createdBy: 'admin',
+            createdAt: '2024-01-10',
+            fileCount: 4,
+            children: []
+        },
+        {
+            id: 'org-dir-003',
+            name: '회의록',
+            path: '/조직문서/회의록',
+            type: 'organization',
+            permissions: ['admin', 'manager', 'user'],
+            createdBy: 'admin',
+            createdAt: '2024-01-05',
+            fileCount: 5,
+            children: []
+        }
+    ];
+    
     // Source quota constants (in MB)
     const QUOTA_LIMITS = {
         MAX_FILE_SIZE: 50,              // 개별 파일 최대 크기
@@ -1662,6 +2084,9 @@
     
     // Initialize
     document.addEventListener('DOMContentLoaded', () => {
+        // Load saved data from localStorage
+        loadDataFromLocalStorage();
+        
         WeraserCore.init('phase1');
         renderSidebar();
         showWelcomeScreen();
@@ -2404,9 +2829,10 @@
     async function generateAIResponse(message) {
         const messagesDiv = document.getElementById('chatMessages');
         
-        // Use Smart Gemini with CORS detection and fallback
-        if (!window.smartGemini) {
-            window.smartGemini = new SmartGeminiChat();
+        // Use direct Gemini Chat like index-clean.html
+        if (!window.geminiChat) {
+            console.error('Gemini API not initialized');
+            return;
         }
         
         // Show typing indicator with animation
@@ -2425,15 +2851,15 @@
         
         // Get current project documents
         const project = projects.find(p => p.id === currentProject);
-        const documents = project ? project.documents.map(doc => ({
+        const documents = project && Array.isArray(project.documents) ? project.documents.map(doc => ({
             name: doc.name,
             type: doc.type || 'file',
             content: doc.content || '' // In real implementation, would load actual content
         })) : [];
         
         try {
-            // Use Smart Gemini with automatic fallback
-            const result = await window.smartGemini.sendMessage(message);
+            // Use direct Gemini Chat for reliable API calls
+            const result = await window.geminiChat.sendMessage(message, documents);
             
             // Remove typing indicator
             typingIndicator.remove();
@@ -2441,40 +2867,19 @@
             if (result && result.success) {
                 // Create AI message with actual Gemini response
                 const responseText = result.response;
-                const responseTime = result.responseTime ? ` (${result.responseTime}ms)` : '';
-                
-                // Add warning if CORS was detected
-                let finalText = responseText;
-                if (result.warning) {
-                    finalText += `\n\n⚠️ ${result.warning}`;
-                }
                 
                 const aiMessage = createMessage('ai', 
-                    finalText,
+                    responseText,
                     true,
                     []
                 );
                 messagesDiv.appendChild(aiMessage);
                 messagesDiv.scrollTop = messagesDiv.scrollHeight;
                 
-                // Show response time in console
-                console.log(`Response received${responseTime}`);
-            } else if (result && result.fallback) {
-                // Use fallback response
-                const fallbackText = result.response || '죄송합니다. 현재 응답을 생성할 수 없습니다.';
-                const aiMessage = createMessage('ai', 
-                    fallbackText + '\n\n[네트워크 문제로 기본 응답을 표시합니다]',
-                    false,
-                    []
-                );
-                messagesDiv.appendChild(aiMessage);
-                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+                console.log('Gemini response received successfully');
             } else {
                 // Handle error
-                const errorMessage = result?.error || '알 수 없는 오류';
-                console.error('Gemini Error:', errorMessage);
-                
-                // Error message
+                const errorMessage = result?.error || 'API 응답 오류';
                 const aiMessage = createMessage('ai', 
                     `오류: ${errorMessage}`,
                     false,
@@ -2608,76 +3013,182 @@
         // Close dropdown first
         toggleDocumentAddMenu();
         
+        // Remove any existing modals first
+        const existingModals = document.querySelectorAll('.modal, .modal-overlay');
+        existingModals.forEach(modal => modal.remove());
+        
+        // Get current usage for quota display
+        const currentUsage = calculateCurrentUsage(currentProject);
+        const usagePercentage = (currentUsage.size / QUOTA_LIMITS.PROJECT_QUOTA * 100).toFixed(1);
+        
         // Create organization document browser modal
         const modal = document.createElement('div');
-        modal.className = 'modal-overlay';
+        modal.className = 'modal show';
+        modal.style.zIndex = '10000';
         modal.innerHTML = `
-            <div class="modal-container" style="width: 80%; max-width: 800px; height: 70vh;">
+            <div class="modal-container" style="width: 85%; max-width: 900px; max-height: 90vh; display: flex; flex-direction: column; box-shadow: none;">
                 <div class="modal-header">
-                    <h3>조직 문서 불러오기</h3>
-                    <button class="modal-close" onclick="closeModal()">&times;</button>
-                </div>
-                <div class="modal-content" style="height: calc(100% - 100px); overflow-y: auto;">
-                    <div class="org-browser">
-                        <div class="org-browser-tree">
-                            <div class="org-folder expanded" onclick="toggleOrgFolder(this)">
-                                <span class="folder-icon">📁</span>
-                                <span class="folder-name">조직문서</span>
-                                <span class="folder-count">(12개 문서)</span>
+                    <div class="modal-header-content">
+                        <div>
+                            <h3>📁 조직 문서 불러오기</h3>
+                            <div class="quota-navigation">
+                                <div class="quota-bar">
+                                    <div class="quota-fill" style="width: ${usagePercentage}%"></div>
+                                </div>
+                                <span class="quota-text">${currentUsage.size.toFixed(1)}MB / ${QUOTA_LIMITS.PROJECT_QUOTA}MB (${usagePercentage}%)</span>
                             </div>
-                            <div class="org-folder-content" style="margin-left: 20px;">
-                                <div class="org-folder" onclick="toggleOrgFolder(this)">
-                                    <span class="folder-icon">📂</span>
-                                    <span class="folder-name">계약서</span>
-                                    <span class="folder-count">(3개)</span>
+                        </div>
+                        <button class="modal-close" onclick="closeModal()">&times;</button>
+                    </div>
+                </div>
+                <div class="modal-content" style="padding: 20px; flex: 1; overflow-y: auto; display: flex; flex-direction: column;">
+                    <div class="browser-tips" style="padding: 12px 0; margin-bottom: 16px; font-size: 12px; color: #787774;">
+                        💡 <strong>사용법:</strong> 폴더를 클릭하여 확장하고, 체크박스로 문서를 선택하세요. 
+                        선택한 문서들이 프로젝트에 자동으로 동기화됩니다.
+                    </div>
+                    <div class="org-browser-unified" style="display: flex; flex-direction: column;">
+                        
+                        <!-- Step 1: Browse and Select Documents -->
+                        <div class="workflow-step">
+                            <h4 style="margin: 0 0 12px 0; font-size: 16px; color: #37352f; display: flex; align-items: center; gap: 8px;">
+                                <span style="width: 24px; height: 24px; background: #007acc; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold;">1</span>
+                                조직 문서 탐색 및 선택
+                            </h4>
+                            
+                            <div class="org-browser-tree" style="padding: 12px 0; margin-bottom: 16px;">
+                                <div class="org-folder expanded" onclick="toggleOrgFolder(this)" style="display: flex; align-items: center; padding: 8px 12px; margin-bottom: 4px; border-radius: 6px; cursor: pointer; background: white; transition: all 0.2s;">
+                                    <span class="folder-icon" style="margin-right: 10px; font-size: 16px;">📁</span>
+                                    <span class="folder-name" style="flex: 1; font-weight: 600; color: #37352f;">조직문서</span>
+                                    <span class="folder-count" style="color: #787774; font-size: 11px; background: #f1f1ef; padding: 2px 6px; border-radius: 4px;">(12개 문서)</span>
                                 </div>
-                                <div class="org-folder-content" style="margin-left: 20px; display: none;">
-                                    <div class="org-file">
-                                        <input type="checkbox" class="file-checkbox">
-                                        <span class="file-icon">📄</span>
-                                        <span class="file-name">2024_H-Line_계약서.pdf</span>
-                                        <span class="file-meta">2.5MB • 2024-08-15</span>
+                                <div class="org-folder-content" style="margin-left: 20px; display: block;">
+                                    <div class="org-folder" onclick="toggleOrgFolder(this)" style="display: flex; align-items: center; padding: 6px 8px; margin-bottom: 2px; border-radius: 4px; cursor: pointer; transition: all 0.2s;">
+                                        <span class="folder-icon" style="margin-right: 8px; font-size: 14px;">📂</span>
+                                        <span class="folder-name" style="flex: 1; font-weight: 500; color: #37352f;">계약서</span>
+                                        <span class="folder-count" style="color: #787774; font-size: 10px; background: #f1f1ef; padding: 1px 4px; border-radius: 3px;">(3개)</span>
                                     </div>
-                                    <div class="org-file">
-                                        <input type="checkbox" class="file-checkbox">
-                                        <span class="file-icon">📝</span>
-                                        <span class="file-name">부속합의서.docx</span>
-                                        <span class="file-meta">1.2MB • 2024-08-20</span>
+                                    <div class="org-folder-content" style="margin-left: 20px; display: none;">
+                                        <div class="org-file" onclick="toggleFileSelection(this, event)" onmouseover="this.style.background='#f0f8ff'" onmouseout="this.style.background='white'" style="display: flex; align-items: center; padding: 8px 12px; margin-bottom: 4px; border-radius: 6px; cursor: pointer; transition: all 0.2s; background: white; border: 1px solid transparent;">
+                                            <input type="checkbox" class="file-checkbox" onchange="updateOrgSelectionInfo()" style="margin-right: 12px; width: 16px; height: 16px; accent-color: #007acc; cursor: pointer;">
+                                            <span class="file-icon" style="margin-right: 12px; font-size: 16px;">📄</span>
+                                            <div style="flex: 1; display: flex; flex-direction: column; gap: 2px;">
+                                                <span class="file-name" style="font-weight: 500; color: #37352f; font-size: 14px; line-height: 1.3;">2024_H-Line_계약서.pdf</span>
+                                                <span class="file-meta" style="color: #787774; font-size: 12px; line-height: 1.3;">2.5MB • 2024-08-15</span>
+                                            </div>
+                                        </div>
+                                        <div class="org-file" onclick="toggleFileSelection(this, event)" onmouseover="this.style.background='#f0f8ff'" onmouseout="this.style.background='white'" style="display: flex; align-items: center; padding: 8px 12px; margin-bottom: 4px; border-radius: 6px; cursor: pointer; transition: all 0.2s; background: white; border: 1px solid transparent;">
+                                            <input type="checkbox" class="file-checkbox" onchange="updateOrgSelectionInfo()" style="margin-right: 12px; width: 16px; height: 16px; accent-color: #007acc; cursor: pointer;">
+                                            <span class="file-icon" style="margin-right: 12px; font-size: 16px;">📝</span>
+                                            <div style="flex: 1; display: flex; flex-direction: column; gap: 2px;">
+                                                <span class="file-name" style="font-weight: 500; color: #37352f; font-size: 14px; line-height: 1.3;">부속합의서.docx</span>
+                                                <span class="file-meta" style="color: #787774; font-size: 12px; line-height: 1.3;">1.2MB • 2024-08-20</span>
+                                            </div>
+                                        </div>
+                                        <div class="org-file" onclick="toggleFileSelection(this, event)" onmouseover="this.style.background='#f0f8ff'" onmouseout="this.style.background='white'" style="display: flex; align-items: center; padding: 8px 12px; margin-bottom: 4px; border-radius: 6px; cursor: pointer; transition: all 0.2s; background: white; border: 1px solid transparent;">
+                                            <input type="checkbox" class="file-checkbox" onchange="updateOrgSelectionInfo()" style="margin-right: 12px; width: 16px; height: 16px; accent-color: #007acc; cursor: pointer;">
+                                            <span class="file-icon" style="margin-right: 12px; font-size: 16px;">📊</span>
+                                            <div style="flex: 1; display: flex; flex-direction: column; gap: 2px;">
+                                                <span class="file-name" style="font-weight: 500; color: #37352f; font-size: 14px; line-height: 1.3;">계약조건_분석.xlsx</span>
+                                                <span class="file-meta" style="color: #787774; font-size: 12px; line-height: 1.3;">1.8MB • 2024-08-10</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="org-folder" onclick="toggleOrgFolder(this)" style="display: flex; align-items: center; padding: 6px 8px; margin-bottom: 2px; border-radius: 4px; cursor: pointer; transition: all 0.2s;">
+                                        <span class="folder-icon" style="margin-right: 8px; font-size: 14px;">📂</span>
+                                        <span class="folder-name" style="flex: 1; font-weight: 500; color: #37352f;">관세자료</span>
+                                        <span class="folder-count" style="color: #787774; font-size: 10px; background: #f1f1ef; padding: 1px 4px; border-radius: 3px;">(4개)</span>
+                                    </div>
+                                    <div class="org-folder-content" style="margin-left: 20px; display: none;">
+                                        <div class="org-file" onclick="toggleFileSelection(this, event)" onmouseover="this.style.background='#f0f8ff'" onmouseout="this.style.background='white'" style="display: flex; align-items: center; padding: 8px 12px; margin-bottom: 4px; border-radius: 6px; cursor: pointer; transition: all 0.2s; background: white; border: 1px solid transparent;">
+                                            <input type="checkbox" class="file-checkbox" onchange="updateOrgSelectionInfo()" style="margin-right: 12px; width: 16px; height: 16px; accent-color: #007acc; cursor: pointer;">
+                                            <span class="file-icon" style="margin-right: 12px; font-size: 16px;">📊</span>
+                                            <div style="flex: 1; display: flex; flex-direction: column; gap: 2px;">
+                                                <span class="file-name" style="font-weight: 500; color: #37352f; font-size: 14px; line-height: 1.3;">HS_코드_분류표.xlsx</span>
+                                                <span class="file-meta" style="color: #787774; font-size: 12px; line-height: 1.3;">3.8MB • 2024-07-01</span>
+                                            </div>
+                                        </div>
+                                        <div class="org-file" onclick="toggleFileSelection(this, event)" onmouseover="this.style.background='#f0f8ff'" onmouseout="this.style.background='white'" style="display: flex; align-items: center; padding: 8px 12px; margin-bottom: 4px; border-radius: 6px; cursor: pointer; transition: all 0.2s; background: white; border: 1px solid transparent;">
+                                            <input type="checkbox" class="file-checkbox" onchange="updateOrgSelectionInfo()" style="margin-right: 12px; width: 16px; height: 16px; accent-color: #007acc; cursor: pointer;">
+                                            <span class="file-icon" style="margin-right: 12px; font-size: 16px;">📄</span>
+                                            <div style="flex: 1; display: flex; flex-direction: column; gap: 2px;">
+                                                <span class="file-name" style="font-weight: 500; color: #37352f; font-size: 14px; line-height: 1.3;">관세법_개정사항.pdf</span>
+                                                <span class="file-meta" style="color: #787774; font-size: 12px; line-height: 1.3;">4.2MB • 2024-06-15</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="org-folder" onclick="toggleOrgFolder(this)" style="display: flex; align-items: center; padding: 6px 8px; margin-bottom: 2px; border-radius: 4px; cursor: pointer; transition: all 0.2s;">
+                                        <span class="folder-icon" style="margin-right: 8px; font-size: 14px;">📂</span>
+                                        <span class="folder-name" style="flex: 1; font-weight: 500; color: #37352f;">회의록</span>
+                                        <span class="folder-count" style="color: #787774; font-size: 10px; background: #f1f1ef; padding: 1px 4px; border-radius: 3px;">(5개)</span>
+                                    </div>
+                                    <div class="org-folder-content" style="margin-left: 20px; display: none;">
+                                        <div class="org-file" onclick="toggleFileSelection(this, event)" onmouseover="this.style.background='#f0f8ff'" onmouseout="this.style.background='white'" style="display: flex; align-items: center; padding: 8px 12px; margin-bottom: 4px; border-radius: 6px; cursor: pointer; transition: all 0.2s; background: white; border: 1px solid transparent;">
+                                            <input type="checkbox" class="file-checkbox" onchange="updateOrgSelectionInfo()" style="margin-right: 12px; width: 16px; height: 16px; accent-color: #007acc; cursor: pointer;">
+                                            <span class="file-icon" style="margin-right: 12px; font-size: 16px;">📝</span>
+                                            <div style="flex: 1; display: flex; flex-direction: column; gap: 2px;">
+                                                <span class="file-name" style="font-weight: 500; color: #37352f; font-size: 14px; line-height: 1.3;">2024년_3분기_검토회의.docx</span>
+                                                <span class="file-meta" style="color: #787774; font-size: 12px; line-height: 1.3;">0.8MB • 2024-07-25</span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="org-folder" onclick="toggleOrgFolder(this)">
-                                    <span class="folder-icon">📂</span>
-                                    <span class="folder-name">관세자료</span>
-                                    <span class="folder-count">(2개)</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Step 2: Import Selection Summary -->
+                        <div class="workflow-step">
+                            <h4 style="margin: 0 0 12px 0; font-size: 16px; color: #37352f; display: flex; align-items: center; gap: 8px;">
+                                <span style="width: 24px; height: 24px; background: #007acc; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold;">2</span>
+                                불러오기 확인 및 실행
+                            </h4>
+                            
+                            <div class="selection-summary-unified" style="padding: 16px; border-radius: 8px;">
+                                <div class="summary-header" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                                    <h5 style="margin: 0; font-size: 14px; font-weight: 600; color: #37352f;">📋 선택 요약</h5>
+                                    <div class="selection-counts" style="font-size: 12px; color: #787774;">
+                                        <span id="selectedCount">선택된 문서: 0개</span>
+                                        <span style="margin-left: 12px;" id="totalSize">총 크기: 0MB</span>
+                                    </div>
                                 </div>
-                                <div class="org-folder-content" style="margin-left: 20px; display: none;">
-                                    <div class="org-file">
-                                        <input type="checkbox" class="file-checkbox">
-                                        <span class="file-icon">📊</span>
-                                        <span class="file-name">HS_코드_분류표.xlsx</span>
-                                        <span class="file-meta">3.8MB • 2024-07-01</span>
+                                
+                                <div class="import-controls" style="display: flex; align-items: center; justify-content: space-between;">
+                                    <div class="quota-status" style="font-size: 11px; color: #787774;">
+                                        <span id="orgQuotaHelp">💡 프로젝트 용량 한도: 500MB</span>
+                                        <span id="orgQuotaWarning" class="quota-warning" style="display: none; margin-left: 8px; color: #ef4444;"></span>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <div class="selection-info">
-                        <span id="selectedCount">선택된 문서: 0개</span>
-                        <span id="totalSize">총 크기: 0MB</span>
-                        <span id="orgQuotaWarning" class="quota-warning" style="display: none;">프로젝트 용량 한도 근접</span>
-                    </div>
-                    <div class="modal-buttons">
-                        <button class="btn-secondary" onclick="closeModal()">취소</button>
-                        <button class="btn-primary" id="importBtn" onclick="importSelectedDocuments()" disabled>불러오기</button>
-                    </div>
+                <div class="modal-footer" style="padding: 16px 20px; border-top: 1px solid #e9e9e7; display: flex; justify-content: space-between;">
+                    <button class="btn-secondary" onclick="closeModal()">취소</button>
+                    <button class="btn-primary" id="importBtn" onclick="importSelectedDocuments()" disabled>
+                        📥 불러오기
+                    </button>
                 </div>
             </div>
         `;
         
         document.body.appendChild(modal);
-        updateSelectionInfo();
+        
+        // Initialize the organization browser
+        setTimeout(() => {
+            // Auto-expand the main organization folder to show content
+            const mainFolder = modal.querySelector('.org-folder.expanded');
+            if (mainFolder) {
+                const icon = mainFolder.querySelector('.folder-icon');
+                if (icon) icon.textContent = '📂';
+            }
+            
+            // Auto-expand contract folder as an example
+            const contractFolder = modal.querySelector('.org-folder[onclick*="toggleOrgFolder"]');
+            if (contractFolder && contractFolder.querySelector('.folder-name').textContent === '계약서') {
+                toggleOrgFolder(contractFolder);
+            }
+            
+            updateOrgSelectionInfo();
+        }, 10);
     }
     
     // Show personal document upload with directory selection
@@ -2685,81 +3196,168 @@
         // Close dropdown first
         toggleDocumentAddMenu();
         
+        // Remove any existing modals first
+        const existingModals = document.querySelectorAll('.modal, .modal-overlay');
+        existingModals.forEach(modal => modal.remove());
+        
+        // Get current usage for quota display
+        const currentUsage = calculateCurrentUsage(currentProject);
+        const usagePercentage = (currentUsage.size / QUOTA_LIMITS.PROJECT_QUOTA * 100).toFixed(1);
+        const remainingQuota = QUOTA_LIMITS.PROJECT_QUOTA - currentUsage.size;
+        
         // Create personal upload modal
         const modal = document.createElement('div');
-        modal.className = 'modal-overlay';
+        modal.className = 'modal show';
         modal.innerHTML = `
-            <div class="modal-container" style="width: 60%; max-width: 600px;">
+            <div class="modal-container" style="width: 70%; max-width: 800px; max-height: 90vh; display: flex; flex-direction: column; box-shadow: none;">
                 <div class="modal-header">
-                    <h3>개인 문서 업로드</h3>
-                    <button class="modal-close" onclick="closeModal()">&times;</button>
-                </div>
-                <div class="modal-content">
-                    <div class="upload-step" id="directoryStep">
-                        <h4>1. 저장할 디렉토리 선택</h4>
-                        <div class="directory-selector">
-                            <div class="existing-directories">
-                                <h5>기존 디렉토리</h5>
-                                <div class="directory-list">
-                                    <div class="directory-item" onclick="selectDirectory('/개인문서', this)">
-                                        <span class="folder-icon">📁</span>
-                                        <span>/개인문서</span>
-                                        <span class="dir-count">(5개)</span>
-                                    </div>
-                                    <div class="directory-item" onclick="selectDirectory('/개인문서/임시', this)">
-                                        <span class="folder-icon">📁</span>
-                                        <span>/개인문서/임시</span>
-                                        <span class="dir-count">(2개)</span>
-                                    </div>
-                                    <div class="directory-item" onclick="selectDirectory('/개인문서/계획서', this)">
-                                        <span class="folder-icon">📁</span>
-                                        <span>/개인문서/계획서</span>
-                                        <span class="dir-count">(2개)</span>
-                                    </div>
+                    <div class="modal-header-content">
+                        <div>
+                            <h3>개인 문서 업로드</h3>
+                            <div class="quota-navigation">
+                                <div class="quota-bar">
+                                    <div class="quota-fill" style="width: ${usagePercentage}%"></div>
                                 </div>
-                            </div>
-                            <div class="new-directory">
-                                <h5>새 디렉토리 생성</h5>
-                                <div style="display: flex; gap: 8px;">
-                                    <input type="text" id="newDirName" placeholder="디렉토리 이름 입력" 
-                                           style="flex: 1; padding: 8px; border: 1px solid #e9e9e7; border-radius: 4px;">
-                                    <button class="btn-secondary" onclick="createNewDirectory()">생성</button>
-                                </div>
+                                <span class="quota-text">${currentUsage.size.toFixed(1)}MB / ${QUOTA_LIMITS.PROJECT_QUOTA}MB (${usagePercentage}%)</span>
                             </div>
                         </div>
-                    </div>
-                    <div class="upload-step" id="fileStep" style="display: none;">
-                        <h4>2. 파일 선택 및 업로드</h4>
-                        <div class="selected-directory">
-                            선택된 디렉토리: <span id="selectedDirPath"></span>
-                        </div>
-                        <div class="file-upload-area" onclick="triggerFileSelect()" 
-                             ondrop="handleFileDrop(event)" ondragover="handleDragOver(event)">
-                            <div class="upload-icon">📤</div>
-                            <div class="upload-text">파일을 드래그하여 놓거나 클릭하여 선택하세요</div>
-                            <div class="upload-formats">지원 형식: PDF, Word, Excel, PPT, 이미지, 텍스트</div>
-                        </div>
-                        <input type="file" id="fileInput" multiple accept=".pdf,.docx,.xlsx,.csv,.txt,.pptx,.png,.jpg,.jpeg" 
-                               style="display: none;" onchange="handleFileSelect(event)">
+                        <button class="modal-close" onclick="closeModal()">&times;</button>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <div class="upload-info" id="uploadInfo" style="display: none;">
-                        <span id="fileCount">파일: 0개</span>
-                        <span id="totalUploadSize">크기: 0MB</span>
-                        <span id="quotaWarning" class="quota-warning" style="display: none;">용량 한도 근접</span>
+                <div class="modal-content" style="padding: 24px; flex: 1; overflow-y: auto; display: flex; flex-direction: column;">
+                    <div class="upload-tips" style="padding: 12px 0; margin-bottom: 20px; flex-shrink: 0;">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+                            <span style="font-size: 18px;">💡</span>
+                            <span style="font-size: 13px; color: #37352f;">개인 문서는 내 계정에만 저장되며 프로젝트 용량에 포함됩니다</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+                            <span style="font-size: 18px;">📂</span>
+                            <span style="font-size: 13px; color: #37352f;">디렉토리 구조를 활용해 체계적으로 관리하세요</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <span style="font-size: 18px;">⚡</span>
+                            <span style="font-size: 13px; color: #37352f;">남은 용량: <strong>${remainingQuota.toFixed(1)}MB</strong></span>
+                        </div>
                     </div>
-                    <div class="modal-buttons">
-                        <button class="btn-secondary" onclick="closeModal()">취소</button>
-                        <button class="btn-primary" id="selectBtn" onclick="confirmDirectorySelection()" style="display: none;">선택</button>
-                        <button class="btn-primary" id="nextBtn" onclick="nextStep()" disabled>다음</button>
-                        <button class="btn-primary" id="uploadBtn" onclick="executeUpload()" style="display: none;" disabled>업로드</button>
+                    
+                    <div class="upload-workflow-unified" style="display: flex; flex-direction: column;">
+                    
+                    <!-- Step 1: Directory Selection -->
+                    <div class="workflow-step" style="margin-bottom: 24px;">
+                        <h4 style="margin: 0 0 16px 0; font-size: 16px; color: #37352f; display: flex; align-items: center; gap: 8px;">
+                            <span style="width: 24px; height: 24px; background: #007acc; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold;">1</span>
+                            저장 위치 선택
+                        </h4>
+                        
+                        <!-- Existing Directories -->
+                        <div style="margin-bottom: 20px;">
+                            <h5 style="margin: 0 0 10px 32px; font-size: 13px; color: #787774; font-weight: 500;">기존 디렉토리</h5>
+                            <div style="display: flex; flex-direction: column; gap: 6px; margin-left: 32px;">
+                                <label onclick="selectPersonalDirectory('/개인문서', this)" 
+                                       onmouseover="if(!this.querySelector('input').checked) this.style.background='#f8f9fa'" 
+                                       onmouseout="if(!this.querySelector('input').checked) this.style.background='white'"
+                                       style="display: flex; align-items: center; padding: 10px 14px; border: 1px solid #e9e9e7; border-radius: 6px; cursor: pointer; transition: all 0.2s; background: white;">
+                                    <input type="radio" name="personalDirectory" value="/개인문서" style="margin-right: 12px; width: 16px; height: 16px; accent-color: #007acc;">
+                                    <span style="margin-right: 10px; font-size: 18px;">📁</span>
+                                    <span style="flex: 1; font-weight: 500; color: #37352f; font-size: 14px;">/개인문서</span>
+                                    <span style="color: #787774; font-size: 12px; background: #f1f1ef; padding: 2px 8px; border-radius: 4px; margin-right: 8px;">(5개)</span>
+                                    <button onclick="event.stopPropagation(); editPersonalDirectory('/개인문서')" style="padding: 4px 8px; margin-right: 4px; font-size: 11px; background: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer;">수정</button>
+                                    <button onclick="event.stopPropagation(); deletePersonalDirectory('/개인문서')" style="padding: 4px 8px; font-size: 11px; background: #dc3545; color: white; border: none; border-radius: 3px; cursor: pointer;">삭제</button>
+                                </label>
+                                <label onclick="selectPersonalDirectory('/개인문서/임시', this)"
+                                       onmouseover="if(!this.querySelector('input').checked) this.style.background='#f8f9fa'" 
+                                       onmouseout="if(!this.querySelector('input').checked) this.style.background='white'"
+                                       style="display: flex; align-items: center; padding: 10px 14px; border: 1px solid #e9e9e7; border-radius: 6px; cursor: pointer; transition: all 0.2s; background: white;">
+                                    <input type="radio" name="personalDirectory" value="/개인문서/임시" style="margin-right: 12px; width: 16px; height: 16px; accent-color: #007acc;">
+                                    <span style="margin-right: 10px; font-size: 18px;">📁</span>
+                                    <span style="flex: 1; font-weight: 500; color: #37352f; font-size: 14px;">/개인문서/임시</span>
+                                    <span style="color: #787774; font-size: 12px; background: #f1f1ef; padding: 2px 8px; border-radius: 4px; margin-right: 8px;">(2개)</span>
+                                    <button onclick="event.stopPropagation(); editPersonalDirectory('/개인문서/임시')" style="padding: 4px 8px; margin-right: 4px; font-size: 11px; background: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer;">수정</button>
+                                    <button onclick="event.stopPropagation(); deletePersonalDirectory('/개인문서/임시')" style="padding: 4px 8px; font-size: 11px; background: #dc3545; color: white; border: none; border-radius: 3px; cursor: pointer;">삭제</button>
+                                </label>
+                                <label onclick="selectPersonalDirectory('/개인문서/계획서', this)"
+                                       onmouseover="if(!this.querySelector('input').checked) this.style.background='#f8f9fa'" 
+                                       onmouseout="if(!this.querySelector('input').checked) this.style.background='white'"
+                                       style="display: flex; align-items: center; padding: 10px 14px; border: 1px solid #e9e9e7; border-radius: 6px; cursor: pointer; transition: all 0.2s; background: white;">
+                                    <input type="radio" name="personalDirectory" value="/개인문서/계획서" style="margin-right: 12px; width: 16px; height: 16px; accent-color: #007acc;">
+                                    <span style="margin-right: 10px; font-size: 18px;">📁</span>
+                                    <span style="flex: 1; font-weight: 500; color: #37352f; font-size: 14px;">/개인문서/계획서</span>
+                                    <span style="color: #787774; font-size: 12px; background: #f1f1ef; padding: 2px 8px; border-radius: 4px; margin-right: 8px;">(2개)</span>
+                                    <button onclick="event.stopPropagation(); editPersonalDirectory('/개인문서/계획서')" style="padding: 4px 8px; margin-right: 4px; font-size: 11px; background: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer;">수정</button>
+                                    <button onclick="event.stopPropagation(); deletePersonalDirectory('/개인문서/계획서')" style="padding: 4px 8px; font-size: 11px; background: #dc3545; color: white; border: none; border-radius: 3px; cursor: pointer;">삭제</button>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- New Directory -->
+                        <div>
+                            <h5 style="margin: 0 0 10px 32px; font-size: 13px; color: #787774; font-weight: 500;">새 디렉토리 생성</h5>
+                            <div style="display: flex; gap: 8px; margin-left: 32px;">
+                                <input type="text" id="newPersonalDirName" placeholder="새 디렉토리 이름 입력" 
+                                       style="flex: 1; padding: 9px 12px; border: 1px solid #e9e9e7; border-radius: 6px; font-size: 14px;">
+                                <button class="btn-secondary" onclick="createNewPersonalDirectory()" 
+                                        style="padding: 9px 18px; font-size: 13px; white-space: nowrap; background: white; border: 1px solid #e9e9e7; border-radius: 6px; cursor: pointer; transition: all 0.2s;"
+                                        onmouseover="this.style.background='#f8f9fa'" onmouseout="this.style.background='white'">
+                                    생성 후 선택
+                                </button>
+                            </div>
+                        </div>
                     </div>
+                    
+                    <!-- Step 2: File Upload -->
+                    <div class="workflow-step">
+                        <h4 style="margin: 0 0 12px 0; font-size: 16px; color: #37352f; display: flex; align-items: center; gap: 8px;">
+                            <span style="width: 24px; height: 24px; background: #007acc; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold;">2</span>
+                            파일 선택 및 업로드
+                        </h4>
+                        
+                        <div class="file-upload-area" onclick="triggerPersonalFileSelect()" 
+                             ondrop="handlePersonalFileDrop(event)" ondragover="handleDragOver(event)"
+                             style="border: 2px dashed #e9e9e7; border-radius: 8px; padding: 32px; text-align: center; cursor: pointer; margin-bottom: 16px; transition: all 0.2s;">
+                            <div class="upload-icon" style="font-size: 48px; margin-bottom: 12px;">📤</div>
+                            <div class="upload-text" style="font-size: 16px; font-weight: 500; margin-bottom: 4px;">파일을 드래그하여 놓거나 클릭하여 선택하세요</div>
+                            <div class="upload-formats" style="font-size: 12px; color: #787774;">지원 형식: PDF, Word, Excel, PPT, 이미지, 텍스트</div>
+                        </div>
+                        <input type="file" id="personalFileInput" multiple 
+                               accept=".pdf,.docx,.xlsx,.csv,.txt,.pptx,.png,.jpg,.jpeg" 
+                               style="display: none;" onchange="handlePersonalFileSelect(event)">
+                        
+                        <div class="selected-files" id="personalSelectedFiles" style="display: none; margin-bottom: 16px;">
+                            <h5 style="margin: 0 0 8px 0;">선택된 파일</h5>
+                            <div class="file-list" id="personalFileList" style="max-height: 120px; overflow-y: auto; border: 1px solid #e9e9e7; border-radius: 6px; background: #fafafa;">
+                                <!-- Files will be listed here -->
+                            </div>
+                        </div>
+                        
+                        <!-- Upload Summary -->
+                        <div class="upload-summary-unified" style="padding: 16px; border-radius: 8px;">
+                            <div class="summary-header" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                                <h5 style="margin: 0; font-size: 14px; font-weight: 600; color: #37352f;">📊 업로드 요약</h5>
+                                <div class="file-counts" style="font-size: 12px; color: #787774;">
+                                    <span id="personalFileCount">선택된 파일: 0개</span>
+                                    <span style="margin-left: 12px;" id="personalTotalSize">총 크기: 0MB</span>
+                                </div>
+                            </div>
+                            
+                            <div class="upload-controls" style="display: flex; align-items: center; justify-content: space-between;">
+                                <div class="quota-status" style="font-size: 11px; color: #787774;">
+                                    <span id="personalQuotaCheck">용량 확인 중...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer" style="padding: 16px 20px; border-top: 1px solid #e9e9e7; display: flex; justify-content: space-between;">
+                    <button class="btn-secondary" onclick="closeModal()">취소</button>
+                    <button class="btn-primary" id="personalUploadBtn" onclick="executePersonalUpload()" disabled>
+                        📤 업로드
+                    </button>
                 </div>
             </div>
         `;
         
         document.body.appendChild(modal);
+        updatePersonalSelectionInfo();
     }
     
     // Quota and validation functions
@@ -2884,27 +3482,473 @@
         }
     }
     
+    // Personal Document Upload Functions
+    let selectedPersonalDirectory = null;
+    let personalSelectedFiles = [];
+
+    function selectPersonalDirectory(dirPath, element) {
+        selectedPersonalDirectory = dirPath;
+        
+        // Update radio selection
+        if (element && element.querySelector) {
+            const radio = element.querySelector('input[type="radio"]');
+            if (radio) {
+                radio.checked = true;
+            }
+        }
+        
+        // Update all directory label styling
+        const dirLabels = document.querySelectorAll('label[onclick*="selectPersonalDirectory"]');
+        dirLabels.forEach(label => {
+            label.style.borderColor = '#e9e9e7';
+            label.style.background = 'white';
+            label.style.borderWidth = '1px';
+        });
+        
+        // Highlight selected option
+        if (element && element.tagName === 'LABEL') {
+            element.style.borderColor = '#007acc';
+            element.style.background = '#f0f8ff';
+            element.style.borderWidth = '2px';
+        }
+        
+        // Update selection info
+        updatePersonalSelectionInfo();
+    }
+
+    function createNewPersonalDirectory() {
+        const nameInput = document.getElementById('newPersonalDirName');
+        const dirName = nameInput.value.trim();
+        
+        if (!dirName) {
+            alert('디렉토리 이름을 입력하세요.');
+            return;
+        }
+        
+        // Validate directory name
+        if (!/^[a-zA-Z0-9가-힣_\-\s]+$/.test(dirName)) {
+            alert('디렉토리 이름에는 한글, 영문, 숫자, 언더스코어, 하이픈, 공백만 사용할 수 있습니다.');
+            return;
+        }
+        
+        const newDirPath = `/개인문서/${dirName}`;
+        
+        // Add to existing directory list
+        const dirListContainer = document.querySelector('div[style*="flex-direction: column; gap: 6px; margin-left: 32px"]');
+        if (dirListContainer) {
+            const newDirOption = document.createElement('label');
+            newDirOption.style.cssText = 'display: flex; align-items: center; padding: 10px 14px; border: 2px solid #007acc; border-radius: 6px; cursor: pointer; transition: all 0.2s; background: #f0f8ff;';
+            
+            const radioId = `dir-new-${Date.now()}`;
+            newDirOption.innerHTML = `
+                <input type="radio" name="personalDirectory" value="${newDirPath}" id="${radioId}" style="margin-right: 12px; width: 16px; height: 16px; accent-color: #007acc;" checked>
+                <span style="margin-right: 10px; font-size: 18px;">📁</span>
+                <span style="flex: 1; font-weight: 500; color: #37352f; font-size: 14px;">${newDirPath}</span>
+                <span style="color: #787774; font-size: 12px; background: #f1f1ef; padding: 2px 8px; border-radius: 4px; margin-right: 8px;">(신규)</span>
+                <button onclick="event.stopPropagation(); editPersonalDirectory('${newDirPath}')" style="padding: 4px 8px; margin-right: 4px; font-size: 11px; background: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer;">수정</button>
+                <button onclick="event.stopPropagation(); deletePersonalDirectory('${newDirPath}')" style="padding: 4px 8px; font-size: 11px; background: #dc3545; color: white; border: none; border-radius: 3px; cursor: pointer;">삭제</button>
+            `;
+            
+            // Add event handlers
+            newDirOption.onclick = () => selectPersonalDirectory(newDirPath, newDirOption);
+            newDirOption.onmouseover = function() { 
+                if(!this.querySelector('input').checked) this.style.background='#f8f9fa'; 
+            };
+            newDirOption.onmouseout = function() { 
+                if(!this.querySelector('input').checked) this.style.background='white'; 
+            };
+            
+            dirListContainer.appendChild(newDirOption);
+        }
+        
+        // Auto-select the new directory
+        selectedPersonalDirectory = newDirPath;
+        
+        // Clear input
+        nameInput.value = '';
+        
+        // Update selection info
+        updatePersonalSelectionInfo();
+        
+        // Clear input
+        nameInput.value = '';
+    }
+
+    function triggerPersonalFileSelect() {
+        document.getElementById('personalFileInput').click();
+    }
+
+    function handlePersonalFileSelect(event) {
+        const files = Array.from(event.target.files);
+        addPersonalFiles(files);
+    }
+
+    function handlePersonalFileDrop(event) {
+        event.preventDefault();
+        const files = Array.from(event.dataTransfer.files);
+        addPersonalFiles(files);
+    }
+
+    function addPersonalFiles(files) {
+        // Validate files
+        const validation = validateFileUpload(files, currentProject);
+        
+        if (!validation.valid) {
+            alert('파일 업로드 오류:\n' + validation.errors.join('\n'));
+            return;
+        }
+        
+        // Show warnings if any
+        if (validation.warnings.length > 0) {
+            if (!confirm('경고사항:\n' + validation.warnings.join('\n') + '\n\n계속하시겠습니까?')) {
+                return;
+            }
+        }
+        
+        // Add files to selection
+        files.forEach(file => {
+            if (!personalSelectedFiles.find(f => f.name === file.name && f.size === file.size)) {
+                personalSelectedFiles.push(file);
+            }
+        });
+        
+        // Update UI
+        updatePersonalFileList();
+        updatePersonalSelectionInfo();
+    }
+
+    function updatePersonalFileList() {
+        const selectedFilesDiv = document.getElementById('personalSelectedFiles');
+        const fileList = document.getElementById('personalFileList');
+        
+        if (personalSelectedFiles.length > 0) {
+            selectedFilesDiv.style.display = 'block';
+            fileList.innerHTML = personalSelectedFiles.map((file, index) => `
+                <div class="file-item">
+                    <div class="file-info">
+                        <span class="file-icon">${getFileIcon(file.name)}</span>
+                        <span class="file-name">${file.name}</span>
+                        <span class="file-size">${(file.size / (1024 * 1024)).toFixed(1)}MB</span>
+                    </div>
+                    <button onclick="removePersonalFile(${index})" style="background: none; border: none; color: #ef4444; cursor: pointer;">✕</button>
+                </div>
+            `).join('');
+        } else {
+            selectedFilesDiv.style.display = 'none';
+        }
+    }
+
+    function removePersonalFile(index) {
+        personalSelectedFiles.splice(index, 1);
+        updatePersonalFileList();
+        updatePersonalSelectionInfo();
+    }
+
+    function updatePersonalSelectionInfo() {
+        const fileCount = document.getElementById('personalFileCount');
+        const totalSize = document.getElementById('personalTotalSize');
+        const quotaCheck = document.getElementById('personalQuotaCheck');
+        const uploadBtn = document.getElementById('personalUploadBtn');
+        
+        // Update file count
+        fileCount.textContent = `선택된 파일: ${personalSelectedFiles.length}개`;
+        
+        // Update total size
+        const totalSizeMB = personalSelectedFiles.reduce((sum, file) => sum + (file.size / (1024 * 1024)), 0);
+        totalSize.textContent = `총 크기: ${totalSizeMB.toFixed(1)}MB`;
+        
+        // Update quota check
+        const currentUsage = calculateCurrentUsage(currentProject);
+        const newTotalSize = currentUsage.size + totalSizeMB;
+        const quotaUsage = newTotalSize / QUOTA_LIMITS.PROJECT_QUOTA;
+        
+        let quotaStatus = 'success';
+        let quotaMessage = `사용 예정: ${newTotalSize.toFixed(1)}MB / ${QUOTA_LIMITS.PROJECT_QUOTA}MB`;
+        
+        if (quotaUsage >= 1.0) {
+            quotaStatus = 'error';
+            quotaMessage = '용량 한도 초과';
+        } else if (quotaUsage >= WARNING_THRESHOLDS.HIGH) {
+            quotaStatus = 'error';
+            quotaMessage = '용량 한도 근접 (95%+)';
+        } else if (quotaUsage >= WARNING_THRESHOLDS.LOW) {
+            quotaStatus = 'warning';
+            quotaMessage = '용량 주의 (80%+)';
+        }
+        
+        quotaCheck.textContent = quotaMessage;
+        quotaCheck.className = `quota-status ${quotaStatus}`;
+        
+        // Update upload button
+        const canUpload = personalSelectedFiles.length > 0 && 
+                         selectedPersonalDirectory && 
+                         quotaUsage < 1.0;
+        uploadBtn.disabled = !canUpload;
+    }
+
+    function executePersonalUpload() {
+        if (!selectedPersonalDirectory) {
+            alert('디렉토리를 선택해주세요.');
+            return;
+        }
+        
+        if (personalSelectedFiles.length === 0) {
+            alert('업로드할 파일을 선택해주세요.');
+            return;
+        }
+        
+        // Show upload progress
+        const uploadBtn = document.getElementById('personalUploadBtn');
+        const originalText = uploadBtn.textContent;
+        uploadBtn.textContent = '업로드 중...';
+        uploadBtn.disabled = true;
+        
+        // Simulate upload process with vector indexing
+        setTimeout(async () => {
+            // Add files to project documents
+            const project = projects.find(p => p.id === currentProject);
+            if (!project.documents.personal) {
+                project.documents.personal = [];
+            }
+            
+            // Find or create directory
+            let directory = project.documents.personal.find(d => d.name === selectedPersonalDirectory && d.type === 'directory');
+            if (!directory) {
+                directory = {
+                    name: selectedPersonalDirectory,
+                    type: 'directory',
+                    files: []
+                };
+                project.documents.personal.push(directory);
+            }
+            
+            // Process each file for vector indexing
+            const uploadBtn = document.getElementById('personalUploadBtn');
+            let processedCount = 0;
+            
+            for (const file of personalSelectedFiles) {
+                // Update progress
+                uploadBtn.textContent = `처리 중... (${processedCount + 1}/${personalSelectedFiles.length})`;
+                
+                // Add file to directory
+                directory.files.push({
+                    name: file.name,
+                    type: 'file',
+                    size: `${(file.size / (1024 * 1024)).toFixed(1)}MB`,
+                    uploadDate: new Date().toISOString().split('T')[0],
+                    path: `${selectedPersonalDirectory}/${file.name}`
+                });
+                
+                // Vector indexing for personal documents
+                try {
+                    if (window.WeraserCore && window.WeraserCore.ragEngine) {
+                        console.log(`🔍 개인문서 벡터 인덱싱 시작: ${file.name}`);
+                        const indexResult = await window.WeraserCore.ragEngine.processDocument(file);
+                        if (indexResult.success) {
+                            console.log(`✅ 개인문서 인덱싱 완료: ${file.name} (${indexResult.chunks}개 청크)`);
+                        } else {
+                            console.warn(`⚠️ 개인문서 인덱싱 실패: ${file.name}`, indexResult.error);
+                        }
+                    }
+                } catch (error) {
+                    console.warn(`❌ 벡터 인덱싱 중 오류 (${file.name}):`, error);
+                }
+                
+                processedCount++;
+            }
+            
+            // Update project storage
+            const totalNewSize = personalSelectedFiles.reduce((sum, file) => sum + (file.size / (1024 * 1024)), 0);
+            project.storage.used += totalNewSize;
+            
+            // Reset form
+            personalSelectedFiles = [];
+            selectedPersonalDirectory = null;
+            
+            // Update UI
+            updateCapacityDisplay(currentProject);
+            renderSidebar();
+            
+            // Close modal
+            closeModal();
+            
+            // Show success message
+            alert(`${personalSelectedFiles.length}개 파일이 성공적으로 업로드되었습니다.`);
+        }, 1500);
+    }
+
+    function getFileIcon(filename) {
+        const ext = filename.split('.').pop().toLowerCase();
+        const iconMap = {
+            'pdf': '📄',
+            'docx': '📝',
+            'xlsx': '📊', 
+            'csv': '📊',
+            'pptx': '📋',
+            'txt': '📝',
+            'png': '🖼️',
+            'jpg': '🖼️',
+            'jpeg': '🖼️'
+        };
+        return iconMap[ext] || '📄';
+    }
+    
+    // Personal directory management functions
+    function editPersonalDirectory(dirPath) {
+        const newName = prompt(`디렉토리 이름 변경:\n현재: ${dirPath}`, dirPath.split('/').pop());
+        
+        if (newName && newName.trim()) {
+            // Validate new name
+            if (!/^[a-zA-Z0-9가-힣_\-\s]+$/.test(newName)) {
+                alert('디렉토리 이름에는 한글, 영문, 숫자, 언더스코어, 하이픈, 공백만 사용할 수 있습니다.');
+                return;
+            }
+            
+            const pathParts = dirPath.split('/');
+            pathParts[pathParts.length - 1] = newName.trim();
+            const newPath = pathParts.join('/');
+            
+            // Update in project documents
+            const project = projects.find(p => p.id === currentProject);
+            if (project && project.documents.personal) {
+                const dir = project.documents.personal.find(d => d.name === dirPath.split('/').pop());
+                if (dir) {
+                    dir.name = newName.trim();
+                    
+                    // Update files paths
+                    if (dir.files) {
+                        dir.files.forEach(file => {
+                            if (file.path) {
+                                file.path = file.path.replace(dirPath, newPath);
+                            }
+                        });
+                    }
+                }
+            }
+            
+            // Update UI
+            const label = event.target.closest('label');
+            if (label) {
+                const pathSpan = label.querySelector('span[style*="flex: 1"]');
+                if (pathSpan) {
+                    pathSpan.textContent = newPath;
+                }
+                const radio = label.querySelector('input[type="radio"]');
+                if (radio) {
+                    radio.value = newPath;
+                }
+            }
+            
+            alert(`디렉토리가 '${newPath}'로 변경되었습니다.`);
+            renderSidebar();
+        }
+    }
+    
+    function deletePersonalDirectory(dirPath) {
+        // Check if directory has files
+        const project = projects.find(p => p.id === currentProject);
+        let hasFiles = false;
+        
+        if (project && project.documents.personal) {
+            const dir = project.documents.personal.find(d => 
+                d.name === dirPath.split('/').pop() || 
+                (d.type === 'directory' && d.name === dirPath.split('/').pop())
+            );
+            if (dir && dir.files && dir.files.length > 0) {
+                hasFiles = true;
+            }
+        }
+        
+        const confirmMsg = hasFiles ? 
+            `'${dirPath}' 디렉토리에 파일이 있습니다.\n휴지통으로 이동하시겠습니까? (30일 후 자동 삭제)` :
+            `'${dirPath}' 디렉토리를 휴지통으로 이동하시겠습니까? (30일 후 자동 삭제)`;
+        
+        if (confirm(confirmMsg)) {
+            // Move to trash instead of permanent deletion
+            if (project && project.documents.personal) {
+                const dirName = dirPath.split('/').pop();
+                const dirIndex = project.documents.personal.findIndex(d => 
+                    d.name === dirName || 
+                    (d.type === 'directory' && d.name === dirName)
+                );
+                
+                if (dirIndex !== -1) {
+                    const dir = project.documents.personal[dirIndex];
+                    
+                    // Create trash item
+                    const trashItem = {
+                        id: 'trash-' + Date.now(),
+                        type: 'personal-directory',
+                        name: dir.name,
+                        path: dirPath,
+                        fileCount: dir.files ? dir.files.length : 0,
+                        deletedAt: new Date().toISOString(),
+                        projectId: currentProject,
+                        originalData: dir
+                    };
+                    
+                    // Get or create trash items array
+                    let trashItems = JSON.parse(localStorage.getItem('weraser_trash') || '[]');
+                    trashItems.push(trashItem);
+                    localStorage.setItem('weraser_trash', JSON.stringify(trashItems));
+                    
+                    // Remove directory from active documents
+                    project.documents.personal.splice(dirIndex, 1);
+                    
+                    // Note: Storage space is not actually freed until permanently deleted from trash
+                }
+            }
+            
+            // Remove from UI
+            const label = event.target.closest('label');
+            if (label) {
+                label.remove();
+            }
+            
+            alert(`'${dirPath}' 디렉토리가 휴지통으로 이동되었습니다.\n30일 후 자동으로 삭제됩니다.`);
+            
+            // Update displays
+            updateCapacityDisplay(currentProject);
+            renderSidebar();
+        }
+    }
+
+    // Organization document functions
+
+    function toggleFileSelection(element, event) {
+        if (event) event.stopPropagation();
+        const checkbox = element.querySelector('input[type="checkbox"]');
+        checkbox.checked = !checkbox.checked;
+        updateOrgSelectionInfo();
+    }
+
     // Modal helper functions
     function closeModal() {
-        const modal = document.querySelector('.modal-overlay');
+        const modal = document.querySelector('.modal, .modal-overlay');
         if (modal) {
             modal.remove();
         }
+        
+        // Reset personal upload state
+        personalSelectedFiles = [];
+        selectedPersonalDirectory = null;
     }
     
     // Organization document browser functions
     function toggleOrgFolder(element) {
         const content = element.nextElementSibling;
         if (content && content.classList.contains('org-folder-content')) {
-            const isExpanded = content.style.display !== 'none';
+            const isExpanded = content.style.display !== 'none' && content.style.display !== '';
             content.style.display = isExpanded ? 'none' : 'block';
             
             const icon = element.querySelector('.folder-icon');
-            icon.textContent = isExpanded ? '📂' : '📁';
+            if (icon) {
+                icon.textContent = isExpanded ? '📂' : '📁';
+            }
         }
     }
     
-    function updateSelectionInfo() {
+    function updateOrgSelectionInfo() {
         const checkboxes = document.querySelectorAll('.file-checkbox:checked');
         const count = checkboxes.length;
         let totalSize = 0;
@@ -2951,8 +3995,8 @@
         
         // Add event listeners to checkboxes
         document.querySelectorAll('.file-checkbox').forEach(checkbox => {
-            checkbox.removeEventListener('change', updateSelectionInfo);
-            checkbox.addEventListener('change', updateSelectionInfo);
+            checkbox.removeEventListener('change', updateOrgSelectionInfo);
+            checkbox.addEventListener('change', updateOrgSelectionInfo);
         });
     }
     
@@ -2963,22 +4007,58 @@
         checkboxes.forEach(checkbox => {
             const fileElement = checkbox.closest('.org-file');
             const fileName = fileElement.querySelector('.file-name').textContent;
-            selectedFiles.push(fileName);
+            const fileSize = fileElement.querySelector('.file-meta').textContent.split(' ')[0];
+            selectedFiles.push({
+                name: fileName,
+                size: fileSize
+            });
         });
         
         if (selectedFiles.length === 0) {
-            WeraserCore.ui.showNotification('선택된 문서가 없습니다', 'warning');
+            alert('선택된 문서가 없습니다.');
             return;
         }
         
-        WeraserCore.ui.showNotification(`${selectedFiles.length}개 조직 문서 불러오기 완료`, 'success');
-        closeModal();
+        // Show loading state
+        const importBtn = document.getElementById('importBtn');
+        const originalText = importBtn.textContent;
+        importBtn.textContent = '불러오는 중...';
+        importBtn.disabled = true;
         
-        // Update sidebar to show imported documents
-        const project = projects.find(p => p.id === currentProject);
-        if (project) {
+        // Simulate import process
+        setTimeout(() => {
+            // Add files to project documents
+            const project = projects.find(p => p.id === currentProject);
+            if (project && !project.documents.organization) {
+                project.documents.organization = [];
+            }
+            
+            selectedFiles.forEach(file => {
+                project.documents.organization.push({
+                    name: file.name,
+                    type: 'file',
+                    size: file.size,
+                    importDate: new Date().toISOString().split('T')[0],
+                    source: 'organization'
+                });
+            });
+            
+            // Update project storage usage
+            const totalImportSize = selectedFiles.reduce((sum, file) => {
+                return sum + parseFloat(file.size.replace('MB', '') || 0);
+            }, 0);
+            project.storage.used += totalImportSize;
+            
+            // Update UI
+            updateCapacityDisplay(currentProject);
             renderSidebar();
-        }
+            
+            // Close modal
+            closeModal();
+            
+            // Show success message
+            alert(`${selectedFiles.length}개 조직 문서를 성공적으로 불러왔습니다.`);
+        }, 1200);
     }
     
     // Personal upload functions
@@ -3454,14 +4534,312 @@
         }
     }
     
+    // Data persistence functions
+    function saveDataToLocalStorage() {
+        try {
+            // Save projects
+            localStorage.setItem('weraser_projects', JSON.stringify(projects));
+            
+            // Save organization directories
+            localStorage.setItem('weraser_org_directories', JSON.stringify(organizationDirectories));
+            
+            // Save current user
+            localStorage.setItem('weraser_current_user', JSON.stringify(currentUser));
+            
+            console.log('Data saved to localStorage');
+        } catch (error) {
+            console.error('Failed to save data to localStorage:', error);
+        }
+    }
+    
+    function loadDataFromLocalStorage() {
+        try {
+            // Load projects
+            const savedProjects = localStorage.getItem('weraser_projects');
+            if (savedProjects) {
+                projects = JSON.parse(savedProjects);
+                console.log('Projects loaded from localStorage');
+            }
+            
+            // Load organization directories
+            const savedOrgDirs = localStorage.getItem('weraser_org_directories');
+            if (savedOrgDirs) {
+                organizationDirectories = JSON.parse(savedOrgDirs);
+                console.log('Organization directories loaded from localStorage');
+            }
+            
+            // Load current user
+            const savedUser = localStorage.getItem('weraser_current_user');
+            if (savedUser) {
+                const parsedUser = JSON.parse(savedUser);
+                // Ensure the user has admin role for testing
+                parsedUser.role = userRoles.ADMIN;
+                currentUser = parsedUser;
+                // Save the updated user back to localStorage
+                localStorage.setItem('weraser_current_user', JSON.stringify(currentUser));
+                console.log('Current user loaded from localStorage with admin role');
+            } else {
+                // If no saved user, save the default admin user
+                localStorage.setItem('weraser_current_user', JSON.stringify(currentUser));
+                console.log('Default admin user saved to localStorage');
+            }
+        } catch (error) {
+            console.error('Failed to load data from localStorage:', error);
+        }
+    }
+    
+    // Auto-save data on changes
+    function autoSaveData() {
+        saveDataToLocalStorage();
+    }
+    
     // Go to admin
     function goToAdmin() {
-        window.location.href = 'admin.html';
+        // Check user permission
+        if (currentUser.role !== userRoles.ADMIN && currentUser.role !== userRoles.MANAGER) {
+            alert('관리자 권한이 필요합니다.');
+            return;
+        }
+        
+        // Navigate to admin page
+        window.location.href = 'admin-dashboard.html';
     }
     
     // Show profile
     function showProfile() {
         WeraserCore.ui.showNotification('프로필 화면 표시', 'info');
+    }
+    
+    // Show directory management modal
+    function showDirectoryManagement() {
+        // Remove any existing modals
+        const existingModals = document.querySelectorAll('.modal, .modal-overlay');
+        existingModals.forEach(modal => modal.remove());
+        
+        // Create modal
+        const modal = document.createElement('div');
+        modal.className = 'modal show';
+        modal.innerHTML = `
+            <div class="modal-container" style="width: 80%; max-width: 1000px; max-height: 90vh; display: flex; flex-direction: column; box-shadow: none;">
+                <div class="modal-header">
+                    <div class="modal-header-content">
+                        <div>
+                            <h3>⚙️ 디렉토리 관리</h3>
+                            <div style="font-size: 12px; color: #787774; margin-top: 4px;">
+                                조직 문서 디렉토리를 관리하고 권한을 설정합니다
+                            </div>
+                        </div>
+                        <button class="modal-close" onclick="closeModal()">&times;</button>
+                    </div>
+                </div>
+                <div class="modal-content" style="padding: 24px; flex: 1; overflow-y: auto; display: flex; flex-direction: column;">
+                    <!-- Tab Navigation -->
+                    <div style="display: flex; gap: 20px; border-bottom: 1px solid #e9e9e7; margin-bottom: 20px;">
+                        <div id="orgDirTab" onclick="switchDirectoryTab('organization')" 
+                             style="padding: 12px 0; cursor: pointer; border-bottom: 2px solid #007acc; color: #007acc; font-weight: 500;">
+                            조직 디렉토리
+                        </div>
+                        <div id="personalDirTab" onclick="switchDirectoryTab('personal')" 
+                             style="padding: 12px 0; cursor: pointer; color: #787774;">
+                            개인 디렉토리 설정
+                        </div>
+                    </div>
+                    
+                    <!-- Organization Directory Management -->
+                    <div id="orgDirContent" style="display: flex; flex-direction: column; gap: 20px;">
+                        <!-- Add New Directory -->
+                        <div style="display: flex; gap: 10px; padding: 16px; background: #f8f9fa; border-radius: 8px;">
+                            <input type="text" id="newOrgDirName" placeholder="새 디렉토리 이름" 
+                                   style="flex: 1; padding: 10px; border: 1px solid #e9e9e7; border-radius: 6px;">
+                            <button class="btn-primary" onclick="addOrganizationDirectory()">
+                                ➕ 디렉토리 추가
+                            </button>
+                        </div>
+                        
+                        <!-- Directory List -->
+                        <div id="orgDirList" style="flex: 1;">
+                            ${renderOrganizationDirectories()}
+                        </div>
+                    </div>
+                    
+                    <!-- Personal Directory Settings (Hidden by default) -->
+                    <div id="personalDirContent" style="display: none; flex-direction: column; gap: 20px;">
+                        <div style="padding: 20px; background: #f8f9fa; border-radius: 8px; text-align: center;">
+                            <h4 style="margin: 0 0 10px 0;">개인 디렉토리 정책 설정</h4>
+                            <p style="color: #787774; margin: 0;">사용자별 개인 디렉토리 생성 권한 및 용량 제한을 설정합니다</p>
+                            <div style="margin-top: 20px; display: flex; gap: 20px; justify-content: center;">
+                                <label style="display: flex; align-items: center; gap: 8px;">
+                                    <input type="checkbox" id="allowPersonalDirCreation" checked>
+                                    사용자 디렉토리 생성 허용
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 8px;">
+                                    최대 용량:
+                                    <input type="number" id="personalQuotaLimit" value="1024" 
+                                           style="width: 100px; padding: 4px 8px; border: 1px solid #e9e9e7; border-radius: 4px;">
+                                    MB
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer" style="padding: 16px 20px; border-top: 1px solid #e9e9e7; display: flex; justify-content: flex-end;">
+                    <button class="btn-secondary" onclick="closeModal()">닫기</button>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+    }
+    
+    // Render organization directories
+    function renderOrganizationDirectories() {
+        if (organizationDirectories.length === 0) {
+            return '<div style="text-align: center; padding: 40px; color: #787774;">등록된 디렉토리가 없습니다</div>';
+        }
+        
+        return organizationDirectories.map(dir => `
+            <div class="directory-item" style="display: flex; align-items: center; padding: 12px 16px; background: white; border: 1px solid #e9e9e7; border-radius: 8px; margin-bottom: 8px;">
+                <span style="font-size: 20px; margin-right: 12px;">📁</span>
+                <div style="flex: 1;">
+                    <div style="font-weight: 500; color: #37352f;">${dir.name}</div>
+                    <div style="font-size: 12px; color: #787774; margin-top: 2px;">
+                        ${dir.path} • ${dir.fileCount}개 파일 • 생성: ${dir.createdAt}
+                    </div>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn-secondary" onclick="editOrganizationDirectory('${dir.id}')" 
+                            style="padding: 6px 12px; font-size: 12px;">
+                        ✏️ 수정
+                    </button>
+                    <button class="btn-secondary" onclick="deleteOrganizationDirectory('${dir.id}')" 
+                            style="padding: 6px 12px; font-size: 12px; color: #dc3545;">
+                        🗑️ 삭제
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    }
+    
+    // Switch directory tab
+    function switchDirectoryTab(tab) {
+        const orgTab = document.getElementById('orgDirTab');
+        const personalTab = document.getElementById('personalDirTab');
+        const orgContent = document.getElementById('orgDirContent');
+        const personalContent = document.getElementById('personalDirContent');
+        
+        if (tab === 'organization') {
+            orgTab.style.borderBottom = '2px solid #007acc';
+            orgTab.style.color = '#007acc';
+            orgTab.style.fontWeight = '500';
+            personalTab.style.borderBottom = 'none';
+            personalTab.style.color = '#787774';
+            personalTab.style.fontWeight = 'normal';
+            
+            orgContent.style.display = 'flex';
+            personalContent.style.display = 'none';
+        } else {
+            personalTab.style.borderBottom = '2px solid #007acc';
+            personalTab.style.color = '#007acc';
+            personalTab.style.fontWeight = '500';
+            orgTab.style.borderBottom = 'none';
+            orgTab.style.color = '#787774';
+            orgTab.style.fontWeight = 'normal';
+            
+            personalContent.style.display = 'flex';
+            orgContent.style.display = 'none';
+        }
+    }
+    
+    // Add organization directory
+    function addOrganizationDirectory() {
+        const nameInput = document.getElementById('newOrgDirName');
+        const dirName = nameInput.value.trim();
+        
+        if (!dirName) {
+            alert('디렉토리 이름을 입력하세요.');
+            return;
+        }
+        
+        // Check for duplicate names
+        if (organizationDirectories.some(dir => dir.name === dirName)) {
+            alert('이미 존재하는 디렉토리 이름입니다.');
+            return;
+        }
+        
+        // Create new directory
+        const newDir = {
+            id: `org-dir-${Date.now()}`,
+            name: dirName,
+            path: `/조직문서/${dirName}`,
+            type: 'organization',
+            permissions: ['admin', 'manager'],
+            createdBy: currentUser.name,
+            createdAt: new Date().toISOString().split('T')[0],
+            fileCount: 0,
+            children: []
+        };
+        
+        organizationDirectories.push(newDir);
+        autoSaveData();
+        
+        // Update UI
+        const dirList = document.getElementById('orgDirList');
+        dirList.innerHTML = renderOrganizationDirectories();
+        
+        // Clear input
+        nameInput.value = '';
+        
+        alert(`"${dirName}" 디렉토리가 생성되었습니다.`);
+    }
+    
+    // Edit organization directory
+    function editOrganizationDirectory(dirId) {
+        const dir = organizationDirectories.find(d => d.id === dirId);
+        if (!dir) return;
+        
+        const newName = prompt('새 디렉토리 이름:', dir.name);
+        if (!newName || newName === dir.name) return;
+        
+        // Check for duplicate names
+        if (organizationDirectories.some(d => d.id !== dirId && d.name === newName)) {
+            alert('이미 존재하는 디렉토리 이름입니다.');
+            return;
+        }
+        
+        // Update directory
+        dir.name = newName;
+        dir.path = `/조직문서/${newName}`;
+        autoSaveData();
+        
+        // Update UI
+        const dirList = document.getElementById('orgDirList');
+        if (dirList) {
+            dirList.innerHTML = renderOrganizationDirectories();
+        }
+        
+        alert(`디렉토리 이름이 "${newName}"로 변경되었습니다.`);
+    }
+    
+    // Delete organization directory
+    function deleteOrganizationDirectory(dirId) {
+        const dir = organizationDirectories.find(d => d.id === dirId);
+        if (!dir) return;
+        
+        if (!confirm(`"${dir.name}" 디렉토리를 삭제하시겠습니까?\n\n⚠️ 주의: ${dir.fileCount}개의 파일이 포함되어 있습니다.`)) {
+            return;
+        }
+        
+        // Remove directory
+        organizationDirectories = organizationDirectories.filter(d => d.id !== dirId);
+        autoSaveData();
+        
+        // Update UI
+        const dirList = document.getElementById('orgDirList');
+        if (dirList) {
+            dirList.innerHTML = renderOrganizationDirectories();
+        }
+        
+        alert(`"${dir.name}" 디렉토리가 삭제되었습니다.`);
     }
 </script>
 </body>

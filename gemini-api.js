@@ -283,9 +283,34 @@ function enableGeminiChat() {
             // AI 응답 요청
             showTypingIndicator();
             
+            // 벡터 검색 수행 (RAG Engine을 통해)
+            let vectorSearchResult = null;
+            if (window.WeraserCore && window.WeraserCore.ragEngine.isVectorEngineReady) {
+                try {
+                    vectorSearchResult = await window.WeraserCore.ragEngine.searchQuery(message, 'org');
+                    console.log('🔍 벡터 검색 결과:', vectorSearchResult);
+                } catch (error) {
+                    console.warn('벡터 검색 실패, 일반 모드로 진행:', error);
+                }
+            }
+            
             // 현재 문서 가져오기
             const documents = getCurrentDocuments();
-            const result = await window.geminiChat.sendMessage(message, documents);
+            
+            // 벡터 검색 결과가 있으면 우선 사용
+            let result;
+            if (vectorSearchResult && vectorSearchResult.confidence > 0.6) {
+                console.log('✅ 벡터 RAG 응답 사용');
+                result = {
+                    success: true,
+                    response: vectorSearchResult.text,
+                    sources: vectorSearchResult.source ? [vectorSearchResult.source] : [],
+                    metadata: vectorSearchResult.data
+                };
+            } else {
+                console.log('📝 기존 Gemini API 사용');
+                result = await window.geminiChat.sendMessage(message, documents);
+            }
             
             hideTypingIndicator();
             

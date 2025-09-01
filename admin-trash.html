@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weraser 관리자 - 휴지통</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif;
+            background-color: #f8f9fa;
+            overflow: hidden;
+        }
+
+        .admin-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Sidebar */
+        .admin-sidebar {
+            width: 250px;
+            background: white;
+            border-right: 1px solid #e9ecef;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .admin-header {
+            padding: 20px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .admin-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .admin-subtitle {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .admin-nav {
+            flex: 1;
+            padding: 20px 0;
+        }
+
+        .admin-nav-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: #666;
+            text-decoration: none;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .admin-nav-item:hover {
+            background: #f8f9fa;
+            color: #333;
+        }
+
+        .admin-nav-item.active {
+            background: #e7f5ff;
+            color: #1971c2;
+            border-right: 3px solid #1971c2;
+        }
+
+        .admin-nav-item i {
+            width: 20px;
+            margin-right: 12px;
+        }
+
+        .admin-footer {
+            padding: 20px;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .admin-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .admin-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #1971c2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .admin-user-info h4 {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 2px;
+        }
+
+        .admin-user-info p {
+            font-size: 12px;
+            color: #666;
+        }
+
+        /* Main Content */
+        .admin-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .admin-topbar {
+            background: white;
+            border-bottom: 1px solid #e9ecef;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .page-subtitle {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .admin-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 16px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background: white;
+            color: #666;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            background: #f8f9fa;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+            border-color: #dc3545;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+            border-color: #ffc107;
+        }
+
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+
+        .admin-content {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+            background: #f8f9fa;
+        }
+
+        /* Trash Section */
+        .trash-section {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .section-header {
+            padding: 20px 30px;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        /* Trash Stats */
+        .trash-stats {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            flex: 1;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-card h3 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .stat-card p {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .stat-card i {
+            float: right;
+            font-size: 20px;
+            color: #dc3545;
+            margin-top: -5px;
+        }
+
+        /* Search and Filter */
+        .trash-toolbar {
+            padding: 20px 30px;
+            border-bottom: 1px solid #f1f3f4;
+            background: #fafbfc;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .search-box {
+            flex: 1;
+            max-width: 300px;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px 40px 10px 16px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+        }
+
+        .search-box i {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+        }
+
+        .bulk-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        /* Trash Table */
+        .trash-table-container {
+            overflow-x: auto;
+        }
+
+        .trash-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        .trash-table th,
+        .trash-table td {
+            padding: 16px 20px;
+            text-align: left;
+            border-bottom: 1px solid #f1f3f4;
+        }
+
+        .trash-table th {
+            background: #fafbfc;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .trash-table td {
+            color: #555;
+            font-size: 14px;
+        }
+
+        .trash-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .file-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: #ffeaa7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #e17055;
+            font-size: 16px;
+        }
+
+        .file-icon.pdf {
+            background: #ff7675;
+            color: white;
+        }
+
+        .file-icon.doc {
+            background: #74b9ff;
+            color: white;
+        }
+
+        .file-icon.xls {
+            background: #00b894;
+            color: white;
+        }
+
+        .file-icon.folder {
+            background: #fdcb6e;
+            color: #e84393;
+        }
+
+        .file-details h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 2px;
+        }
+
+        .file-details p {
+            font-size: 12px;
+            color: #666;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            border-radius: 6px;
+            background: transparent;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .action-btn:hover {
+            background: #f8f9fa;
+            color: #333;
+        }
+
+        .action-btn.restore:hover {
+            color: #28a745;
+        }
+
+        .action-btn.delete:hover {
+            color: #dc3545;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: #999;
+        }
+
+        .empty-state i {
+            font-size: 64px;
+            margin-bottom: 20px;
+            color: #ddd;
+        }
+
+        .empty-state h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #666;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        /* Auto-cleanup Alert */
+        .cleanup-alert {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .cleanup-alert i {
+            color: #856404;
+            font-size: 18px;
+        }
+
+        .cleanup-alert-content h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #856404;
+            margin-bottom: 5px;
+        }
+
+        .cleanup-alert-content p {
+            font-size: 12px;
+            color: #6c5700;
+            margin: 0;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .admin-sidebar {
+                width: 60px;
+            }
+
+            .admin-nav-item span {
+                display: none;
+            }
+
+            .admin-header .admin-title {
+                font-size: 16px;
+            }
+
+            .admin-subtitle {
+                display: none;
+            }
+
+            .admin-user-info {
+                display: none;
+            }
+
+            .trash-stats {
+                flex-direction: column;
+            }
+
+            .trash-toolbar {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 15px;
+            }
+
+            .search-box {
+                max-width: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <div class="admin-sidebar">
+            <div class="admin-header">
+                <div class="admin-title">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>관리자 대시보드</span>
+                </div>
+                <div class="admin-subtitle">Weraser Admin</div>
+            </div>
+
+            <nav class="admin-nav">
+                <a href="admin-dashboard.html" class="admin-nav-item">
+                    <i class="fas fa-home"></i>
+                    <span>대시보드</span>
+                </a>
+                <a href="admin-documents.html" class="admin-nav-item">
+                    <i class="fas fa-folder-open"></i>
+                    <span>조직문서 관리</span>
+                </a>
+                <a href="admin-members.html" class="admin-nav-item">
+                    <i class="fas fa-users"></i>
+                    <span>조직회원 관리</span>
+                </a>
+                <a href="admin-trash.html" class="admin-nav-item active">
+                    <i class="fas fa-trash"></i>
+                    <span>휴지통</span>
+                </a>
+            </nav>
+
+            <div class="admin-footer">
+                <div class="admin-user">
+                    <div class="admin-avatar">김</div>
+                    <div class="admin-user-info">
+                        <h4>김대리</h4>
+                        <p>Administrator</p>
+                    </div>
+                </div>
+                <a href="index.html" class="admin-nav-item" style="margin-top: 10px; border-top: 1px solid #e9ecef; padding-top: 15px;">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>메인 앱으로</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="admin-main">
+            <div class="admin-topbar">
+                <div>
+                    <h1 class="page-title">휴지통</h1>
+                    <p class="page-subtitle">삭제된 파일을 복원하거나 디렉토리를 관리합니다. 30일 후 자동 영구삭제됩니다.</p>
+                </div>
+                <div class="admin-actions">
+                    <button class="btn btn-warning" onclick="emptyTrash()">
+                        <i class="fas fa-broom"></i>
+                        전체 비우기
+                    </button>
+                </div>
+            </div>
+
+            <div class="admin-content">
+                <!-- Auto-cleanup Alert -->
+                <div class="cleanup-alert">
+                    <i class="fas fa-clock"></i>
+                    <div class="cleanup-alert-content">
+                        <h4>자동 정리 안내</h4>
+                        <p>휴지통의 파일들은 삭제일로부터 30일 후 자동으로 영구 삭제됩니다. 중요한 파일은 미리 복원해 주세요.</p>
+                    </div>
+                </div>
+
+                <!-- Trash Statistics -->
+                <div class="trash-stats">
+                    <div class="stat-card">
+                        <h3 id="totalTrashItems">3</h3>
+                        <p>전체 항목</p>
+                        <i class="fas fa-trash-alt"></i>
+                    </div>
+                    <div class="stat-card">
+                        <h3 id="trashSize">12.8 MB</h3>
+                        <p>총 용량</p>
+                        <i class="fas fa-hdd"></i>
+                    </div>
+                    <div class="stat-card">
+                        <h3 id="expiringSoon">1</h3>
+                        <p>7일 내 삭제 예정</p>
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="stat-card">
+                        <h3 id="oldestItem">25일</h3>
+                        <p>가장 오래된 항목</p>
+                        <i class="fas fa-calendar-times"></i>
+                    </div>
+                </div>
+
+                <!-- Trash Section -->
+                <div class="trash-section">
+                    <div class="section-header">
+                        <h2 class="section-title">삭제된 항목</h2>
+                    </div>
+
+                    <!-- Search and Bulk Actions -->
+                    <div class="trash-toolbar">
+                        <div class="search-box">
+                            <input type="text" id="trashSearch" placeholder="파일 검색..." onkeyup="filterTrashItems()">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <div class="bulk-actions">
+                            <button class="btn" onclick="restoreSelected()" id="restoreBtn" disabled>
+                                <i class="fas fa-undo"></i>
+                                선택 복원
+                            </button>
+                            <button class="btn btn-danger" onclick="deleteSelectedPermanently()" id="deleteBtn" disabled>
+                                <i class="fas fa-times"></i>
+                                영구 삭제
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Trash Table -->
+                    <div class="trash-table-container">
+                        <table class="trash-table">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <input type="checkbox" id="selectAll" onchange="toggleSelectAll()">
+                                    </th>
+                                    <th>이름</th>
+                                    <th>원본 위치</th>
+                                    <th>크기</th>
+                                    <th>삭제일시</th>
+                                    <th>삭제한 사용자</th>
+                                    <th>남은 일수</th>
+                                    <th>작업</th>
+                                </tr>
+                            </thead>
+                            <tbody id="trashTableBody">
+                                <!-- Trash items will be rendered here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 휴지통 데이터
+        let trashData = [
+            {
+                id: 'trash-1',
+                name: '구형규정_v1.pdf',
+                originalPath: '/조직문서/관세자료/',
+                type: 'pdf',
+                size: '8.2 MB',
+                deletedAt: '2024-12-07', // 25일 전
+                deletedBy: '김대리',
+                daysLeft: 5
+            },
+            {
+                id: 'trash-2',
+                name: '매뉴얼_구버전.docx',
+                originalPath: '/조직문서/회의록/',
+                type: 'doc',
+                size: '3.1 MB',
+                deletedAt: '2024-12-20', // 12일 전
+                deletedBy: '이영희',
+                daysLeft: 18
+            },
+            {
+                id: 'trash-3',
+                name: '임시폴더',
+                originalPath: '/조직문서/',
+                type: 'folder',
+                size: '1.5 MB',
+                deletedAt: '2024-12-25', // 7일 전
+                deletedBy: '박민수',
+                daysLeft: 23
+            }
+        ];
+
+        let filteredTrashItems = [...trashData];
+
+        // 휴지통 테이블 렌더링
+        function renderTrashTable() {
+            const tbody = document.getElementById('trashTableBody');
+            
+            if (filteredTrashItems.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8">
+                            <div class="empty-state">
+                                <i class="fas fa-trash-alt"></i>
+                                <h3>휴지통이 비어있습니다</h3>
+                                <p>삭제된 파일이 없습니다.<br>삭제된 파일들은 여기서 복원하거나 영구 삭제할 수 있습니다.</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            tbody.innerHTML = filteredTrashItems.map(item => `
+                <tr>
+                    <td>
+                        <input type="checkbox" class="trash-checkbox" value="${item.id}" onchange="updateBulkButtons()">
+                    </td>
+                    <td>
+                        <div class="file-info">
+                            <div class="file-icon ${item.type}">
+                                <i class="fas fa-${getFileIcon(item.type)}"></i>
+                            </div>
+                            <div class="file-details">
+                                <h4>${item.name}</h4>
+                                <p>${item.type === 'folder' ? '폴더' : '파일'}</p>
+                            </div>
+                        </div>
+                    </td>
+                    <td>${item.originalPath}</td>
+                    <td>${item.size}</td>
+                    <td>${formatDate(item.deletedAt)}</td>
+                    <td>${item.deletedBy}</td>
+                    <td>
+                        <span style="color: ${item.daysLeft <= 7 ? '#dc3545' : '#666'}; font-weight: ${item.daysLeft <= 7 ? '600' : 'normal'}">
+                            ${item.daysLeft}일
+                        </span>
+                    </td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="action-btn restore" onclick="restoreItem('${item.id}')" title="복원">
+                                <i class="fas fa-undo"></i>
+                            </button>
+                            <button class="action-btn delete" onclick="deletePermanently('${item.id}')" title="영구 삭제">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // 파일 아이콘 가져오기
+        function getFileIcon(type) {
+            const icons = {
+                pdf: 'file-pdf',
+                doc: 'file-word',
+                xls: 'file-excel',
+                folder: 'folder'
+            };
+            return icons[type] || 'file';
+        }
+
+        // 휴지통 항목 필터링
+        function filterTrashItems() {
+            const searchTerm = document.getElementById('trashSearch').value.toLowerCase();
+            
+            filteredTrashItems = trashData.filter(item => {
+                return item.name.toLowerCase().includes(searchTerm) ||
+                       item.originalPath.toLowerCase().includes(searchTerm) ||
+                       item.deletedBy.toLowerCase().includes(searchTerm);
+            });
+            
+            renderTrashTable();
+            updateStats();
+        }
+
+        // 통계 업데이트
+        function updateStats() {
+            const totalItems = trashData.length;
+            const totalSize = trashData.length > 0 ? '12.8 MB' : '0 B';
+            const expiringSoon = trashData.filter(item => item.daysLeft <= 7).length;
+            const oldestDays = trashData.length > 0 ? Math.min(...trashData.map(item => item.daysLeft)) : 0;
+            
+            document.getElementById('totalTrashItems').textContent = totalItems;
+            document.getElementById('trashSize').textContent = totalSize;
+            document.getElementById('expiringSoon').textContent = expiringSoon;
+            document.getElementById('oldestItem').textContent = oldestDays > 0 ? `${30 - oldestDays}일` : '-';
+        }
+
+        // 전체 선택 토글
+        function toggleSelectAll() {
+            const selectAll = document.getElementById('selectAll');
+            const checkboxes = document.querySelectorAll('.trash-checkbox');
+            
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = selectAll.checked;
+            });
+            
+            updateBulkButtons();
+        }
+
+        // 대량 작업 버튼 상태 업데이트
+        function updateBulkButtons() {
+            const selectedItems = document.querySelectorAll('.trash-checkbox:checked');
+            const restoreBtn = document.getElementById('restoreBtn');
+            const deleteBtn = document.getElementById('deleteBtn');
+            
+            const hasSelection = selectedItems.length > 0;
+            restoreBtn.disabled = !hasSelection;
+            deleteBtn.disabled = !hasSelection;
+        }
+
+        // 항목 복원
+        function restoreItem(itemId) {
+            const item = trashData.find(i => i.id === itemId);
+            if (!item) return;
+            
+            if (confirm(`'${item.name}'을(를) 원본 위치로 복원하시겠습니까?\n원본 위치: ${item.originalPath}`)) {
+                trashData = trashData.filter(i => i.id !== itemId);
+                filteredTrashItems = [...trashData];
+                renderTrashTable();
+                updateStats();
+                showNotification(`${item.name}이(가) 복원되었습니다.`, 'success');
+            }
+        }
+
+        // 선택 항목 복원
+        function restoreSelected() {
+            const selectedIds = Array.from(document.querySelectorAll('.trash-checkbox:checked'))
+                                   .map(cb => cb.value);
+            
+            if (selectedIds.length === 0) return;
+            
+            if (confirm(`선택된 ${selectedIds.length}개 항목을 복원하시겠습니까?`)) {
+                selectedIds.forEach(id => {
+                    trashData = trashData.filter(i => i.id !== id);
+                });
+                
+                filteredTrashItems = [...trashData];
+                renderTrashTable();
+                updateStats();
+                showNotification(`${selectedIds.length}개 항목이 복원되었습니다.`, 'success');
+                
+                document.getElementById('selectAll').checked = false;
+                updateBulkButtons();
+            }
+        }
+
+        // 영구 삭제
+        function deletePermanently(itemId) {
+            const item = trashData.find(i => i.id === itemId);
+            if (!item) return;
+            
+            if (confirm(`'${item.name}'을(를) 영구적으로 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`)) {
+                trashData = trashData.filter(i => i.id !== itemId);
+                filteredTrashItems = [...trashData];
+                renderTrashTable();
+                updateStats();
+                showNotification(`${item.name}이(가) 영구 삭제되었습니다.`, 'success');
+            }
+        }
+
+        // 선택 항목 영구 삭제
+        function deleteSelectedPermanently() {
+            const selectedIds = Array.from(document.querySelectorAll('.trash-checkbox:checked'))
+                                   .map(cb => cb.value);
+            
+            if (selectedIds.length === 0) return;
+            
+            if (confirm(`선택된 ${selectedIds.length}개 항목을 영구적으로 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`)) {
+                selectedIds.forEach(id => {
+                    trashData = trashData.filter(i => i.id !== id);
+                });
+                
+                filteredTrashItems = [...trashData];
+                renderTrashTable();
+                updateStats();
+                showNotification(`${selectedIds.length}개 항목이 영구 삭제되었습니다.`, 'success');
+                
+                document.getElementById('selectAll').checked = false;
+                updateBulkButtons();
+            }
+        }
+
+        // 휴지통 전체 비우기
+        function emptyTrash() {
+            if (trashData.length === 0) {
+                showNotification('휴지통이 이미 비어있습니다.', 'info');
+                return;
+            }
+            
+            if (confirm(`휴지통의 모든 항목(${trashData.length}개)을 영구적으로 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`)) {
+                const count = trashData.length;
+                trashData = [];
+                filteredTrashItems = [];
+                renderTrashTable();
+                updateStats();
+                showNotification(`휴지통이 비워졌습니다. ${count}개 항목이 영구 삭제되었습니다.`, 'success');
+                
+                document.getElementById('selectAll').checked = false;
+                updateBulkButtons();
+            }
+        }
+
+        // 날짜 포맷팅
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            const date = new Date(dateString);
+            return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        }
+
+        // 알림 시스템
+        function showNotification(message, type = 'info') {
+            const colors = {
+                success: '#28a745',
+                error: '#dc3545',
+                warning: '#ffc107',
+                info: '#17a2b8'
+            };
+            
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 80px;
+                right: 20px;
+                background: ${colors[type]};
+                color: white;
+                padding: 12px 20px;
+                border-radius: 6px;
+                z-index: 3000;
+                font-weight: 500;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+                animation: slideInRight 0.3s ease-out;
+            `;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOutRight 0.3s ease-out forwards';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // CSS 애니메이션
+        const notificationStyles = document.createElement('style');
+        notificationStyles.textContent = `
+            @keyframes slideInRight {
+                from { transform: translateX(100%); }
+                to { transform: translateX(0); }
+            }
+            @keyframes slideOutRight {
+                from { transform: translateX(0); }
+                to { transform: translateX(100%); }
+            }
+        `;
+        document.head.appendChild(notificationStyles);
+
+        // 페이지 로드 시 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            renderTrashTable();
+            updateStats();
+        });
+    </script>
+</body>
+</html>

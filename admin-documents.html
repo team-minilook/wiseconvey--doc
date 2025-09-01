@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weraser 관리자 - 조직문서 관리</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif;
+            background-color: #f8f9fa;
+            overflow: hidden;
+        }
+
+        .admin-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Sidebar */
+        .admin-sidebar {
+            width: 250px;
+            background: white;
+            border-right: 1px solid #e9ecef;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .admin-header {
+            padding: 20px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .admin-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .admin-subtitle {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .admin-nav {
+            flex: 1;
+            padding: 20px 0;
+        }
+
+        .admin-nav-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: #666;
+            text-decoration: none;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .admin-nav-item:hover {
+            background: #f8f9fa;
+            color: #333;
+        }
+
+        .admin-nav-item.active {
+            background: #e7f5ff;
+            color: #1971c2;
+            border-right: 3px solid #1971c2;
+        }
+
+        .admin-nav-item i {
+            width: 20px;
+            margin-right: 12px;
+        }
+
+        .admin-footer {
+            padding: 20px;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .admin-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .admin-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #1971c2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .admin-user-info h4 {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 2px;
+        }
+
+        .admin-user-info p {
+            font-size: 12px;
+            color: #666;
+        }
+
+        /* Main Content */
+        .admin-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .admin-topbar {
+            background: white;
+            border-bottom: 1px solid #e9ecef;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .page-subtitle {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .admin-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 16px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background: white;
+            color: #666;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            background: #f8f9fa;
+        }
+
+        .btn-primary {
+            background: #1971c2;
+            color: white;
+            border-color: #1971c2;
+        }
+
+        .btn-primary:hover {
+            background: #1864ab;
+        }
+
+        .admin-content {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+            background: #f8f9fa;
+        }
+
+        /* Document Management Section */
+        .documents-section {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .section-header {
+            padding: 20px 30px;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        /* Upload Toolbar */
+        .upload-toolbar {
+            padding: 20px 30px;
+            border-bottom: 1px solid #f1f3f4;
+            background: #fafbfc;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .toolbar-left {
+            display: flex;
+            gap: 12px;
+        }
+
+        .upload-btn {
+            cursor: pointer;
+            margin: 0;
+        }
+
+        .toolbar-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        /* File Tree */
+        .file-tree-container {
+            padding: 20px 30px;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .file-tree {
+            list-style: none;
+        }
+
+        .tree-node {
+            margin-bottom: 2px;
+        }
+
+        .tree-node-content {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+
+        .tree-node-content:hover {
+            background: #f8f9fa;
+        }
+
+        .tree-node-content.selected {
+            background: #e7f5ff;
+            color: #1971c2;
+        }
+
+        .tree-node-content.drag-over {
+            background: rgba(25, 113, 194, 0.1);
+            border-color: #1971c2;
+            border-style: dashed;
+            animation: dropzonePulse 1s infinite;
+        }
+
+        @keyframes dropzonePulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .tree-node-toggle {
+            width: 16px;
+            height: 16px;
+            margin-right: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .tree-node-toggle.collapsed::before {
+            content: '\f054';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            font-size: 10px;
+        }
+
+        .tree-node-toggle.expanded::before {
+            content: '\f078';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            font-size: 10px;
+        }
+
+        .tree-node-icon {
+            margin-right: 8px;
+            color: #666;
+        }
+
+        .tree-node-label {
+            flex: 1;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .tree-node-meta {
+            font-size: 12px;
+            color: #999;
+            margin-left: 10px;
+        }
+
+        .tree-node-actions {
+            display: none;
+            gap: 5px;
+            margin-left: 10px;
+        }
+
+        .tree-node-content:hover .tree-node-actions {
+            display: flex;
+        }
+
+        .tree-action {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            border: none;
+            background: transparent;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .tree-action:hover {
+            background: #e9ecef;
+            color: #333;
+        }
+
+        .tree-children {
+            margin-left: 24px;
+            list-style: none;
+        }
+
+        .tree-children.collapsed {
+            display: none;
+        }
+
+        /* Global Drop Overlay */
+        .global-drop-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(25, 113, 194, 0.1);
+            backdrop-filter: blur(2px);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .global-drop-overlay.active {
+            display: flex;
+        }
+
+        .drop-message {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            border: 2px dashed #1971c2;
+        }
+
+        .drop-message i {
+            font-size: 48px;
+            color: #1971c2;
+            margin-bottom: 20px;
+        }
+
+        .drop-message h3 {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .drop-message p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        /* Upload Toast */
+        .upload-toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            padding: 20px;
+            min-width: 300px;
+            z-index: 3000;
+            transform: translateX(100%);
+            transition: transform 0.3s ease-out;
+        }
+
+        .upload-toast.show {
+            transform: translateX(0);
+        }
+
+        .toast-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .toast-title {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .toast-close {
+            border: none;
+            background: none;
+            color: #999;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .toast-progress {
+            margin-bottom: 10px;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: #e9ecef;
+            border-radius: 3px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: var(--progress, 0%);
+            background: linear-gradient(90deg, #1971c2, #339af0);
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            font-size: 12px;
+            color: #666;
+            text-align: right;
+            margin-top: 5px;
+        }
+
+        /* Context Menu */
+        .context-menu {
+            position: fixed;
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            padding: 5px 0;
+            min-width: 150px;
+            z-index: 3000;
+            display: none;
+        }
+
+        .context-menu-item {
+            padding: 8px 15px;
+            font-size: 14px;
+            color: #333;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background 0.2s;
+        }
+
+        .context-menu-item:hover {
+            background: #f8f9fa;
+        }
+
+        .context-menu-item.danger {
+            color: #dc3545;
+        }
+
+        .context-menu-divider {
+            height: 1px;
+            background: #e9ecef;
+            margin: 5px 0;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .admin-sidebar {
+                width: 60px;
+            }
+
+            .admin-nav-item span {
+                display: none;
+            }
+
+            .admin-header .admin-title {
+                font-size: 16px;
+            }
+
+            .admin-subtitle {
+                display: none;
+            }
+
+            .admin-user-info {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <div class="admin-sidebar">
+            <div class="admin-header">
+                <div class="admin-title">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>관리자 대시보드</span>
+                </div>
+                <div class="admin-subtitle">Weraser Admin</div>
+            </div>
+
+            <nav class="admin-nav">
+                <a href="admin-dashboard.html" class="admin-nav-item">
+                    <i class="fas fa-home"></i>
+                    <span>대시보드</span>
+                </a>
+                <a href="admin-documents.html" class="admin-nav-item active">
+                    <i class="fas fa-folder-open"></i>
+                    <span>조직문서 관리</span>
+                </a>
+                <a href="admin-members.html" class="admin-nav-item">
+                    <i class="fas fa-users"></i>
+                    <span>조직회원 관리</span>
+                </a>
+                <a href="admin-trash.html" class="admin-nav-item">
+                    <i class="fas fa-trash"></i>
+                    <span>휴지통</span>
+                </a>
+            </nav>
+
+            <div class="admin-footer">
+                <div class="admin-user">
+                    <div class="admin-avatar">김</div>
+                    <div class="admin-user-info">
+                        <h4>김대리</h4>
+                        <p>Administrator</p>
+                    </div>
+                </div>
+                <a href="index.html" class="admin-nav-item" style="margin-top: 10px; border-top: 1px solid #e9ecef; padding-top: 15px;">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>메인 앱으로</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="admin-main">
+            <div class="admin-topbar">
+                <div>
+                    <h1 class="page-title">조직문서 관리</h1>
+                    <p class="page-subtitle">조직 문서 디렉토리 구조를 관리하고 권한을 설정합니다.</p>
+                </div>
+                <div class="admin-actions">
+                    <button class="btn" onclick="refreshFileTree()">
+                        <i class="fas fa-sync-alt"></i>
+                        새로고침
+                    </button>
+                    <button class="btn btn-primary" onclick="showUploadHelp()">
+                        <i class="fas fa-question-circle"></i>
+                        도움말
+                    </button>
+                </div>
+            </div>
+
+            <div class="admin-content">
+                <div class="documents-section">
+                    <div class="section-header">
+                        <h2 class="section-title">문서 관리</h2>
+                    </div>
+
+                    <!-- Upload Toolbar -->
+                    <div class="upload-toolbar">
+                        <div class="toolbar-left">
+                            <button class="btn btn-primary" onclick="createRootDirectory()">
+                                <i class="fas fa-folder-plus"></i>
+                                새 폴더
+                            </button>
+                            <label class="btn btn-primary upload-btn" for="quickUpload">
+                                <i class="fas fa-upload"></i>
+                                파일 업로드
+                                <input type="file" id="quickUpload" multiple accept=".pdf,.doc,.docx,.xls,.xlsx" style="display: none;" onchange="handleQuickUpload(event)">
+                            </label>
+                        </div>
+                        <div class="toolbar-right">
+                            <span>💡 파일을 원하는 폴더로 끌어다 놓으세요</span>
+                        </div>
+                    </div>
+
+                    <!-- File Tree -->
+                    <div class="file-tree-container">
+                        <ul class="file-tree" id="fileTree">
+                            <!-- File tree will be rendered here -->
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Global Drop Overlay -->
+    <div class="global-drop-overlay" id="globalDropOverlay">
+        <div class="drop-message">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <h3>파일을 놓아주세요</h3>
+            <p>업로드할 파일을 원하는 폴더로 끌어다 놓으세요</p>
+        </div>
+    </div>
+
+    <!-- Upload Toast -->
+    <div class="upload-toast" id="uploadToast">
+        <div class="toast-header">
+            <span class="toast-title" id="toastTitle">파일 업로드 중...</span>
+            <button class="toast-close" onclick="cancelUpload()">&times;</button>
+        </div>
+        <div class="toast-progress">
+            <div class="progress-bar"></div>
+            <div class="progress-text" id="progressText">0%</div>
+        </div>
+    </div>
+
+    <!-- Context Menu -->
+    <div class="context-menu" id="contextMenu">
+        <div class="context-menu-item" onclick="renameNode()">
+            <i class="fas fa-edit"></i>
+            이름 변경
+        </div>
+        <div class="context-menu-item" onclick="downloadFile()">
+            <i class="fas fa-download"></i>
+            다운로드
+        </div>
+        <div class="context-menu-divider"></div>
+        <div class="context-menu-item danger" onclick="deleteNode()">
+            <i class="fas fa-trash"></i>
+            삭제
+        </div>
+    </div>
+
+    <script>
+        // 파일 트리 데이터
+        let fileTreeData = [
+            {
+                id: 'root-1',
+                name: '개발자',
+                type: 'folder',
+                children: [],
+                created: '2024-01-15',
+                creator: '김대리'
+            },
+            {
+                id: 'root-2',
+                name: '관세자료',
+                type: 'folder',
+                children: [
+                    {
+                        id: 'file-1',
+                        name: '신입사원_OT.pptx',
+                        type: 'file',
+                        size: '2.3 MB',
+                        created: '2025-09-01',
+                        creator: '김대리'
+                    },
+                    {
+                        id: 'file-2',
+                        name: '운영실무_가이드.pdf',
+                        type: 'file',
+                        size: '5.1 MB',
+                        created: '2025-09-01',
+                        creator: '김대리'
+                    }
+                ],
+                created: '2024-01-10',
+                creator: '김대리'
+            },
+            {
+                id: 'root-3',
+                name: '회의록',
+                type: 'folder',
+                children: [],
+                created: '2024-01-05',
+                creator: '김대리'
+            },
+            {
+                id: 'root-4',
+                name: '노노',
+                type: 'folder',
+                children: [],
+                created: '2025-09-01',
+                creator: '김대리'
+            },
+            {
+                id: 'file-3',
+                name: '(개인)인원 충원-12개월.pdf',
+                type: 'file',
+                size: '454.99 KB',
+                created: '2025-09-01',
+                creator: '김대리'
+            }
+        ];
+
+        let selectedNode = null;
+        let contextMenuNode = null;
+        let isUploading = false;
+        let currentUpload = null;
+
+        // 파일 트리 렌더링
+        function renderFileTree() {
+            const treeContainer = document.getElementById('fileTree');
+            treeContainer.innerHTML = renderTreeNodes(fileTreeData);
+        }
+
+        function renderTreeNodes(nodes) {
+            return nodes.map(node => renderTreeNode(node)).join('');
+        }
+
+        function renderTreeNode(node) {
+            const hasChildren = node.children && node.children.length > 0;
+            const isExpanded = !node.collapsed;
+            const nodeClass = node.type === 'folder' ? 'tree-node folder' : 'tree-node file';
+            
+            let html = `<li class="${nodeClass}">`;
+            html += `<div class="tree-node-content" data-id="${node.id}" data-type="${node.type}">`;
+            
+            if (node.type === 'folder') {
+                html += `<div class="tree-node-toggle ${isExpanded && hasChildren ? 'expanded' : 'collapsed'}" onclick="toggleNode('${node.id}')"></div>`;
+                html += `<i class="fas fa-folder tree-node-icon"></i>`;
+            } else {
+                html += `<div class="tree-node-toggle"></div>`;
+                html += `<i class="fas fa-file tree-node-icon"></i>`;
+            }
+            
+            html += `<span class="tree-node-label">${node.name}</span>`;
+            
+            if (node.size) {
+                html += `<span class="tree-node-meta">${node.size}</span>`;
+            }
+            
+            html += `<div class="tree-node-actions">`;
+            if (node.type === 'folder') {
+                html += `<button class="tree-action" onclick="addFile('${node.id}')" title="파일 추가">
+                    <i class="fas fa-plus"></i>
+                </button>`;
+            }
+            html += `<button class="tree-action" onclick="showContextMenu(event, '${node.id}')" title="더보기">
+                <i class="fas fa-ellipsis-v"></i>
+            </button>`;
+            html += `</div>`;
+            html += `</div>`;
+            
+            if (hasChildren && isExpanded) {
+                html += `<ul class="tree-children">${renderTreeNodes(node.children)}</ul>`;
+            }
+            
+            html += `</li>`;
+            return html;
+        }
+
+        // 노드 토글
+        function toggleNode(nodeId) {
+            const node = findNodeById(fileTreeData, nodeId);
+            if (node && node.type === 'folder') {
+                node.collapsed = !node.collapsed;
+                renderFileTree();
+            }
+        }
+
+        // 노드 찾기
+        function findNodeById(nodes, id) {
+            for (let node of nodes) {
+                if (node.id === id) return node;
+                if (node.children) {
+                    const found = findNodeById(node.children, id);
+                    if (found) return found;
+                }
+            }
+            return null;
+        }
+
+        // 새 폴더 생성
+        function createRootDirectory() {
+            const name = prompt('새 폴더명을 입력하세요:');
+            if (!name) return;
+            
+            const newFolder = {
+                id: 'folder-' + Date.now(),
+                name: name,
+                type: 'folder',
+                children: [],
+                created: new Date().toISOString().split('T')[0],
+                creator: '김대리'
+            };
+            
+            fileTreeData.push(newFolder);
+            renderFileTree();
+            showNotification('새 폴더가 생성되었습니다.', 'success');
+        }
+
+        // 파일 업로드 핸들러
+        function handleQuickUpload(event) {
+            const files = Array.from(event.target.files);
+            if (files.length === 0) return;
+            
+            // 루트에 업로드
+            uploadFilesToTarget(files, null);
+            event.target.value = ''; // Reset input
+        }
+
+        // 타겟으로 파일 업로드
+        async function uploadFilesToTarget(files, targetNode) {
+            if (isUploading) {
+                showNotification('다른 업로드가 진행 중입니다.', 'warning');
+                return;
+            }
+            
+            const validFiles = files.filter(file => {
+                const validTypes = ['.pdf', '.doc', '.docx', '.xls', '.xlsx'];
+                const extension = '.' + file.name.split('.').pop().toLowerCase();
+                return validTypes.includes(extension);
+            });
+            
+            if (validFiles.length === 0) {
+                showNotification('지원하지 않는 파일 형식입니다. PDF, Word, Excel 파일만 업로드 가능합니다.', 'error');
+                return;
+            }
+            
+            isUploading = true;
+            showUploadToast();
+            updateUploadProgress(0, `${validFiles.length}개 파일 업로드 준비 중...`);
+            
+            try {
+                for (let i = 0; i < validFiles.length; i++) {
+                    const file = validFiles[i];
+                    const progress = ((i + 1) / validFiles.length) * 100;
+                    
+                    updateUploadProgress(progress, `${file.name} 업로드 중... (${i + 1}/${validFiles.length})`);
+                    
+                    // 파일 업로드 처리 (실제로는 서버에 업로드)
+                    await addFileToNode(file, targetNode);
+                    
+                    // 잠시 대기 (시뮬레이션)
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                }
+                
+                updateUploadProgress(100, '업로드 완료!');
+                setTimeout(() => {
+                    hideUploadToast();
+                    showNotification(`${validFiles.length}개 파일이 성공적으로 업로드되었습니다.`, 'success');
+                }, 1000);
+                
+            } catch (error) {
+                console.error('업로드 오류:', error);
+                showNotification('업로드 중 오류가 발생했습니다.', 'error');
+            } finally {
+                isUploading = false;
+                renderFileTree();
+            }
+        }
+
+        // 파일 노드 추가
+        async function addFileToNode(file, targetNode) {
+            const fileName = file.name;
+            const fileSize = formatFileSize(file.size);
+            
+            const fileNode = {
+                id: 'file-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9),
+                name: fileName,
+                type: 'file',
+                size: fileSize,
+                created: new Date().toISOString().split('T')[0],
+                creator: '김대리'
+            };
+            
+            if (targetNode) {
+                if (!targetNode.children) targetNode.children = [];
+                targetNode.children.push(fileNode);
+            } else {
+                fileTreeData.push(fileNode);
+            }
+            
+            // Vector indexing for organization documents
+            try {
+                if (window.WeraserCore && window.WeraserCore.ragEngine) {
+                    console.log(`🔍 조직문서 벡터 인덱싱 시작: ${fileName}`);
+                    const indexResult = await window.WeraserCore.ragEngine.processDocument(file);
+                    if (indexResult.success) {
+                        console.log(`✅ 조직문서 인덱싱 완료: ${fileName} (${indexResult.chunks}개 청크)`);
+                        fileNode.vectorIndexed = true;
+                        fileNode.vectorId = indexResult.documentId;
+                    } else {
+                        console.warn(`⚠️ 조직문서 인덱싱 실패: ${fileName}`, indexResult.error);
+                    }
+                }
+            } catch (error) {
+                console.warn(`❌ 벡터 인덱싱 중 오류 (${fileName}):`, error);
+            }
+        }
+
+        // 파일 크기 포맷팅
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // 드래그 앤 드롭 설정
+        function setupEnhancedDragAndDrop() {
+            let dragCounter = 0;
+            
+            // Global drag events
+            document.addEventListener('dragenter', (e) => {
+                e.preventDefault();
+                dragCounter++;
+                if (dragCounter === 1) {
+                    document.getElementById('globalDropOverlay').classList.add('active');
+                }
+            });
+            
+            document.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                dragCounter--;
+                if (dragCounter === 0) {
+                    document.getElementById('globalDropOverlay').classList.remove('active');
+                }
+            });
+            
+            document.addEventListener('dragover', (e) => {
+                e.preventDefault();
+            });
+            
+            document.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dragCounter = 0;
+                document.getElementById('globalDropOverlay').classList.remove('active');
+                
+                const files = Array.from(e.dataTransfer.files);
+                if (files.length > 0) {
+                    uploadFilesToTarget(files, null);
+                }
+            });
+            
+            // Individual folder drop zones
+            document.addEventListener('dragover', (e) => {
+                const treeNode = e.target.closest('.tree-node-content[data-type="folder"]');
+                if (treeNode) {
+                    e.preventDefault();
+                    treeNode.classList.add('drag-over');
+                }
+            });
+            
+            document.addEventListener('dragleave', (e) => {
+                const treeNode = e.target.closest('.tree-node-content[data-type="folder"]');
+                if (treeNode && !treeNode.contains(e.relatedTarget)) {
+                    treeNode.classList.remove('drag-over');
+                }
+            });
+            
+            document.addEventListener('drop', (e) => {
+                const treeNode = e.target.closest('.tree-node-content[data-type="folder"]');
+                if (treeNode) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    treeNode.classList.remove('drag-over');
+                    
+                    const nodeId = treeNode.dataset.id;
+                    const targetNode = findNodeById(fileTreeData, nodeId);
+                    const files = Array.from(e.dataTransfer.files);
+                    
+                    if (files.length > 0 && targetNode) {
+                        uploadFilesToTarget(files, targetNode);
+                    }
+                }
+            });
+        }
+
+        // 업로드 토스트 관리
+        function showUploadToast() {
+            document.getElementById('uploadToast').classList.add('show');
+        }
+
+        function hideUploadToast() {
+            document.getElementById('uploadToast').classList.remove('show');
+        }
+
+        function updateUploadProgress(percent, message) {
+            const progressBar = document.querySelector('#uploadToast .progress-bar');
+            const progressText = document.getElementById('progressText');
+            const toastTitle = document.getElementById('toastTitle');
+            
+            progressBar.style.setProperty('--progress', `${percent}%`);
+            progressText.textContent = `${Math.round(percent)}%`;
+            toastTitle.textContent = message;
+        }
+
+        function cancelUpload() {
+            if (isUploading) {
+                isUploading = false;
+                currentUpload = null;
+                hideUploadToast();
+                showNotification('업로드가 취소되었습니다.', 'info');
+            }
+        }
+
+        // 컨텍스트 메뉴
+        function showContextMenu(event, nodeId) {
+            event.preventDefault();
+            event.stopPropagation();
+            
+            contextMenuNode = nodeId;
+            const contextMenu = document.getElementById('contextMenu');
+            contextMenu.style.display = 'block';
+            contextMenu.style.left = event.pageX + 'px';
+            contextMenu.style.top = event.pageY + 'px';
+            
+            document.addEventListener('click', hideContextMenu);
+        }
+
+        function hideContextMenu() {
+            document.getElementById('contextMenu').style.display = 'none';
+            document.removeEventListener('click', hideContextMenu);
+        }
+
+        function renameNode() {
+            const node = findNodeById(fileTreeData, contextMenuNode);
+            if (!node) return;
+            
+            const newName = prompt('새 이름을 입력하세요:', node.name);
+            if (newName && newName !== node.name) {
+                node.name = newName;
+                renderFileTree();
+                showNotification('이름이 변경되었습니다.', 'success');
+            }
+            hideContextMenu();
+        }
+
+        function deleteNode() {
+            const node = findNodeById(fileTreeData, contextMenuNode);
+            if (!node) return;
+            
+            if (confirm(`'${node.name}'을(를) 삭제하시겠습니까?`)) {
+                removeNodeById(fileTreeData, contextMenuNode);
+                renderFileTree();
+                showNotification('삭제되었습니다.', 'success');
+            }
+            hideContextMenu();
+        }
+
+        function removeNodeById(nodes, id) {
+            for (let i = 0; i < nodes.length; i++) {
+                if (nodes[i].id === id) {
+                    nodes.splice(i, 1);
+                    return true;
+                }
+                if (nodes[i].children) {
+                    if (removeNodeById(nodes[i].children, id)) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        function downloadFile() {
+            const node = findNodeById(fileTreeData, contextMenuNode);
+            if (node && node.type === 'file') {
+                showNotification(`${node.name} 다운로드를 시작합니다.`, 'info');
+                // 실제로는 파일 다운로드 로직 구현
+            }
+            hideContextMenu();
+        }
+
+        // 파일 트리 새로고침
+        function refreshFileTree() {
+            renderFileTree();
+            showNotification('파일 트리가 새로고침되었습니다.', 'success');
+        }
+
+        // 도움말
+        function showUploadHelp() {
+            alert(`📁 조직문서 업로드 방법:
+
+1. 드래그앤드롭: 파일을 원하는 폴더로 끌어다 놓기
+2. 업로드 버튼: '파일 업로드' 버튼 클릭
+3. 폴더 우클릭: 특정 폴더에 파일 추가
+
+✅ 지원 파일: PDF, Word, Excel
+⚡ 자동 벡터 인덱싱으로 즉시 검색 가능
+🔒 조직 전용 문서로 안전하게 관리`);
+        }
+
+        // 알림 시스템
+        function showNotification(message, type = 'info') {
+            const colors = {
+                success: '#28a745',
+                error: '#dc3545', 
+                warning: '#ffc107',
+                info: '#17a2b8'
+            };
+            
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 80px;
+                right: 20px;
+                background: ${colors[type]};
+                color: white;
+                padding: 12px 20px;
+                border-radius: 6px;
+                z-index: 3000;
+                font-weight: 500;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+                animation: slideInRight 0.3s ease-out;
+            `;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOutRight 0.3s ease-out forwards';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // CSS 애니메이션
+        const notificationStyles = document.createElement('style');
+        notificationStyles.textContent = `
+            @keyframes slideInRight {
+                from { transform: translateX(100%); }
+                to { transform: translateX(0); }
+            }
+            @keyframes slideOutRight {
+                from { transform: translateX(0); }
+                to { transform: translateX(100%); }
+            }
+        `;
+        document.head.appendChild(notificationStyles);
+
+        // 페이지 로드 시 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            renderFileTree();
+            setupEnhancedDragAndDrop();
+        });
+    </script>
+</body>
+</html>
