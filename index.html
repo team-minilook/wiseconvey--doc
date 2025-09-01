@@ -8,6 +8,9 @@
     <link rel="stylesheet" href="gemini-api.css">
     <!-- Gemini API Integration -->
     <script src="config-secure.js"></script>
+    <script src="gemini-direct.js"></script>
+    <script src="gemini-mock.js"></script>
+    <script src="gemini-smart.js"></script>
     <script src="gemini-api.js"></script>
     <style>
         /* Hide Gemini API Modal - No modal needed */
@@ -703,6 +706,535 @@
             font-size: 13px;
         }
         
+        /* Storage Progress Bar */
+        .storage-progress {
+            margin: 12px;
+            padding: 12px;
+            background: #f7f7f5;
+            border-radius: 6px;
+            border: 1px solid #e9e9e7;
+        }
+        
+        .storage-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .storage-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #37352f;
+        }
+        
+        .storage-info {
+            font-size: 11px;
+            color: #787774;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e9e9e7;
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #0066FF, #00D4AA);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        
+        .progress-warning {
+            background: linear-gradient(90deg, #FFA500, #FF6B6B);
+        }
+        
+        .storage-details {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 6px;
+            font-size: 10px;
+            color: #a4a4a2;
+        }
+        
+        /* Document sync status */
+        .sync-status {
+            margin-left: 4px;
+            font-size: 10px;
+            opacity: 0.6;
+            animation: rotate 2s linear infinite;
+        }
+        
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Document artifact view */
+        .artifact-panel {
+            position: fixed;
+            right: 20px;
+            top: 80px;
+            bottom: 20px;
+            width: 400px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            display: none;
+            flex-direction: column;
+            z-index: 1000;
+        }
+        
+        .artifact-panel.visible {
+            display: flex;
+        }
+        
+        .artifact-header {
+            padding: 16px;
+            border-bottom: 1px solid #e9e9e7;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .artifact-title {
+            font-weight: 600;
+            color: #37352f;
+        }
+        
+        .artifact-close {
+            cursor: pointer;
+            padding: 4px;
+            color: #787774;
+        }
+        
+        .artifact-content {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #37352f;
+        }
+        
+        .artifact-meta {
+            padding: 12px 16px;
+            background: #f7f7f5;
+            border-top: 1px solid #e9e9e7;
+            font-size: 12px;
+            color: #787774;
+        }
+        
+        /* Document Add Dropdown */
+        .document-add-container {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .document-add-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            background: #2383e2;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-family: inherit;
+        }
+        
+        .document-add-btn:hover {
+            background: #1976d2;
+        }
+        
+        .dropdown-arrow {
+            font-size: 10px;
+            transition: transform 0.2s;
+        }
+        
+        .document-add-btn.active .dropdown-arrow {
+            transform: rotate(180deg);
+        }
+        
+        .document-add-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border: 1px solid #e9e9e7;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            min-width: 180px;
+            z-index: 1000;
+            display: none;
+            margin-top: 4px;
+        }
+        
+        .document-add-dropdown.show {
+            display: block;
+        }
+        
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 13px;
+        }
+        
+        .dropdown-item:hover {
+            background: #f1f1ef;
+        }
+        
+        .dropdown-item:first-child {
+            border-radius: 6px 6px 0 0;
+        }
+        
+        .dropdown-item:last-child {
+            border-radius: 0 0 6px 6px;
+        }
+        
+        .dropdown-item span:first-child {
+            font-size: 16px;
+        }
+        
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+        
+        .modal-container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            max-width: 90vw;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .modal-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #e9e9e7;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .modal-header h3 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            color: #787774;
+        }
+        
+        .modal-close:hover {
+            background: #f1f1ef;
+        }
+        
+        .modal-content {
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .modal-footer {
+            padding: 16px 20px;
+            border-top: 1px solid #e9e9e7;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: #2383e2;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .btn-primary:hover {
+            background: #1976d2;
+        }
+        
+        .btn-primary:disabled {
+            background: #a4a4a2;
+            cursor: not-allowed;
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: #37352f;
+            border: 1px solid #e9e9e7;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .btn-secondary:hover {
+            background: #f1f1ef;
+        }
+        
+        /* Organization Document Browser */
+        .org-browser-tree {
+            font-size: 13px;
+        }
+        
+        .org-folder, .org-file {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 8px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        
+        .org-folder:hover, .org-file:hover {
+            background: #f1f1ef;
+        }
+        
+        .org-folder-content {
+            margin-left: 20px;
+        }
+        
+        .folder-name {
+            flex: 1;
+        }
+        
+        .folder-count, .file-meta {
+            color: #787774;
+            font-size: 11px;
+        }
+        
+        .file-checkbox {
+            margin-right: 4px;
+        }
+        
+        .selection-info {
+            font-size: 12px;
+            color: #787774;
+            display: flex;
+            gap: 12px;
+        }
+        
+        /* Personal Upload Modal */
+        .upload-step h4 {
+            margin: 0 0 16px 0;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .upload-step h5 {
+            margin: 0 0 8px 0;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        
+        .directory-selector {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .directory-list {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .directory-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border: 1px solid #e9e9e7;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .directory-item:hover {
+            background: #f1f1ef;
+            border-color: #2383e2;
+        }
+        
+        .directory-item.selected {
+            background: #e6f7ff;
+            border-color: #2383e2;
+        }
+        
+        .dir-count {
+            color: #787774;
+            font-size: 11px;
+            margin-left: auto;
+        }
+        
+        .selected-directory {
+            background: #f7f7f5;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 16px;
+            font-size: 13px;
+        }
+        
+        .file-upload-area {
+            border: 2px dashed #e9e9e7;
+            border-radius: 8px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .file-upload-area:hover, .file-upload-area.dragover {
+            border-color: #2383e2;
+            background: #f8fbff;
+        }
+        
+        .upload-icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+        
+        .upload-text {
+            font-size: 14px;
+            color: #37352f;
+            margin-bottom: 8px;
+        }
+        
+        .upload-formats {
+            font-size: 12px;
+            color: #787774;
+        }
+        
+        .selected-files {
+            text-align: left;
+        }
+        
+        .file-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 0;
+            border-bottom: 1px solid #f1f1ef;
+        }
+        
+        .file-item:last-child {
+            border-bottom: none;
+        }
+        
+        .file-name {
+            flex: 1;
+            font-size: 13px;
+        }
+        
+        .file-size {
+            color: #787774;
+            font-size: 11px;
+        }
+        
+        /* Upload quota and validation */
+        .quota-warning {
+            color: #ef4444;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        
+        .upload-info {
+            font-size: 12px;
+            color: #787774;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        
+        .capacity-bar {
+            width: 100%;
+            height: 6px;
+            background: #f1f1ef;
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 8px 0;
+        }
+        
+        .capacity-fill {
+            height: 100%;
+            background: #2383e2;
+            transition: all 0.3s ease;
+        }
+        
+        .capacity-fill.warning {
+            background: #f59e0b;
+        }
+        
+        .capacity-fill.danger {
+            background: #ef4444;
+        }
+        
+        .validation-error {
+            color: #ef4444;
+            font-size: 12px;
+            margin-top: 8px;
+            padding: 8px;
+            background: #fef2f2;
+            border-radius: 4px;
+            border: 1px solid #fecaca;
+        }
+        
+        /* Stop button for chat */
+        .stop-button {
+            padding: 6px 12px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-left: 8px;
+        }
+        
+        .stop-button:hover {
+            background: #dc2626;
+        }
+        
         .doc-category {
             margin-bottom: 8px;
         }
@@ -886,26 +1418,128 @@
     let currentChat = null;
     let showThinkingProcess = true;
     
+    // Source quota constants (in MB)
+    const QUOTA_LIMITS = {
+        MAX_FILE_SIZE: 50,              // 개별 파일 최대 크기
+        PROJECT_QUOTA: 500,             // 프로젝트당 총 용량
+        USER_PERSONAL_QUOTA: 1024,      // 사용자별 개인 문서 할당량
+        MAX_FILES_PER_PROJECT: 1000,    // 프로젝트당 최대 문서 수
+        MAX_SIMULTANEOUS_UPLOAD: 10,    // 최대 동시 업로드 파일 수
+        DAILY_UPLOAD_LIMIT: 100         // 일일 업로드 한도
+    };
+    
+    // Warning thresholds
+    const WARNING_THRESHOLDS = {
+        LOW: 0.8,    // 80%
+        HIGH: 0.95   // 95%
+    };
+    
     // Mock data for projects and chats
     let projects = [
         {
             id: 'proj1',
             name: 'H-Line 수출 프로젝트',
             documentCount: 24,
+            storage: {
+                used: 124.5, // MB
+                total: 500   // MB
+            },
             chats: [
                 { id: 'chat1', title: 'HS 코드 분류 검토', lastMessage: '올해 관세율은...', time: '방금 전' },
                 { id: 'chat2', title: '운송 경로 최적화', lastMessage: '부산항 경유시...', time: '2시간 전' }
             ],
             documents: {
                 organization: [
-                    { type: 'folder', name: '계약서', files: ['2024_H-Line_계약서.pdf', '부속합의서.docx'] },
-                    { type: 'folder', name: '관세자료', files: ['HS_코드_분류표.xlsx', '관세율표.pdf'] },
-                    { type: 'folder', name: '법무자료', files: ['수출입법령.pdf', 'FTA_가이드.pdf'] }
+                    { 
+                        type: 'folder', 
+                        name: '계약서', 
+                        path: '/조직문서/계약서',
+                        files: [
+                            {
+                                name: '2024_H-Line_계약서.pdf',
+                                updateDate: '2024-08-15 14:30',
+                                updater: '김책임 과장',
+                                size: '2.5MB'
+                            },
+                            {
+                                name: '부속합의서.docx',
+                                updateDate: '2024-08-20 10:15',
+                                updater: '이상무 대리',
+                                size: '1.2MB'
+                            }
+                        ]
+                    },
+                    { 
+                        type: 'folder', 
+                        name: '관세자료',
+                        path: '/조직문서/관세자료',
+                        files: [
+                            {
+                                name: 'HS_코드_분류표.xlsx',
+                                updateDate: '2024-07-01 09:00',
+                                updater: '박무역 부장',
+                                size: '3.8MB'
+                            },
+                            {
+                                name: '관세율표.pdf',
+                                updateDate: '2024-07-01 09:00',
+                                updater: '박무역 부장',
+                                size: '5.2MB'
+                            }
+                        ]
+                    },
+                    { 
+                        type: 'folder', 
+                        name: '법무자료',
+                        path: '/조직문서/법무자료',
+                        files: [
+                            {
+                                name: '수출입법령.pdf',
+                                updateDate: '2024-06-15 16:45',
+                                updater: '최법무 팀장',
+                                size: '8.9MB'
+                            },
+                            {
+                                name: 'FTA_가이드.pdf',
+                                updateDate: '2024-06-20 11:30',
+                                updater: '최법무 팀장',
+                                size: '6.7MB'
+                            }
+                        ]
+                    }
                 ],
                 personal: [
-                    { type: 'file', name: '프로젝트_요약.pptx' },
-                    { type: 'file', name: '미팅_노트.docx' },
-                    { type: 'folder', name: '개인메모', files: ['검토사항.txt', '체크리스트.xlsx'] }
+                    { 
+                        type: 'file', 
+                        name: '프로젝트_요약.pptx',
+                        uploadDate: '2024-08-25 13:20',
+                        size: '4.5MB',
+                        path: '/개인문서'
+                    },
+                    { 
+                        type: 'file', 
+                        name: '미팅_노트.docx',
+                        uploadDate: '2024-08-26 09:15',
+                        size: '0.8MB',
+                        path: '/개인문서'
+                    },
+                    { 
+                        type: 'folder', 
+                        name: '개인메모',
+                        path: '/개인문서/개인메모',
+                        files: [
+                            {
+                                name: '검토사항.txt',
+                                uploadDate: '2024-08-27 14:00',
+                                size: '0.1MB'
+                            },
+                            {
+                                name: '체크리스트.xlsx',
+                                uploadDate: '2024-08-27 15:30',
+                                size: '0.3MB'
+                            }
+                        ]
+                    }
                 ]
             }
         },
@@ -913,17 +1547,68 @@
             id: 'proj2',
             name: '2024 연간 계획',
             documentCount: 15,
+            storage: {
+                used: 89.2,  // MB
+                total: 500   // MB
+            },
             chats: [
                 { id: 'chat3', title: 'Q1 목표 설정', lastMessage: '1분기 매출 목표는...', time: '어제' }
             ],
             documents: {
                 organization: [
-                    { type: 'folder', name: '회사정책', files: ['인사규정.pdf', '복무규정.pdf'] },
-                    { type: 'file', name: '2024_사업계획서.pdf' }
+                    { 
+                        type: 'folder', 
+                        name: '회사정책',
+                        path: '/조직문서/회사정책',
+                        files: [
+                            {
+                                name: '인사규정.pdf',
+                                updateDate: '2024-01-10 10:00',
+                                updater: '정인사 이사',
+                                size: '1.5MB'
+                            },
+                            {
+                                name: '복무규정.pdf',
+                                updateDate: '2024-01-10 10:00',
+                                updater: '정인사 이사',
+                                size: '1.8MB'
+                            }
+                        ]
+                    },
+                    { 
+                        type: 'file', 
+                        name: '2024_사업계획서.pdf',
+                        path: '/조직문서',
+                        updateDate: '2024-01-05 09:00',
+                        updater: '김기획 상무',
+                        size: '12.3MB'
+                    }
                 ],
                 personal: [
-                    { type: 'folder', name: '분기별 계획', files: ['Q1_계획.docx', 'Q2_계획.docx'] },
-                    { type: 'file', name: '연간_목표.xlsx' }
+                    { 
+                        type: 'folder', 
+                        name: '분기별 계획',
+                        path: '/개인문서/분기별 계획',
+                        files: [
+                            {
+                                name: 'Q1_계획.docx',
+                                uploadDate: '2024-01-15 11:00',
+                                size: '2.1MB'
+                            },
+                            {
+                                name: 'Q2_계획.docx',
+                                uploadDate: '2024-04-01 10:30',
+                                size: '2.3MB'
+                            }
+                        ]
+                    },
+                    { 
+                        type: 'file', 
+                        name: '연간_목표.xlsx',
+                        path: '/개인문서',
+                        uploadDate: '2024-01-02 14:00',
+                        size: '0.5MB'
+                    }
                 ]
             }
         },
@@ -931,15 +1616,45 @@
             id: 'proj3',
             name: '신규 고객사 대응',
             documentCount: 8,
+            storage: {
+                used: 45.8,  // MB
+                total: 500   // MB
+            },
             chats: [],
             documents: {
                 organization: [
-                    { type: 'file', name: '회사소개서.pdf' },
-                    { type: 'file', name: '포트폴리오.pdf' }
+                    { 
+                        type: 'file', 
+                        name: '회사소개서.pdf',
+                        path: '/조직문서',
+                        updateDate: '2024-03-01 10:00',
+                        updater: '홍보부 팀장',
+                        size: '15.2MB'
+                    },
+                    { 
+                        type: 'file', 
+                        name: '포트폴리오.pdf',
+                        path: '/조직문서',
+                        updateDate: '2024-05-15 14:30',
+                        updater: '디자인팀',
+                        size: '28.5MB'
+                    }
                 ],
                 personal: [
-                    { type: 'file', name: '제안서_초안.pptx' },
-                    { type: 'file', name: '견적서.xlsx' }
+                    { 
+                        type: 'file', 
+                        name: '제안서_초안.pptx',
+                        path: '/개인문서',
+                        uploadDate: '2024-08-28 16:00',
+                        size: '8.7MB'
+                    },
+                    { 
+                        type: 'file', 
+                        name: '견적서.xlsx',
+                        path: '/개인문서',
+                        uploadDate: '2024-08-28 17:30',
+                        size: '0.4MB'
+                    }
                 ]
             }
         }
@@ -958,8 +1673,33 @@
         }
     });
     
+    // Render storage progress
+    function renderStorageProgress(project) {
+        if (!project || !project.storage) return '';
+        
+        const { used, total } = project.storage;
+        const percentage = (used / total * 100).toFixed(1);
+        const isWarning = percentage > 80;
+        
+        return `
+            <div class="storage-progress">
+                <div class="storage-header">
+                    <div class="storage-title">💾 저장 공간</div>
+                    <div class="storage-info">${used.toFixed(1)} MB / ${total} MB (${percentage}%)</div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill ${isWarning ? 'progress-warning' : ''}" style="width: ${percentage}%"></div>
+                </div>
+                <div class="storage-details">
+                    <span>사용 가능: ${(total - used).toFixed(1)} MB</span>
+                    ${isWarning ? '<span style="color: #ff6b6b;">⚠️ 용량 주의</span>' : ''}
+                </div>
+            </div>
+        `;
+    }
+    
     // Render document tree
-    function renderDocumentTree(documents) {
+    function renderDocumentTree(documents, project) {
         if (!documents) return '<div class="empty-state" style="padding: 12px; font-size: 12px;">문서가 없습니다</div>';
         
         const orgCount = countDocuments(documents.organization);
@@ -973,7 +1713,7 @@
                     <span class="doc-category-count">${orgCount}</span>
                 </div>
                 <div class="doc-items">
-                    ${renderDocumentItems(documents.organization)}
+                    ${renderDocumentItems(documents.organization, 'org')}
                 </div>
             </div>
             <div class="doc-category" id="personalDocs">
@@ -983,42 +1723,61 @@
                     <span class="doc-category-count">${personalCount}</span>
                 </div>
                 <div class="doc-items">
-                    ${renderDocumentItems(documents.personal)}
+                    ${renderDocumentItems(documents.personal, 'personal')}
                 </div>
             </div>
         `;
     }
     
-    // Render document items
-    function renderDocumentItems(items) {
+    // Render document items with path
+    function renderDocumentItems(items, type = 'org', basePath = '') {
         if (!items || items.length === 0) return '<div style="padding: 4px 8px; color: #a4a4a2; font-size: 11px;">비어 있음</div>';
         
         return items.map(item => {
+            const currentPath = item.path || (basePath ? `${basePath}/${item.name}` : item.name);
+            
             if (item.type === 'folder') {
                 return `
                     <div class="doc-folder" id="folder-${item.name}">
-                        <div class="doc-folder-header" onclick="toggleDocFolder('folder-${item.name}')">
+                        <div class="doc-folder-header" onclick="toggleDocFolder('folder-${item.name}')" title="경로: ${currentPath}">
                             <span class="doc-category-icon">▶</span>
                             <span>📁</span>
                             <span class="doc-item-name">${item.name}</span>
                         </div>
                         <div class="doc-folder-files">
-                            ${item.files.map(file => `
-                                <div class="doc-item" onclick="showDocument('${file}')">
-                                    <span class="doc-item-icon">${getFileIcon(file)}</span>
-                                    <span class="doc-item-name">${file}</span>
-                                </div>
-                            `).join('')}
+                            ${item.files.map(file => {
+                                const fileName = typeof file === 'string' ? file : file.name;
+                                const fileData = typeof file === 'object' ? file : null;
+                                const filePath = `${currentPath}/${fileName}`;
+                                const tooltip = type === 'org' && fileData 
+                                    ? `경로: ${filePath}\n업데이트: ${fileData.updateDate}\n담당자: ${fileData.updater}`
+                                    : type === 'personal' && fileData
+                                    ? `경로: ${filePath}\n업로드: ${fileData.uploadDate}`
+                                    : `경로: ${filePath}`;
+                                return `
+                                    <div class="doc-item" onclick="selectDocument('${filePath}', '${type}', ${fileData ? `'${JSON.stringify(fileData).replace(/'/g, "&#39;").replace(/"/g, "&quot;")}'` : 'null'})" title="${tooltip}">
+                                        <span class="doc-item-icon">${getFileIcon(fileName)}</span>
+                                        <span class="doc-item-name">${fileName}</span>
+                                        ${type === 'org' ? '<span class="sync-status" title="자동 동기화">🔄</span>' : ''}
+                                    </div>
+                                `;
+                            }).join('')}
                         </div>
                     </div>
                 `;
             } else {
+                const tooltip = type === 'org' && item.updateDate
+                    ? `경로: ${currentPath}\n업데이트: ${item.updateDate}\n담당자: ${item.updater}`
+                    : type === 'personal' && item.uploadDate
+                    ? `경로: ${currentPath}\n업로드: ${item.uploadDate}`
+                    : `경로: ${currentPath}`;
                 return `
-                    <div class="doc-item" onclick="showDocument('${item.name}')">
+                    <div class="doc-item" onclick="selectDocument('${currentPath}', '${type}', ${item ? `'${JSON.stringify(item).replace(/'/g, "&#39;").replace(/"/g, "&quot;")}'` : 'null'})" title="${tooltip}">
                         <span class="doc-item-icon">${getFileIcon(item.name)}</span>
                         <span class="doc-item-name">${item.name}</span>
+                        ${type === 'org' ? '<span class="sync-status" title="자동 동기화">🔄</span>' : ''}
                     </div>
-                `;
+                `;            
             }
         }).join('');
     }
@@ -1133,9 +1892,21 @@
                 <div class="sidebar-section" style="border-top: 1px solid #e9e9e7;">
                     <div class="sidebar-title">
                         <span>문서 관리</span>
-                        <div style="display: flex; gap: 4px;">
-                            <button class="icon-button" onclick="uploadDocument()" title="개인 문서 업로드">📤</button>
-                            <button class="icon-button" onclick="importFromOrg()" title="조직 문서 임포트">📥</button>
+                        <div class="document-add-container">
+                            <button class="document-add-btn" onclick="toggleDocumentAddMenu()" title="문서 추가">
+                                ➕ 문서 추가
+                                <span class="dropdown-arrow">▼</span>
+                            </button>
+                            <div class="document-add-dropdown" id="documentAddDropdown">
+                                <div class="dropdown-item" onclick="showOrgDocumentBrowser()">
+                                    <span>📁</span>
+                                    <span>조직 문서 불러오기</span>
+                                </div>
+                                <div class="dropdown-item" onclick="showPersonalUpload()">
+                                    <span>📤</span>
+                                    <span>개인 문서 업로드</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="document-tree" id="sidebarDocumentTree">
@@ -1533,6 +2304,22 @@
     }
     
     
+    // Stop AI generation
+    let generationAborted = false;
+    function stopGeneration() {
+        generationAborted = true;
+        const typingIndicator = document.getElementById('typingIndicator');
+        if (typingIndicator) {
+            typingIndicator.remove();
+        }
+        
+        // Add message that generation was stopped
+        const messagesDiv = document.getElementById('chatMessages');
+        const stoppedMessage = createMessage('ai', '🚫 생성이 중단되었습니다.', false, []);
+        messagesDiv.appendChild(stoppedMessage);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+    
     // Toggle sidebar
     function toggleSidebar() {
         document.getElementById('sidebar').classList.toggle('collapsed');
@@ -1617,12 +2404,9 @@
     async function generateAIResponse(message) {
         const messagesDiv = document.getElementById('chatMessages');
         
-        // Initialize Gemini if not already done
-        if (!window.geminiChat) {
-            // Initialize with default or saved key
-            initializeGeminiChat();
-            // Wait a bit for initialization
-            await new Promise(resolve => setTimeout(resolve, 500));
+        // Use Smart Gemini with CORS detection and fallback
+        if (!window.smartGemini) {
+            window.smartGemini = new SmartGeminiChat();
         }
         
         // Show typing indicator with animation
@@ -1648,23 +2432,40 @@
         })) : [];
         
         try {
-            // Ensure Gemini is initialized
-            if (!window.geminiChat) {
-                throw new Error('Gemini API가 초기화되지 않았습니다');
-            }
-            
-            // Send message to Gemini
-            const result = await window.geminiChat.sendMessage(message, documents);
+            // Use Smart Gemini with automatic fallback
+            const result = await window.smartGemini.sendMessage(message);
             
             // Remove typing indicator
             typingIndicator.remove();
             
             if (result && result.success) {
                 // Create AI message with actual Gemini response
+                const responseText = result.response;
+                const responseTime = result.responseTime ? ` (${result.responseTime}ms)` : '';
+                
+                // Add warning if CORS was detected
+                let finalText = responseText;
+                if (result.warning) {
+                    finalText += `\n\n⚠️ ${result.warning}`;
+                }
+                
                 const aiMessage = createMessage('ai', 
-                    result.response,
+                    finalText,
                     true,
-                    result.sources ? result.sources.map(s => s.name) : []
+                    []
+                );
+                messagesDiv.appendChild(aiMessage);
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+                
+                // Show response time in console
+                console.log(`Response received${responseTime}`);
+            } else if (result && result.fallback) {
+                // Use fallback response
+                const fallbackText = result.response || '죄송합니다. 현재 응답을 생성할 수 없습니다.';
+                const aiMessage = createMessage('ai', 
+                    fallbackText + '\n\n[네트워크 문제로 기본 응답을 표시합니다]',
+                    false,
+                    []
                 );
                 messagesDiv.appendChild(aiMessage);
                 messagesDiv.scrollTop = messagesDiv.scrollHeight;
@@ -1675,7 +2476,7 @@
                 
                 // Error message
                 const aiMessage = createMessage('ai', 
-                    `죄송합니다. 오류가 발생했습니다: ${errorMessage}\n\n다시 시도해주세요.`,
+                    `오류: ${errorMessage}`,
                     false,
                     []
                 );
@@ -1769,34 +2570,846 @@
     }
     
     // Upload document
+    // Legacy upload function - replaced by new modal system
     function uploadDocument() {
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.multiple = true;
-        input.accept = '.pdf,.docx,.xlsx,.csv,.txt,.pptx';
-        input.onchange = async (e) => {
-            const files = e.target.files;
-            WeraserCore.ui.showNotification(`${files.length}개 문서 업로드 중...`, 'info');
-            
-            // Add to current project's documents
-            const project = projects.find(p => p.id === currentProject);
-            for (const file of files) {
-                project.documents.push({ type: 'file', name: file.name });
-                project.documentCount++;
-            }
-            
-            renderSidebar();
-            setTimeout(() => {
-                WeraserCore.ui.showNotification(`${files.length}개 문서 업로드 완료`, 'success');
-            }, 1000);
-        };
-        input.click();
+        // Redirect to new upload system
+        showPersonalUpload();
     }
     
-    // Import from organization
-    function importFromOrg() {
-        WeraserCore.ui.showNotification('조직 공유 저장소에서 문서 선택 화면 표시', 'info');
-        // TODO: Show organization document picker
+    // Toggle document add dropdown menu
+    function toggleDocumentAddMenu() {
+        const dropdown = document.getElementById('documentAddDropdown');
+        const button = document.querySelector('.document-add-btn');
+        
+        if (dropdown.classList.contains('show')) {
+            dropdown.classList.remove('show');
+            button.classList.remove('active');
+        } else {
+            dropdown.classList.add('show');
+            button.classList.add('active');
+        }
+    }
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(event) {
+        const container = document.querySelector('.document-add-container');
+        if (container && !container.contains(event.target)) {
+            const dropdown = document.getElementById('documentAddDropdown');
+            const button = document.querySelector('.document-add-btn');
+            if (dropdown && button) {
+                dropdown.classList.remove('show');
+                button.classList.remove('active');
+            }
+        }
+    });
+    
+    // Show organization document browser modal
+    function showOrgDocumentBrowser() {
+        // Close dropdown first
+        toggleDocumentAddMenu();
+        
+        // Create organization document browser modal
+        const modal = document.createElement('div');
+        modal.className = 'modal-overlay';
+        modal.innerHTML = `
+            <div class="modal-container" style="width: 80%; max-width: 800px; height: 70vh;">
+                <div class="modal-header">
+                    <h3>조직 문서 불러오기</h3>
+                    <button class="modal-close" onclick="closeModal()">&times;</button>
+                </div>
+                <div class="modal-content" style="height: calc(100% - 100px); overflow-y: auto;">
+                    <div class="org-browser">
+                        <div class="org-browser-tree">
+                            <div class="org-folder expanded" onclick="toggleOrgFolder(this)">
+                                <span class="folder-icon">📁</span>
+                                <span class="folder-name">조직문서</span>
+                                <span class="folder-count">(12개 문서)</span>
+                            </div>
+                            <div class="org-folder-content" style="margin-left: 20px;">
+                                <div class="org-folder" onclick="toggleOrgFolder(this)">
+                                    <span class="folder-icon">📂</span>
+                                    <span class="folder-name">계약서</span>
+                                    <span class="folder-count">(3개)</span>
+                                </div>
+                                <div class="org-folder-content" style="margin-left: 20px; display: none;">
+                                    <div class="org-file">
+                                        <input type="checkbox" class="file-checkbox">
+                                        <span class="file-icon">📄</span>
+                                        <span class="file-name">2024_H-Line_계약서.pdf</span>
+                                        <span class="file-meta">2.5MB • 2024-08-15</span>
+                                    </div>
+                                    <div class="org-file">
+                                        <input type="checkbox" class="file-checkbox">
+                                        <span class="file-icon">📝</span>
+                                        <span class="file-name">부속합의서.docx</span>
+                                        <span class="file-meta">1.2MB • 2024-08-20</span>
+                                    </div>
+                                </div>
+                                <div class="org-folder" onclick="toggleOrgFolder(this)">
+                                    <span class="folder-icon">📂</span>
+                                    <span class="folder-name">관세자료</span>
+                                    <span class="folder-count">(2개)</span>
+                                </div>
+                                <div class="org-folder-content" style="margin-left: 20px; display: none;">
+                                    <div class="org-file">
+                                        <input type="checkbox" class="file-checkbox">
+                                        <span class="file-icon">📊</span>
+                                        <span class="file-name">HS_코드_분류표.xlsx</span>
+                                        <span class="file-meta">3.8MB • 2024-07-01</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="selection-info">
+                        <span id="selectedCount">선택된 문서: 0개</span>
+                        <span id="totalSize">총 크기: 0MB</span>
+                        <span id="orgQuotaWarning" class="quota-warning" style="display: none;">프로젝트 용량 한도 근접</span>
+                    </div>
+                    <div class="modal-buttons">
+                        <button class="btn-secondary" onclick="closeModal()">취소</button>
+                        <button class="btn-primary" id="importBtn" onclick="importSelectedDocuments()" disabled>불러오기</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        updateSelectionInfo();
+    }
+    
+    // Show personal document upload with directory selection
+    function showPersonalUpload() {
+        // Close dropdown first
+        toggleDocumentAddMenu();
+        
+        // Create personal upload modal
+        const modal = document.createElement('div');
+        modal.className = 'modal-overlay';
+        modal.innerHTML = `
+            <div class="modal-container" style="width: 60%; max-width: 600px;">
+                <div class="modal-header">
+                    <h3>개인 문서 업로드</h3>
+                    <button class="modal-close" onclick="closeModal()">&times;</button>
+                </div>
+                <div class="modal-content">
+                    <div class="upload-step" id="directoryStep">
+                        <h4>1. 저장할 디렉토리 선택</h4>
+                        <div class="directory-selector">
+                            <div class="existing-directories">
+                                <h5>기존 디렉토리</h5>
+                                <div class="directory-list">
+                                    <div class="directory-item" onclick="selectDirectory('/개인문서', this)">
+                                        <span class="folder-icon">📁</span>
+                                        <span>/개인문서</span>
+                                        <span class="dir-count">(5개)</span>
+                                    </div>
+                                    <div class="directory-item" onclick="selectDirectory('/개인문서/임시', this)">
+                                        <span class="folder-icon">📁</span>
+                                        <span>/개인문서/임시</span>
+                                        <span class="dir-count">(2개)</span>
+                                    </div>
+                                    <div class="directory-item" onclick="selectDirectory('/개인문서/계획서', this)">
+                                        <span class="folder-icon">📁</span>
+                                        <span>/개인문서/계획서</span>
+                                        <span class="dir-count">(2개)</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="new-directory">
+                                <h5>새 디렉토리 생성</h5>
+                                <div style="display: flex; gap: 8px;">
+                                    <input type="text" id="newDirName" placeholder="디렉토리 이름 입력" 
+                                           style="flex: 1; padding: 8px; border: 1px solid #e9e9e7; border-radius: 4px;">
+                                    <button class="btn-secondary" onclick="createNewDirectory()">생성</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="upload-step" id="fileStep" style="display: none;">
+                        <h4>2. 파일 선택 및 업로드</h4>
+                        <div class="selected-directory">
+                            선택된 디렉토리: <span id="selectedDirPath"></span>
+                        </div>
+                        <div class="file-upload-area" onclick="triggerFileSelect()" 
+                             ondrop="handleFileDrop(event)" ondragover="handleDragOver(event)">
+                            <div class="upload-icon">📤</div>
+                            <div class="upload-text">파일을 드래그하여 놓거나 클릭하여 선택하세요</div>
+                            <div class="upload-formats">지원 형식: PDF, Word, Excel, PPT, 이미지, 텍스트</div>
+                        </div>
+                        <input type="file" id="fileInput" multiple accept=".pdf,.docx,.xlsx,.csv,.txt,.pptx,.png,.jpg,.jpeg" 
+                               style="display: none;" onchange="handleFileSelect(event)">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="upload-info" id="uploadInfo" style="display: none;">
+                        <span id="fileCount">파일: 0개</span>
+                        <span id="totalUploadSize">크기: 0MB</span>
+                        <span id="quotaWarning" class="quota-warning" style="display: none;">용량 한도 근접</span>
+                    </div>
+                    <div class="modal-buttons">
+                        <button class="btn-secondary" onclick="closeModal()">취소</button>
+                        <button class="btn-primary" id="selectBtn" onclick="confirmDirectorySelection()" style="display: none;">선택</button>
+                        <button class="btn-primary" id="nextBtn" onclick="nextStep()" disabled>다음</button>
+                        <button class="btn-primary" id="uploadBtn" onclick="executeUpload()" style="display: none;" disabled>업로드</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+    }
+    
+    // Quota and validation functions
+    function calculateCurrentUsage(projectId) {
+        const project = projects.find(p => p.id === projectId);
+        if (!project) return { size: 0, count: 0 };
+        
+        let totalSize = 0;
+        let totalCount = 0;
+        
+        // Calculate organization documents
+        if (project.documents.organization) {
+            project.documents.organization.forEach(item => {
+                if (item.type === 'file') {
+                    totalSize += parseFloat(item.size?.replace('MB', '') || 0);
+                    totalCount++;
+                } else if (item.files) {
+                    item.files.forEach(file => {
+                        totalSize += parseFloat(file.size?.replace('MB', '') || 0);
+                        totalCount++;
+                    });
+                }
+            });
+        }
+        
+        // Calculate personal documents
+        if (project.documents.personal) {
+            project.documents.personal.forEach(item => {
+                if (item.type === 'file') {
+                    totalSize += parseFloat(item.size?.replace('MB', '') || 0);
+                    totalCount++;
+                } else if (item.files) {
+                    item.files.forEach(file => {
+                        totalSize += parseFloat(file.size?.replace('MB', '') || 0);
+                        totalCount++;
+                    });
+                }
+            });
+        }
+        
+        return { size: totalSize, count: totalCount };
+    }
+    
+    function validateFileUpload(files, projectId) {
+        const errors = [];
+        const warnings = [];
+        
+        // Check file count limit
+        if (files.length > QUOTA_LIMITS.MAX_SIMULTANEOUS_UPLOAD) {
+            errors.push(`최대 ${QUOTA_LIMITS.MAX_SIMULTANEOUS_UPLOAD}개 파일만 동시에 업로드할 수 있습니다. (현재: ${files.length}개)`);
+        }
+        
+        // Check individual file sizes and formats
+        let totalNewSize = 0;
+        const allowedFormats = ['.pdf', '.docx', '.xlsx', '.csv', '.txt', '.pptx', '.png', '.jpg', '.jpeg'];
+        
+        Array.from(files).forEach((file, index) => {
+            const fileSizeMB = file.size / (1024 * 1024);
+            const fileExt = '.' + file.name.split('.').pop().toLowerCase();
+            
+            // File size check
+            if (fileSizeMB > QUOTA_LIMITS.MAX_FILE_SIZE) {
+                errors.push(`파일 "${file.name}"의 크기가 ${QUOTA_LIMITS.MAX_FILE_SIZE}MB를 초과합니다. (${fileSizeMB.toFixed(1)}MB)`);
+            }
+            
+            // Format check
+            if (!allowedFormats.includes(fileExt)) {
+                errors.push(`파일 "${file.name}"은(는) 지원하지 않는 형식입니다. 지원 형식: ${allowedFormats.join(', ')}`);
+            }
+            
+            totalNewSize += fileSizeMB;
+        });
+        
+        // Check project quota
+        const currentUsage = calculateCurrentUsage(projectId);
+        const newTotalSize = currentUsage.size + totalNewSize;
+        const quotaUsage = newTotalSize / QUOTA_LIMITS.PROJECT_QUOTA;
+        
+        if (newTotalSize > QUOTA_LIMITS.PROJECT_QUOTA) {
+            errors.push(`프로젝트 용량 한도를 초과합니다. (현재: ${currentUsage.size.toFixed(1)}MB, 추가: ${totalNewSize.toFixed(1)}MB, 한도: ${QUOTA_LIMITS.PROJECT_QUOTA}MB)`);
+        } else if (quotaUsage >= WARNING_THRESHOLDS.HIGH) {
+            warnings.push(`프로젝트 용량의 ${(quotaUsage * 100).toFixed(0)}%를 사용하게 됩니다. 용량 정리를 권장합니다.`);
+        } else if (quotaUsage >= WARNING_THRESHOLDS.LOW) {
+            warnings.push(`프로젝트 용량의 ${(quotaUsage * 100).toFixed(0)}%를 사용하게 됩니다.`);
+        }
+        
+        // Check file count
+        const newTotalCount = currentUsage.count + files.length;
+        if (newTotalCount > QUOTA_LIMITS.MAX_FILES_PER_PROJECT) {
+            errors.push(`프로젝트당 최대 ${QUOTA_LIMITS.MAX_FILES_PER_PROJECT}개 문서만 저장할 수 있습니다. (현재: ${currentUsage.count}개, 추가: ${files.length}개)`);
+        }
+        
+        return { 
+            valid: errors.length === 0, 
+            errors, 
+            warnings, 
+            newSize: totalNewSize,
+            totalSize: newTotalSize,
+            quotaUsage: quotaUsage
+        };
+    }
+    
+    function updateCapacityDisplay(projectId) {
+        const usage = calculateCurrentUsage(projectId);
+        const percentage = (usage.size / QUOTA_LIMITS.PROJECT_QUOTA) * 100;
+        
+        // Update sidebar capacity bar
+        const capacityFill = document.querySelector('.capacity-used');
+        const capacityText = document.querySelector('.capacity-text');
+        
+        if (capacityFill && capacityText) {
+            capacityFill.style.width = Math.min(percentage, 100) + '%';
+            capacityText.textContent = `${usage.size.toFixed(1)}MB / ${QUOTA_LIMITS.PROJECT_QUOTA}MB`;
+            
+            // Update color based on usage
+            capacityFill.className = 'capacity-used';
+            if (percentage >= WARNING_THRESHOLDS.HIGH * 100) {
+                capacityFill.classList.add('danger');
+            } else if (percentage >= WARNING_THRESHOLDS.LOW * 100) {
+                capacityFill.classList.add('warning');
+            }
+        }
+    }
+    
+    // Modal helper functions
+    function closeModal() {
+        const modal = document.querySelector('.modal-overlay');
+        if (modal) {
+            modal.remove();
+        }
+    }
+    
+    // Organization document browser functions
+    function toggleOrgFolder(element) {
+        const content = element.nextElementSibling;
+        if (content && content.classList.contains('org-folder-content')) {
+            const isExpanded = content.style.display !== 'none';
+            content.style.display = isExpanded ? 'none' : 'block';
+            
+            const icon = element.querySelector('.folder-icon');
+            icon.textContent = isExpanded ? '📂' : '📁';
+        }
+    }
+    
+    function updateSelectionInfo() {
+        const checkboxes = document.querySelectorAll('.file-checkbox:checked');
+        const count = checkboxes.length;
+        let totalSize = 0;
+        
+        checkboxes.forEach(checkbox => {
+            const fileElement = checkbox.closest('.org-file');
+            const metaText = fileElement.querySelector('.file-meta').textContent;
+            const sizeMatch = metaText.match(/([\d.]+)MB/);
+            if (sizeMatch) {
+                totalSize += parseFloat(sizeMatch[1]);
+            }
+        });
+        
+        const countElement = document.getElementById('selectedCount');
+        const sizeElement = document.getElementById('totalSize');
+        const warningElement = document.getElementById('orgQuotaWarning');
+        const importBtn = document.getElementById('importBtn');
+        
+        if (countElement) countElement.textContent = `선택된 문서: ${count}개`;
+        if (sizeElement) sizeElement.textContent = `총 크기: ${totalSize.toFixed(1)}MB`;
+        
+        // Check quota and update warning
+        const currentUsage = calculateCurrentUsage(currentProject);
+        const newTotalSize = currentUsage.size + totalSize;
+        const quotaUsage = newTotalSize / QUOTA_LIMITS.PROJECT_QUOTA;
+        
+        if (warningElement) {
+            if (quotaUsage >= WARNING_THRESHOLDS.HIGH) {
+                warningElement.textContent = `용량 한도 ${(quotaUsage * 100).toFixed(0)}% 사용 - 정리 필요`;
+                warningElement.style.display = 'inline';
+            } else if (quotaUsage >= WARNING_THRESHOLDS.LOW) {
+                warningElement.textContent = `용량 한도 ${(quotaUsage * 100).toFixed(0)}% 사용`;
+                warningElement.style.display = 'inline';
+            } else {
+                warningElement.style.display = 'none';
+            }
+        }
+        
+        // Enable/disable import button
+        if (importBtn) {
+            const canImport = count > 0 && newTotalSize <= QUOTA_LIMITS.PROJECT_QUOTA;
+            importBtn.disabled = !canImport;
+        }
+        
+        // Add event listeners to checkboxes
+        document.querySelectorAll('.file-checkbox').forEach(checkbox => {
+            checkbox.removeEventListener('change', updateSelectionInfo);
+            checkbox.addEventListener('change', updateSelectionInfo);
+        });
+    }
+    
+    function importSelectedDocuments() {
+        const checkboxes = document.querySelectorAll('.file-checkbox:checked');
+        const selectedFiles = [];
+        
+        checkboxes.forEach(checkbox => {
+            const fileElement = checkbox.closest('.org-file');
+            const fileName = fileElement.querySelector('.file-name').textContent;
+            selectedFiles.push(fileName);
+        });
+        
+        if (selectedFiles.length === 0) {
+            WeraserCore.ui.showNotification('선택된 문서가 없습니다', 'warning');
+            return;
+        }
+        
+        WeraserCore.ui.showNotification(`${selectedFiles.length}개 조직 문서 불러오기 완료`, 'success');
+        closeModal();
+        
+        // Update sidebar to show imported documents
+        const project = projects.find(p => p.id === currentProject);
+        if (project) {
+            renderSidebar();
+        }
+    }
+    
+    // Personal upload functions
+    let selectedDirectory = '';
+    
+    function selectDirectory(dirPath, element) {
+        selectedDirectory = dirPath;
+        
+        // Update UI to show selected directory
+        document.querySelectorAll('.directory-item').forEach(item => {
+            item.classList.remove('selected');
+        });
+        
+        // Use provided element or try to get from event
+        const targetElement = element || (window.event && window.event.target ? window.event.target.closest('.directory-item') : null);
+        if (targetElement) {
+            targetElement.classList.add('selected');
+        }
+        
+        // Enable next button
+        const nextBtn = document.getElementById('nextBtn');
+        if (nextBtn) {
+            nextBtn.disabled = false;
+        }
+    }
+    
+    function createNewDirectory() {
+        const input = document.getElementById('newDirName');
+        const dirName = input.value.trim();
+        
+        if (!dirName) {
+            WeraserCore.ui.showNotification('디렉토리 이름을 입력하세요', 'warning');
+            return;
+        }
+        
+        const fullPath = `/개인문서/${dirName}`;
+        selectedDirectory = fullPath;
+        
+        // Add new directory to list
+        const dirList = document.querySelector('.directory-list');
+        const newDirElement = document.createElement('div');
+        newDirElement.className = 'directory-item selected';
+        newDirElement.onclick = () => selectDirectory(fullPath, newDirElement);
+        newDirElement.innerHTML = `
+            <span class="folder-icon">📁</span>
+            <span>${fullPath}</span>
+            <span class="dir-count">(0개)</span>
+        `;
+        
+        dirList.appendChild(newDirElement);
+        
+        // Clear other selections
+        document.querySelectorAll('.directory-item').forEach(item => {
+            if (item !== newDirElement) {
+                item.classList.remove('selected');
+            }
+        });
+        
+        // Enable next button and clear input
+        const nextBtn = document.getElementById('nextBtn');
+        if (nextBtn) {
+            nextBtn.disabled = false;
+        }
+        input.value = '';
+        
+        WeraserCore.ui.showNotification(`디렉토리 "${dirName}" 생성 완료`, 'success');
+    }
+    
+    function nextStep() {
+        if (!selectedDirectory) {
+            WeraserCore.ui.showNotification('디렉토리를 선택하세요', 'warning');
+            return;
+        }
+        
+        // Hide directory step, show file step
+        document.getElementById('directoryStep').style.display = 'none';
+        document.getElementById('fileStep').style.display = 'block';
+        document.getElementById('selectedDirPath').textContent = selectedDirectory;
+        
+        // Update buttons
+        document.getElementById('nextBtn').style.display = 'none';
+        document.getElementById('uploadBtn').style.display = 'inline-block';
+    }
+    
+    function triggerFileSelect() {
+        document.getElementById('fileInput').click();
+    }
+    
+    function handleDragOver(event) {
+        event.preventDefault();
+        event.currentTarget.classList.add('dragover');
+    }
+    
+    function handleFileDrop(event) {
+        event.preventDefault();
+        event.currentTarget.classList.remove('dragover');
+        const files = event.dataTransfer.files;
+        handleFiles(files);
+    }
+    
+    function handleFileSelect(event) {
+        const files = event.target.files;
+        handleFiles(files);
+    }
+    
+    function handleFiles(files) {
+        if (files.length === 0) return;
+        
+        // Validate files
+        const validation = validateFileUpload(files, currentProject);
+        
+        // Update upload area to show selected files
+        const uploadArea = document.querySelector('.file-upload-area');
+        let validationHTML = '';
+        
+        if (validation.errors.length > 0) {
+            validationHTML += `
+                <div class="validation-error">
+                    <strong>업로드 불가:</strong><br>
+                    ${validation.errors.map(error => `• ${error}`).join('<br>')}
+                </div>
+            `;
+        }
+        
+        if (validation.warnings.length > 0) {
+            validationHTML += `
+                <div style="color: #f59e0b; font-size: 12px; margin-top: 8px; padding: 8px; background: #fffbeb; border-radius: 4px; border: 1px solid #fed7aa;">
+                    <strong>주의:</strong><br>
+                    ${validation.warnings.map(warning => `• ${warning}`).join('<br>')}
+                </div>
+            `;
+        }
+        
+        uploadArea.innerHTML = `
+            <div class="selected-files">
+                <h5>선택된 파일 (${files.length}개)</h5>
+                ${Array.from(files).map(file => `
+                    <div class="file-item">
+                        <span class="file-icon">${getFileIcon(file.name)}</span>
+                        <span class="file-name">${file.name}</span>
+                        <span class="file-size">${(file.size / (1024 * 1024)).toFixed(1)}MB</span>
+                    </div>
+                `).join('')}
+                ${validationHTML}
+                <button class="btn-secondary" onclick="resetFileSelection()" style="margin-top: 10px;">다시 선택</button>
+            </div>
+        `;
+        
+        // Update upload info
+        const uploadInfo = document.getElementById('uploadInfo');
+        const fileCount = document.getElementById('fileCount');
+        const totalUploadSize = document.getElementById('totalUploadSize');
+        const quotaWarning = document.getElementById('quotaWarning');
+        
+        if (uploadInfo) uploadInfo.style.display = 'flex';
+        if (fileCount) fileCount.textContent = `파일: ${files.length}개`;
+        if (totalUploadSize) totalUploadSize.textContent = `크기: ${validation.newSize.toFixed(1)}MB`;
+        
+        if (quotaWarning) {
+            if (validation.quotaUsage >= WARNING_THRESHOLDS.HIGH) {
+                quotaWarning.textContent = `용량 한도 ${(validation.quotaUsage * 100).toFixed(0)}% 사용`;
+                quotaWarning.style.display = 'inline';
+            } else if (validation.quotaUsage >= WARNING_THRESHOLDS.LOW) {
+                quotaWarning.textContent = `용량 한도 ${(validation.quotaUsage * 100).toFixed(0)}% 사용`;
+                quotaWarning.style.display = 'inline';
+            } else {
+                quotaWarning.style.display = 'none';
+            }
+        }
+        
+        // Enable/disable upload button
+        const uploadBtn = document.getElementById('uploadBtn');
+        if (uploadBtn) {
+            uploadBtn.disabled = !validation.valid;
+        }
+    }
+    
+    function resetFileSelection() {
+        const uploadArea = document.querySelector('.file-upload-area');
+        uploadArea.innerHTML = `
+            <div class="upload-icon">📤</div>
+            <div class="upload-text">파일을 드래그하여 놓거나 클릭하여 선택하세요</div>
+            <div class="upload-formats">지원 형식: PDF, Word, Excel, PPT, 이미지, 텍스트</div>
+        `;
+        
+        uploadArea.onclick = triggerFileSelect;
+        
+        // Disable upload button
+        const uploadBtn = document.getElementById('uploadBtn');
+        if (uploadBtn) {
+            uploadBtn.disabled = true;
+        }
+        
+        // Reset file input
+        document.getElementById('fileInput').value = '';
+    }
+    
+    function executeUpload() {
+        const files = document.getElementById('fileInput').files;
+        if (!files || files.length === 0) {
+            WeraserCore.ui.showNotification('업로드할 파일을 선택하세요', 'warning');
+            return;
+        }
+        
+        // Final validation
+        const validation = validateFileUpload(files, currentProject);
+        if (!validation.valid) {
+            WeraserCore.ui.showNotification('업로드 조건을 확인해주세요', 'error');
+            return;
+        }
+        
+        WeraserCore.ui.showNotification(`${files.length}개 파일을 ${selectedDirectory}에 업로드 중...`, 'info');
+        
+        // Simulate upload process and actually add to project data
+        setTimeout(() => {
+            const project = projects.find(p => p.id === currentProject);
+            if (project) {
+                // Initialize personal documents array if not exists
+                if (!project.documents.personal) {
+                    project.documents.personal = [];
+                }
+                
+                // Check if directory folder exists, create if not
+                let directoryFolder = project.documents.personal.find(item => 
+                    item.type === 'folder' && item.path === selectedDirectory
+                );
+                
+                if (!directoryFolder) {
+                    directoryFolder = {
+                        type: 'folder',
+                        name: selectedDirectory.split('/').pop(),
+                        path: selectedDirectory,
+                        files: []
+                    };
+                    project.documents.personal.push(directoryFolder);
+                }
+                
+                // Add files to directory
+                Array.from(files).forEach(file => {
+                    const fileData = {
+                        name: file.name,
+                        size: (file.size / (1024 * 1024)).toFixed(1) + 'MB',
+                        uploadDate: new Date().toISOString().slice(0, 16).replace('T', ' '),
+                        type: file.type || 'application/octet-stream'
+                    };
+                    
+                    directoryFolder.files.push(fileData);
+                });
+                
+                // Update document count
+                project.documentCount += files.length;
+                
+                WeraserCore.ui.showNotification(`${files.length}개 개인 문서 업로드 완료`, 'success');
+                
+                // Update capacity display and sidebar
+                updateCapacityDisplay(currentProject);
+                renderSidebar();
+            }
+            
+            closeModal();
+        }, 1500);
+    }
+    
+    // Select document and show artifact view
+    function selectDocument(path, type, metadataStr) {
+        console.log('selectDocument called with:', path, type, metadataStr);
+        const project = projects.find(p => p.id === currentProject);
+        if (!project) {
+            console.log('No project found');
+            return;
+        }
+        
+        // Parse metadata if provided
+        let metadata = null;
+        if (metadataStr) {
+            try {
+                metadata = JSON.parse(metadataStr.replace(/&#39;/g, "'").replace(/&quot;/g, '"'));
+                console.log('Parsed metadata:', metadata);
+            } catch (e) {
+                console.error('Failed to parse metadata:', e);
+            }
+        }
+        
+        // Show artifact panel
+        console.log('Calling showArtifactPanel...');
+        showArtifactPanel(path, type, metadata);
+        
+        // Highlight selected document
+        document.querySelectorAll('.doc-item').forEach(item => {
+            item.classList.remove('selected');
+        });
+        if (event && event.currentTarget) {
+            event.currentTarget.classList.add('selected');
+        }
+    }
+    
+    // Show artifact panel
+    function showArtifactPanel(documentPath, documentType, metadata) {
+        console.log('showArtifactPanel called with:', documentPath, documentType, metadata);
+        // Remove existing panel if any
+        let panel = document.querySelector('.artifact-panel');
+        if (!panel) {
+            console.log('Creating new artifact panel');
+            panel = document.createElement('div');
+            panel.className = 'artifact-panel';
+            document.body.appendChild(panel);
+        } else {
+            console.log('Using existing panel');
+        }
+        
+        // Get file name and extension
+        const fileName = documentPath.split('/').pop();
+        const fileExt = fileName.split('.').pop().toUpperCase();
+        
+        // Build metadata section
+        let metaSection = '';
+        if (metadata) {
+            metaSection = `
+                <h4>📊 메타정보</h4>
+                <table style="width: 100%; font-size: 13px; margin: 10px 0;">
+                    ${metadata.updateDate ? `
+                        <tr>
+                            <td style="padding: 6px; color: #787774; width: 30%;">업데이트 일시:</td>
+                            <td style="padding: 6px;">${metadata.updateDate}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 6px; color: #787774;">업데이트 담당자:</td>
+                            <td style="padding: 6px;">${metadata.updater}</td>
+                        </tr>
+                    ` : ''}
+                    ${metadata.uploadDate ? `
+                        <tr>
+                            <td style="padding: 6px; color: #787774; width: 30%;">업로드 일시:</td>
+                            <td style="padding: 6px;">${metadata.uploadDate}</td>
+                        </tr>
+                    ` : ''}
+                    ${metadata.size ? `
+                        <tr>
+                            <td style="padding: 6px; color: #787774;">파일 크기:</td>
+                            <td style="padding: 6px;">${metadata.size}</td>
+                        </tr>
+                    ` : ''}
+                    <tr>
+                        <td style="padding: 6px; color: #787774;">문서 유형:</td>
+                        <td style="padding: 6px;">${getFileIcon(fileName)} ${fileExt}</td>
+                    </tr>
+                </table>
+            `;
+        }
+        
+        // Mock document content
+        const mockDocumentContent = `
+            <h4>📄 문서 내용</h4>
+            <div style="background: #f7f7f5; padding: 15px; border-radius: 6px; margin: 10px 0; font-size: 14px; line-height: 1.8;">
+                ${documentPath.includes('계약') ? `
+                    <p><strong>1. 계약 개요</strong></p>
+                    <p>• 계약명: H-Line 수출 공급 계약</p>
+                    <p>• 계약기간: 2024.01.01 ~ 2024.12.31</p>
+                    <p>• 계약금액: USD 5,000,000</p>
+                    <br>
+                    <p><strong>2. 주요 조항</strong></p>
+                    <p>• 납품 일정: 분기별 나누어 납품</p>
+                    <p>• 품질 보증: ISO 9001 기준 충족</p>
+                    <p>• 결제 조건: L/C at sight</p>
+                ` : documentPath.includes('관세') ? `
+                    <p><strong>HS 코드 분류 체계</strong></p>
+                    <p>• 8708.99: 기타 자동차 부품 - 관세율 8%</p>
+                    <p>• 8708.30: 브레이크 및 서보브레이크 - 관세율 8%</p>
+                    <p>• 8708.40: 기어박스 - 관세율 8%</p>
+                    <br>
+                    <p><strong>FTA 활용 시 혜택</strong></p>
+                    <p>• 한-EU FTA: 즉시 철폐 또는 5년 내 단계적 철폐</p>
+                    <p>• 한-미 FTA: 즉시 철폐 또는 5년 내 단계적 철폐</p>
+                ` : documentPath.includes('법무') ? `
+                    <p><strong>수출입 관련 주요 법령</strong></p>
+                    <p>• 대외무역법: 수출입 기본 법령</p>
+                    <p>• 관세법: 관세 부과 및 징수</p>
+                    <p>• 외국환거래법: 외환 거래 규정</p>
+                    <br>
+                    <p><strong>FTA 활용 가이드</strong></p>
+                    <p>• 원산지 결정 기준</p>
+                    <p>• 원산지 증명서 발급 절차</p>
+                    <p>• FTA별 특혜 관세율</p>
+                ` : `
+                    <p>이 문서의 상세 내용이 여기에 표시됩니다.</p>
+                    <p>실제 시스템에서는 문서의 전체 내용이 표시되며,</p>
+                    <p>텍스트 검색 및 하이라이트 기능이 제공됩니다.</p>
+                `}
+            </div>
+        `;
+        
+        const mockContent = `
+            <h3>📄 ${fileName}</h3>
+            <p><strong>경로:</strong> ${documentPath}</p>
+            <hr style="margin: 16px 0; border: none; border-top: 1px solid #e9e9e7;">
+            ${metaSection}
+            ${mockDocumentContent}
+            <h4>🎯 키워드</h4>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px;">
+                <span style="padding: 4px 8px; background: #e6f7ff; border-radius: 4px; font-size: 12px;">수출</span>
+                <span style="padding: 4px 8px; background: #e6f7ff; border-radius: 4px; font-size: 12px;">계약</span>
+                <span style="padding: 4px 8px; background: #e6f7ff; border-radius: 4px; font-size: 12px;">H-Line</span>
+                <span style="padding: 4px 8px; background: #e6f7ff; border-radius: 4px; font-size: 12px;">2024</span>
+            </div>
+        `;
+        
+        panel.innerHTML = `
+            <div class="artifact-header">
+                <div class="artifact-title">문서 상세</div>
+                <div class="artifact-close" onclick="closeArtifactPanel()">✕</div>
+            </div>
+            <div class="artifact-content">
+                ${mockContent}
+            </div>
+            <div class="artifact-meta">
+                ${documentType === 'org' ? '🔄 자동 동기화 활성' : '👤 개인 문서'} | 
+                ${metadata ? (metadata.updateDate || metadata.uploadDate || '마지막 업데이트: 방금 전') : '마지막 업데이트: 방금 전'}
+            </div>
+        `;
+        
+        console.log('Adding visible class to panel');
+        panel.classList.add('visible');
+        console.log('Panel classes:', panel.className);
+    }
+    
+    // Close artifact panel
+    function closeArtifactPanel() {
+        const panel = document.querySelector('.artifact-panel');
+        if (panel) {
+            panel.classList.remove('visible');
+        }
     }
     
     // Show document
@@ -1805,10 +3418,8 @@
         // TODO: Open document viewer
     }
     
-    // Close modal
-    function closeModal(modalId) {
-        document.getElementById(modalId).classList.remove('show');
-    }
+    // Legacy closeModal function - replaced by modal overlay system
+    // (removed to prevent conflicts)
     
     // Rename chat
     function renameChat() {
